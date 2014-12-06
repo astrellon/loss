@@ -2,40 +2,47 @@
 
 namespace loss
 {
-    const std::string &getErrorName(loss::ReturnCode code)
+    std::map<ReturnCode, std::string> ReturnCodes::s_code_name = {
+        { UNKNOWN_CODE, "unknown_return_code" },
+
+        { SUCCESS, "success" },
+        { NULL_PARAMETER, "null_parameter" },
+        { INTERNAL_ERROR, "internal_error" },
+        { FILE_NOT_FOUND, "file_not_found" },
+
+        { NODE_ALREADY_EXISTS, "node_already_exists" },
+        { NODE_NOT_FOUND, "node_not_found" }
+    };
+
+    std::map<ReturnCode, std::string> ReturnCodes::s_code_desc = {
+        { UNKNOWN_CODE, "unknown return code" },
+
+        { SUCCESS, "success" },
+        { NULL_PARAMETER, "a parameter was null or an empty string." },
+        { INTERNAL_ERROR, "there was an unexpected internal error." },
+        { FILE_NOT_FOUND, "file not found" },
+
+        { NODE_ALREADY_EXISTS, "a node with the given name already exists." },
+        { NODE_NOT_FOUND, "a node with the given name does not exist." }
+    };
+
+    const std::string &ReturnCodes::name(loss::ReturnCode code)
     {
-        switch (code)
+        auto find = s_code_name.find(code);
+        if (find == s_code_name.end())
         {
-            case SUCCESS: return std::string("success");
-            case NULL_PARAMETER: return std::string("null_parameter");
-            case INTERNAL_ERROR: return std::string("internal_error");
-            case FILE_NOT_FOUND: return std::string("file_not_found");
-
-            case NODE_ALREADY_EXISTS: return std::string("node_already_exists");
-            case NODE_NOT_FOUND: return std::string("node_not_found");
-
-            default:
-                                 return std::string("unknown_return_code");
+            return s_code_name[UNKNOWN_CODE];
         }
+        return find->second;
     }
 
-    const std::string &getErrorMessage(loss::ReturnCode code)
+    const std::string &ReturnCodes::desc(loss::ReturnCode code)
     {
-        switch (code)
+        auto find = s_code_desc.find(code);
+        if (find == s_code_desc.end())
         {
-            // Base
-            case SUCCESS: return std::string("success");
-
-            case NULL_PARAMETER: return std::string("a parameter was null or an empty string.");
-            case INTERNAL_ERROR: return std::string("there was an unexpected internal error.");
-            case FILE_NOT_FOUND: return std::string("file not found.");
-
-             // INode related
-            case NODE_ALREADY_EXISTS: return std::string("a node with the given name already exists.");
-            case NODE_NOT_FOUND: return std::string("a node with the given name does not exist.");
-
-            default:
-                                 return std::string("unknown return code");
+            return s_code_desc[UNKNOWN_CODE];
         }
+        return find->second;
     }
 }
