@@ -8,7 +8,7 @@ extern "C"
 #	include <lua/src/lstate.h>
 } 
 
-#include <loss/inode.h>
+#include <loss/fs/inode.h>
 #include <string>
 
 int main()

@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-#include "return_codes.h"
+#include <loss/return_codes.h>
 
 namespace loss
 {
