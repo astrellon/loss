@@ -9,11 +9,13 @@
 
 namespace loss
 {
+    class IFileSystem;
+
     class INode
     {
         public:
 
-            INode();
+            INode(IFileSystem *fs);
             ~INode();
             
             uint32_t symlink_count() const;
@@ -36,10 +38,13 @@ namespace loss
             DataList::const_iterator end_data() const;
             DataList &data();
 
+            IFileSystem *filesystem() const;
+
         private:
             uint32_t _symlink_count;
             NodeMap _nodes;
             DataList _data;
+            IFileSystem *_fs;
 
             NodeMap::const_iterator find_node_iter(const std::string &name) const;
             

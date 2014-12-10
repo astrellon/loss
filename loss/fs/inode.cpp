@@ -1,15 +1,23 @@
 #include "inode.h"
 
+#include "ifilesystem.h"
+
 namespace loss
 {
-    INode::INode() : 
-        _symlink_count(0)
+    INode::INode(IFileSystem *fs) : 
+        _symlink_count(0),
+        _fs(fs)
     {
 
     }
     INode::~INode()
     {
 
+    }
+
+    IFileSystem *INode::filesystem() const
+    {
+        return _fs;
     }
 
     uint32_t INode::symlink_count() const
@@ -39,6 +47,7 @@ namespace loss
 
         _nodes[name] = node;
         node->inc_symlink();
+        return SUCCESS;
     }
     ReturnCode INode::remove_node(const std::string &name)
     {
@@ -50,6 +59,7 @@ namespace loss
 
         _nodes.erase(find);
         find->second->dec_symlink();
+        return SUCCESS;
     }
 
     INode *INode::find_node(const std::string &name) const
