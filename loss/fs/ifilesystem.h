@@ -9,42 +9,65 @@
 
 namespace loss
 {
-    class IMetadata
+    class MetadataDef
     {
         public:
+            MetadataDef();
+
             const std::string &owner() const;
             ReturnCode owner(const std::string &new_owner);
 
             /* Not needed yet {{{
             bool readable() const;
-            ReturnCode readable(bool value);
-            
             bool writable() const;
-            ReturnCode writable(bool value);
-            
             bool executable() const;
-            ReturnCode executable(bool value);
             }}}*/
+        private:
+            std::string _owner;
     };
 
-    class IFile
+    class FileDef
     {
         public:
-            IMetadata &metadata();
-            const IMetadata &metadata() const;
+            FileDef();
+
+            MetadataDef &metadata();
+            const MetadataDef &metadata() const;
 
             uint32_t size() const;
+            void size(uint32_t size);
+
+        private:
+            MetadataDef _metadata;
+            uint32_t _size;
     };
 
-    class IFolder
+    class FolderDef
     {
         public:
-            IMetadata &metadata();
-            const IMetadata &metadata() const;
+            MetadataDef &metadata();
+            const MetadataDef &metadata() const;
 
-            IFile &file(const std::string &name);
-            IFile &file(uint32_t index);
-            uint32_t size() const;
+            ReturnCode add_file(const std::string &name, const FileDef &file);
+            ReturnCode find_file(const std::string &name, FileDef && file) const;
+            ReturnCode add_folder(const std::string &name, const FolderDef &folder);
+            ReturnCode find_folder(const std::string &name, FolderDef && folder) const;
+
+            typedef std::map<std::string, FileDef &> FileMap;
+            typedef std::map<std::string, FolderDef &> FolderMap;
+
+            FileMap::const_iterator begin_files() const;
+            FileMap::const_iterator end_files() const;
+            uint32_t num_files() const;
+
+            FolderMap::const_iterator begin_folders() const;
+            FolderMap::const_iterator end_folders() const;
+            uint32_t num_folders() const;
+
+        private:
+            MetadataDef _metadata;
+            FileMap _files;
+            FolderMap _folders;
     };
 
     class IOResult
