@@ -52,6 +52,7 @@ namespace loss
             ReturnCode find_file(const std::string &name, FileDef && file) const;
             ReturnCode add_folder(const std::string &name, const FolderDef &folder);
             ReturnCode find_folder(const std::string &name, FolderDef && folder) const;
+            bool has_file_folder(const std::string &name);
 
             typedef std::map<std::string, FileDef &> FileMap;
             typedef std::map<std::string, FolderDef &> FolderMap;
@@ -103,7 +104,7 @@ namespace loss
             virtual IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
             virtual IOResult write(const std::string &name, uint32_t offset, uint32_t counter, uint8_t *data) = 0;
 
-            virtual ReturnCode getdir(const std::string &name, IFolder *to_populate) = 0;
+            virtual ReturnCode getdir(const std::string &name, FolderDef *to_populate) = 0;
     };
 
 }

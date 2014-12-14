@@ -67,7 +67,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="loss\inode.cpp" />
+    <ClCompile Include="loss\fs\ifilesystem.cpp" />
+    <ClCompile Include="loss\fs\inode.cpp" />
+    <ClCompile Include="loss\fs\virtual_filesystem.cpp" />
     <ClCompile Include="loss\return_codes.cpp" />
     <ClCompile Include="lua\src\lapi.c" />
     <ClCompile Include="lua\src\lauxlib.c" />
@@ -104,8 +106,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="loss\ifilesystem.h" />
-    <ClInclude Include="loss\inode.h" />
+    <ClInclude Include="loss\fs\ifilesystem.h" />
+    <ClInclude Include="loss\fs\inode.h" />
+    <ClInclude Include="loss\fs\virtual_filesystem.h" />
     <ClInclude Include="loss\iprocess.h" />
     <ClInclude Include="loss\iuser.h" />
     <ClInclude Include="loss\return_codes.h" />

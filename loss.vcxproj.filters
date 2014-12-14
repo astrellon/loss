@@ -25,13 +25,16 @@
     <Filter Include="lua\src">
       <UniqueIdentifier>{5d48cc56-d734-4b35-96f4-5323daee25aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\loss\fs">
+      <UniqueIdentifier>{b7bbc773-bf20-47f6-8fb8-e7648a5d6a5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\loss\fs">
+      <UniqueIdentifier>{3e4b5645-d8f5-4116-98db-b76b0d7254af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="loss\inode.cpp">
-      <Filter>Source Files\loss</Filter>
     </ClCompile>
     <ClCompile Include="loss\return_codes.cpp">
       <Filter>Source Files\loss</Filter>
@@ -132,26 +135,17 @@
     <ClCompile Include="lua\src\lzio.c">
       <Filter>lua\src</Filter>
     </ClCompile>
+    <ClCompile Include="loss\fs\ifilesystem.cpp">
+      <Filter>Source Files\loss\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\fs\inode.cpp">
+      <Filter>Source Files\loss\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\fs\virtual_filesystem.cpp">
+      <Filter>Source Files\loss\fs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="loss\ifilesystem.h">
-      <Filter>Header Files\loss</Filter>
-    </ClInclude>
-    <ClInclude Include="loss\inode.h">
-      <Filter>Header Files\loss</Filter>
-    </ClInclude>
-    <ClInclude Include="loss\iprocess.h">
-      <Filter>Header Files\loss</Filter>
-    </ClInclude>
-    <ClInclude Include="loss\iuser.h">
-      <Filter>Header Files\loss</Filter>
-    </ClInclude>
-    <ClInclude Include="loss\return_codes.h">
-      <Filter>Header Files\loss</Filter>
-    </ClInclude>
-    <ClInclude Include="loss\system.h">
-      <Filter>Header Files\loss</Filter>
-    </ClInclude>
     <ClInclude Include="lua\src\lapi.h">
       <Filter>lua\src</Filter>
     </ClInclude>
@@ -226,6 +220,27 @@
     </ClInclude>
     <ClInclude Include="lua\src\lzio.h">
       <Filter>lua\src</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\fs\ifilesystem.h">
+      <Filter>Header Files\loss\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\fs\inode.h">
+      <Filter>Header Files\loss\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\fs\virtual_filesystem.h">
+      <Filter>Header Files\loss\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\iprocess.h">
+      <Filter>Header Files\loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\iuser.h">
+      <Filter>Header Files\loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\return_codes.h">
+      <Filter>Header Files\loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\system.h">
+      <Filter>Header Files\loss</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

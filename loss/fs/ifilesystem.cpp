@@ -17,6 +17,7 @@ namespace loss
         {
             return NULL_PARAMETER;
         }
+
         _owner = new_owner;
         return SUCCESS;
     }
@@ -54,6 +55,11 @@ namespace loss
 
     ReturnCode FolderDef::add_file(const std::string &name, const FileDef &file)
     {
+        bool name_taken = has_file_folder(name);
+        if (name_taken)
+        {
+            return FILE_NOT_FOUND;
+        }
         return SUCCESS;
     }
 
