@@ -1,18 +1,31 @@
 #include "virtual_filesystem.h"
 
-#include "inode.h"
-
 namespace loss
 {
-
-    IMetadata &VirtualFile::metadata()
+    IOResult VirtualFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
-        return _metadata;
+        std::string test = "Whut up!";
+        uint32_t j = 0, i = offset;
+        for (; j < count && i < test.size(); i++, j++)
+        {
+            buffer[j] = test[i];
+        }
+        if (j < count)
+        {
+            buffer[j++] = '\0';
+        }
+
+        return IOResult(j, SUCCESS);
     }
-    const IMetadata &VirtualFile::metadata() const
+    IOResult VirtualFileSystem::write(const std::string &name, uint32_t offset, uint32_t count, uint8_t *data)
     {
-        return _metadata;
+        return IOResult(0, SUCCESS);
     }
 
-    
+    ReturnCode VirtualFileSystem::getdir(const std::string &name, FolderEntry *to_populate)
+    {
+        auto entry = new FileEntry();
+        entry->size(9);
+        return to_populate->add_file("test.txt", entry);
+    }
 }

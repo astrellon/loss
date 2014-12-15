@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <stdint.h>
 #include <iostream>
 
@@ -26,13 +25,20 @@ namespace loss
             std::string _owner;
     };
 
-    class FileDef
+    class IEntry
     {
         public:
-            FileDef();
+            virtual MetadataDef &metadata() = 0;
+            virtual const MetadataDef &metadata() const = 0;
+    };
 
-            MetadataDef &metadata();
-            const MetadataDef &metadata() const;
+    class FileEntry : public IEntry
+    {
+        public:
+            FileEntry();
+            
+            virtual MetadataDef &metadata();
+            virtual const MetadataDef &metadata() const;
 
             uint32_t size() const;
             void size(uint32_t size);
@@ -42,20 +48,21 @@ namespace loss
             uint32_t _size;
     };
 
-    class FolderDef
+    class FolderEntry : public IEntry
     {
         public:
-            MetadataDef &metadata();
-            const MetadataDef &metadata() const;
+            virtual MetadataDef &metadata();
+            virtual const MetadataDef &metadata() const;
 
-            ReturnCode add_file(const std::string &name, const FileDef &file);
-            ReturnCode find_file(const std::string &name, FileDef && file) const;
-            ReturnCode add_folder(const std::string &name, const FolderDef &folder);
-            ReturnCode find_folder(const std::string &name, FolderDef && folder) const;
-            bool has_file_folder(const std::string &name);
+            ReturnCode add_file(const std::string &name, FileEntry *file);
+            ReturnCode find_file(const std::string &name, FileEntry *file) const;
+            ReturnCode add_folder(const std::string &name, FolderEntry *folder);
+            ReturnCode find_folder(const std::string &name, FolderEntry *folder) const;
+            ReturnCode find_entry(const std::string &name, IEntry *entry) const;
+            bool has_entry(const std::string &name) const;
 
-            typedef std::map<std::string, FileDef &> FileMap;
-            typedef std::map<std::string, FolderDef &> FolderMap;
+            typedef std::map<std::string, FileEntry *> FileMap;
+            typedef std::map<std::string, FolderEntry *> FolderMap;
 
             FileMap::const_iterator begin_files() const;
             FileMap::const_iterator end_files() const;
@@ -78,7 +85,7 @@ namespace loss
             ReturnCode _status;
 
         public:
-            IOResult(uint32_t bytes, ReturnCode status)
+            inline IOResult(uint32_t bytes, ReturnCode status)
             {
                 _bytes = bytes;
                 _status = status;
@@ -88,7 +95,7 @@ namespace loss
             {
                 return _bytes;
             }
-            ReturnCode status() const
+            inline ReturnCode status() const
             {
                 return _status;
             }
@@ -102,9 +109,9 @@ namespace loss
             
             // Change to a stream version at some point.
             virtual IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
-            virtual IOResult write(const std::string &name, uint32_t offset, uint32_t counter, uint8_t *data) = 0;
+            virtual IOResult write(const std::string &name, uint32_t offset, uint32_t count, uint8_t *data) = 0;
 
-            virtual ReturnCode getdir(const std::string &name, FolderDef *to_populate) = 0;
+            virtual ReturnCode getdir(const std::string &name, FolderEntry *to_populate) = 0;
     };
 
 }

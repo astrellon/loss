@@ -8,7 +8,8 @@ extern "C"
 #	include <lua/src/lstate.h>
 } 
 
-#include <loss/fs/inode.h>
+#include <loss/fs/virtual_filesystem.h>
+#include <loss/return_codes.h>
 #include <string>
 
 int main()
@@ -22,6 +23,7 @@ int main()
     lua_close(lua);
     */
 
+    /*
     loss::INode root_node;
     loss::INode text_file;
     loss::INode::DataList &text_data = text_file.data();
@@ -45,6 +47,40 @@ int main()
             std::cout << (char)(*iter2);
         }
         std::cout << "\n";
+    }
+    */
+
+    loss::VirtualFileSystem fs;
+
+    loss::FolderEntry root;
+    auto status = fs.getdir("/", &root);
+    if (status != loss::SUCCESS)
+    {
+        std::cout << "Error getting directory: " << loss::ReturnCodes::desc(status) << "\n";
+    }
+
+    for (auto iter = root.begin_folders(); iter != root.end_folders(); ++iter)
+    {
+        std::cout << "Dir: " << iter->first << "\n";
+    }
+    for (auto iter = root.begin_files(); iter != root.end_files(); ++iter)
+    {
+        std::cout << "File: " << iter->first << " | " << iter->second->size() << "\n";
+        std::cout << "- ";
+        uint8_t temp[256];
+        auto read_result = fs.read(iter->first, 0, 256, temp);
+        if (read_result.status() != loss::SUCCESS)
+        {
+            std::cout << "Error reading file: " << loss::ReturnCodes::desc(read_result.status()) << "\n";
+        }
+        else
+        {
+            for (uint32_t i = 0; i < read_result.bytes(); i++)
+            {
+                std::cout << (char)temp[i];
+            }
+            std::cout << "\n";
+        }
     }
 	
 #ifdef _WIN32

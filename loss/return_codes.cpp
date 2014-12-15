@@ -10,8 +10,9 @@ namespace loss
         { INTERNAL_ERROR, "internal_error" },
         { FILE_NOT_FOUND, "file_not_found" },
 
-        { NODE_ALREADY_EXISTS, "node_already_exists" },
-        { NODE_NOT_FOUND, "node_not_found" }
+        { ENTRY_ALREADY_EXITS, "entry_already_exits" },
+        { WRONG_ENTRY_TYPE, "wrong_entry_type" },
+        { ENTRY_NOT_FOUND, "entry_not_found" }
     };
 
     std::map<ReturnCode, std::string> ReturnCodes::s_code_desc = {
@@ -22,8 +23,9 @@ namespace loss
         { INTERNAL_ERROR, "there was an unexpected internal error." },
         { FILE_NOT_FOUND, "file not found" },
 
-        { NODE_ALREADY_EXISTS, "a node with the given name already exists." },
-        { NODE_NOT_FOUND, "a node with the given name does not exist." }
+        { ENTRY_ALREADY_EXITS, "an entry with the given name already exists." },
+        { WRONG_ENTRY_TYPE, "an entry was found but it was not the correct type." },
+        { ENTRY_NOT_FOUND, "no entry with the given name was found." }
     };
 
     const std::string &ReturnCodes::name(loss::ReturnCode code)

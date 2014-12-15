@@ -16,7 +16,9 @@ namespace loss
         FILE_NOT_FOUND =            -0x0002,
 
         // FileSystem related
-        FILE_ALREADY_EXITS =        -0x0003
+        ENTRY_ALREADY_EXITS =       -0x0003,
+        WRONG_ENTRY_TYPE =          -0x0004,
+        ENTRY_NOT_FOUND =           -0x0005
     };
 
     class ReturnCodes
