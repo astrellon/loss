@@ -58,6 +58,7 @@ namespace loss
             ReturnCode find_file(const std::string &name, FileEntry *file) const;
             ReturnCode add_folder(const std::string &name, FolderEntry *folder);
             ReturnCode find_folder(const std::string &name, FolderEntry *folder) const;
+            
             ReturnCode find_entry(const std::string &name, IEntry *entry) const;
             bool has_entry(const std::string &name) const;
 
@@ -109,7 +110,10 @@ namespace loss
             
             // Change to a stream version at some point.
             virtual IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
-            virtual IOResult write(const std::string &name, uint32_t offset, uint32_t count, uint8_t *data) = 0;
+            virtual IOResult read(const std::string &name, uint32_t offset, uint32_t count, std::ostream &ss);
+            virtual IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data) = 0;
+
+            virtual IOResult write(const std::string &name, uint32_t offset, const std::string &data);
 
             virtual ReturnCode getdir(const std::string &name, FolderEntry *to_populate) = 0;
     };

@@ -14,11 +14,12 @@ namespace loss
         NULL_PARAMETER =             0x0000,
         INTERNAL_ERROR =            -0x0001,
         FILE_NOT_FOUND =            -0x0002,
+        OUT_OF_BOUNDS =             -0x0003,
 
         // FileSystem related
-        ENTRY_ALREADY_EXITS =       -0x0003,
-        WRONG_ENTRY_TYPE =          -0x0004,
-        ENTRY_NOT_FOUND =           -0x0005
+        ENTRY_ALREADY_EXITS =       -0x0010,
+        WRONG_ENTRY_TYPE =          -0x0011,
+        ENTRY_NOT_FOUND =           -0x0012
     };
 
     class ReturnCodes

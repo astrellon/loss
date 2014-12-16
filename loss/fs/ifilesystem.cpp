@@ -166,4 +166,21 @@ namespace loss
     {
         return static_cast<uint32_t>(_folders.size());
     }
+
+    IOResult IFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, std::ostream &ss)
+    {
+        uint8_t *temp = new uint8_t[count];
+        auto result = read(name, offset, count, temp); 
+        if (result.status() == SUCCESS && result.bytes() > 0)
+        {
+            ss.write(reinterpret_cast<const char *>(temp), result.bytes());
+        }
+        delete []temp;
+
+        return result;
+    }
+    IOResult IFileSystem::write(const std::string &name, uint32_t offset, const std::string &data)
+    {
+        return write(name, offset, data.size(), reinterpret_cast<const uint8_t *>(data.c_str()));
+    }
 }
