@@ -10,10 +10,21 @@ extern "C"
 
 #include <loss/fs/virtual_filesystem.h>
 #include <loss/return_codes.h>
+#include <loss/fs/path.h>
 #include <string>
 
 int main()
 {
+    loss::Path p;
+    p.push_dir(std::string("hello/there"));
+    std::cout << "Path: " << p.to_string() << "\n";
+
+    loss::Path p2("/word/up/cracka.txt");
+    std::cout << "Path2: " << p2.to_string() << " | " << p2.filename() << "\n";
+
+    loss::Path p3 = p2.subpath(1);
+    std::cout << "Path3: " << p3.to_string() << " | " << p3.filename() << "\n";
+
     /*
     auto lua = luaL_newstate();
     luaL_openlibs(lua);
@@ -50,6 +61,7 @@ int main()
     }
     */
 
+    /*
     loss::VirtualFileSystem fs;
 
     loss::FolderEntry root;
@@ -82,6 +94,7 @@ int main()
             std::cout << "\n";
         }
     }
+    */
 	
 #ifdef _WIN32
 	std::cin.get();
