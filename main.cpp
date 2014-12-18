@@ -15,6 +15,7 @@ extern "C"
 
 int main()
 {
+    /*
     loss::Path p;
     p.push_dir(std::string("hello/there"));
     std::cout << "Path: " << p.to_string() << "\n";
@@ -24,6 +25,7 @@ int main()
 
     loss::Path p3 = p2.subpath(1);
     std::cout << "Path3: " << p3.to_string() << " | " << p3.filename() << "\n";
+    */
 
     /*
     auto lua = luaL_newstate();
@@ -61,7 +63,6 @@ int main()
     }
     */
 
-    /*
     loss::VirtualFileSystem fs;
 
     loss::FolderEntry root;
@@ -94,7 +95,6 @@ int main()
             std::cout << "\n";
         }
     }
-    */
 	
 #ifdef _WIN32
 	std::cin.get();

@@ -44,7 +44,7 @@ namespace loss
             _dirs.push_back(path);
         }
 
-        if (_dirs.back().find('.') != std::string::npos)
+        if (!_dirs.empty() && _dirs.back().find('.') != std::string::npos)
         {
             dir_to_filename();
         }

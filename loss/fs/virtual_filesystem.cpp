@@ -86,10 +86,18 @@ namespace loss
             }
         }
 
+        // Populate folders
         for (auto iter = folder->begin_folders(); iter != folder->end_folders(); ++iter)
         {
-            //to_populate->add_folder();
+            auto entry = new FolderEntry();
+            auto result = to_populate->add_folder(iter->first, entry);
+            if (result != SUCCESS)
+            {
+                return result;
+            }
         }
+
+        // Populate files
         for (auto iter = folder->begin_files(); iter != folder->end_files(); ++iter)
         {
             auto entry = new FileEntry();
