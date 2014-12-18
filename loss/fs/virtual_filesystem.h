@@ -43,9 +43,9 @@ namespace loss
             {
                 public:
                     ReturnCode add_file(const std::string &name, File *file);
-                    ReturnCode find_file(const std::string &name, File *file) const;
+                    ReturnCode find_file(const std::string &name, File **file) const;
                     ReturnCode add_folder(const std::string &name, Folder *folder);
-                    ReturnCode find_folder(const std::string &name, Folder *folder) const;
+                    ReturnCode find_folder(const std::string &name, Folder **folder) const;
             
                     ReturnCode find_entry(const std::string &name, Entry *entry) const;
                     bool has_entry(const std::string &name) const;
@@ -68,6 +68,7 @@ namespace loss
 
             virtual IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
             virtual IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
+            virtual ReturnCode create_folder(const std::string &name);
 
             virtual ReturnCode getdir(const std::string &name, FolderEntry *to_populate);
 

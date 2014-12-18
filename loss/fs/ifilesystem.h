@@ -110,10 +110,12 @@ namespace loss
             
             // Change to a stream version at some point.
             virtual IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
-            virtual IOResult read(const std::string &name, uint32_t offset, uint32_t count, std::ostream &ss);
             virtual IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data) = 0;
+            virtual ReturnCode create_folder(const std::string &name) = 0;
 
-            virtual IOResult write(const std::string &name, uint32_t offset, const std::string &data);
+            // Helpers
+            IOResult read_stream(const std::string &name, uint32_t offset, uint32_t count, std::ostream &ss);
+            IOResult write_string(const std::string &name, uint32_t offset, const std::string &data);
 
             virtual ReturnCode getdir(const std::string &name, FolderEntry *to_populate) = 0;
     };

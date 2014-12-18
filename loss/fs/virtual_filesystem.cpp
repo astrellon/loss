@@ -12,7 +12,7 @@ namespace loss
         auto folder = &_root;
         for (auto part : path.dirs())
         {
-            ReturnCode result = folder->find_folder(part, folder);
+            ReturnCode result = folder->find_folder(part, &folder);
             if (result != SUCCESS)
             {
                 return IOResult(0, result);
@@ -20,7 +20,7 @@ namespace loss
         }
 
         File *file = nullptr;
-        ReturnCode result = folder->find_file(path.filename(), file);
+        ReturnCode result = folder->find_file(path.filename(), &file);
         if (result != SUCCESS)
         {
             return IOResult(0, result);
@@ -49,7 +49,7 @@ namespace loss
         auto folder = &_root;
         for (auto part : path.dirs())
         {
-            ReturnCode result = folder->find_folder(part, folder);
+            ReturnCode result = folder->find_folder(part, &folder);
             if (result != SUCCESS)
             {
                 return IOResult(0, result);
@@ -57,7 +57,7 @@ namespace loss
         }
 
         File *file = nullptr;
-        ReturnCode result = folder->find_file(path.filename(), file);
+        ReturnCode result = folder->find_file(path.filename(), &file);
         if (result == ENTRY_NOT_FOUND)
         {
             file = new DataFile();
@@ -71,6 +71,23 @@ namespace loss
         return file->write(offset, count, data);
     }
 
+    ReturnCode VirtualFileSystem::create_folder(const std::string &name)
+    {
+        Path path(name);
+        path.dir_to_filename();
+        
+        auto folder = &_root;
+        for (auto part : path.dirs())
+        {
+            ReturnCode result = folder->find_folder(part, &folder);
+            if (result != SUCCESS)
+            {
+                return result;
+            }
+        }
+
+        return folder->add_folder(path.filename(), new Folder());
+    }
     ReturnCode VirtualFileSystem::getdir(const std::string &name, FolderEntry *to_populate)
     {
         Path path(name);
@@ -79,7 +96,7 @@ namespace loss
         auto folder = &_root;
         for (auto part : path.dirs())
         {
-            ReturnCode result = folder->find_folder(part, folder);
+            ReturnCode result = folder->find_folder(part, &folder);
             if (result != SUCCESS)
             {
                 return result;
@@ -122,7 +139,7 @@ namespace loss
 
     uint32_t VirtualFileSystem::DataFile::size() const
     {
-        return 0;
+        return static_cast<uint32_t>(_data.size());
     }
     IOResult VirtualFileSystem::DataFile::read(uint32_t offset, uint32_t count, uint8_t *buffer)
     {
@@ -139,7 +156,7 @@ namespace loss
         uint32_t read_count = count;
         if (end_index > _data.size())
         {
-            read_count -= (_data.size() - end_index);
+            read_count -= (end_index - _data.size());
             end_index = _data.size();
         }
 
@@ -164,10 +181,13 @@ namespace loss
             return IOResult(0, SUCCESS);
         }
 
-        auto iter = _data.begin() + offset;
-        for (uint32_t i = 0; i < count; i++, ++iter)
+        if (offset + count > _data.size())
         {
-            _data.insert(iter, data[i]);
+            _data.resize(offset + count, 0);
+        }
+        for (uint32_t i = 0, j = offset; i < count; i++, j++)
+        {
+            _data[j] = data[i];
         }
         return IOResult(count, SUCCESS);
     }
@@ -183,7 +203,7 @@ namespace loss
         _files[name] = file;
         return SUCCESS;
     }
-    ReturnCode VirtualFileSystem::Folder::find_file(const std::string &name, VirtualFileSystem::File *file) const
+    ReturnCode VirtualFileSystem::Folder::find_file(const std::string &name, VirtualFileSystem::File **file) const
     {
         auto find = _files.find(name);
         if (find == _files.end())
@@ -196,7 +216,7 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        file = find->second;
+        *file = find->second;
         return SUCCESS;
     }
 
@@ -211,7 +231,7 @@ namespace loss
         _folders[name] = folder;
         return SUCCESS;
     }
-    ReturnCode VirtualFileSystem::Folder::find_folder(const std::string &name, VirtualFileSystem::Folder *folder) const
+    ReturnCode VirtualFileSystem::Folder::find_folder(const std::string &name, VirtualFileSystem::Folder **folder) const
     {
         auto find = _folders.find(name);
         if (find == _folders.end())
@@ -224,7 +244,7 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        folder = find->second;
+        *folder = find->second;
         return SUCCESS;
     }
 
