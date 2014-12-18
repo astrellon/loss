@@ -1,12 +1,35 @@
 #include "virtual_filesystem.h"
 
+#include "path.h"
+
 namespace loss
 {
     IOResult VirtualFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
-        std::string test = "Whut up!";
+        Path path(name);
+        path.dir_to_filename();
+
+        auto folder = &_root;
+        for (auto part : path.dirs())
+        {
+            ReturnCode result = folder->find_folder(part, folder);
+            if (result != SUCCESS)
+            {
+                return IOResult(0, result);
+            }
+        }
+
+        File *file = nullptr;
+        ReturnCode result = folder->find_file(path.filename(), file);
+        if (result != SUCCESS)
+        {
+            return IOResult(0, result);
+        }
+
+        return file->read(offset, count, buffer);
+        /*
         uint32_t j = 0, i = offset;
-        for (; j < count && i < test.size(); i++, j++)
+        for (; j < count && i < file->.size(); i++, j++)
         {
             buffer[j] = test[i];
         }
@@ -16,17 +39,68 @@ namespace loss
         }
 
         return IOResult(j, SUCCESS);
+        */
     }
     IOResult VirtualFileSystem::write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data)
     {
-        return IOResult(0, SUCCESS);
+        Path path(name);
+        path.dir_to_filename();
+
+        auto folder = &_root;
+        for (auto part : path.dirs())
+        {
+            ReturnCode result = folder->find_folder(part, folder);
+            if (result != SUCCESS)
+            {
+                return IOResult(0, result);
+            }
+        }
+
+        File *file = nullptr;
+        ReturnCode result = folder->find_file(path.filename(), file);
+        if (result == ENTRY_NOT_FOUND)
+        {
+            file = new DataFile();
+            folder->add_file(path.filename(), file);
+        }
+        else if (result != SUCCESS)
+        {
+            return IOResult(0, result);
+        }
+
+        return file->write(offset, count, data);
     }
 
     ReturnCode VirtualFileSystem::getdir(const std::string &name, FolderEntry *to_populate)
     {
-        auto entry = new FileEntry();
-        entry->size(9);
-        return to_populate->add_file("test.txt", entry);
+        Path path(name);
+        path.filename_to_dir();
+
+        auto folder = &_root;
+        for (auto part : path.dirs())
+        {
+            ReturnCode result = folder->find_folder(part, folder);
+            if (result != SUCCESS)
+            {
+                return result;
+            }
+        }
+
+        for (auto iter = folder->begin_folders(); iter != folder->end_folders(); ++iter)
+        {
+            //to_populate->add_folder();
+        }
+        for (auto iter = folder->begin_files(); iter != folder->end_files(); ++iter)
+        {
+            auto entry = new FileEntry();
+            entry->size(iter->second->size());
+            auto result = to_populate->add_file(iter->first, entry);
+            if (result != SUCCESS)
+            {
+                return result;
+            }
+        }
+        return SUCCESS;
     }
 
     MetadataDef &VirtualFileSystem::Entry::metadata()
@@ -67,7 +141,7 @@ namespace loss
         }
         return IOResult(read_count, SUCCESS);
     }
-    IOResult VirtualFileSystem::DataFile::write(uint32_t offset, uint32_t count, uint8_t *data)
+    IOResult VirtualFileSystem::DataFile::write(uint32_t offset, uint32_t count, const uint8_t *data)
     {
         if (data == nullptr)
         {

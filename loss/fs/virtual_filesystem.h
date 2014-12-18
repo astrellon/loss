@@ -26,7 +26,7 @@ namespace loss
                     virtual uint32_t size() const = 0;
 
                     virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
-                    virtual IOResult write(uint32_t offset, uint32_t count, uint8_t *data) = 0;
+                    virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data) = 0;
             };
             class DataFile : public File
             {
@@ -34,7 +34,7 @@ namespace loss
                     virtual uint32_t size() const;
 
                     virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer);
-                    virtual IOResult write(uint32_t offset, uint32_t count, uint8_t *data);
+                    virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data);
 
                 private:
                     std::vector<uint8_t> _data;
@@ -73,6 +73,9 @@ namespace loss
 
             ReturnCode add_file(const std::string &name, File *file);
             ReturnCode add_folder(const std::string &name, Folder *folder); 
+
+        private:
+            Folder _root;
     };
 
 }
