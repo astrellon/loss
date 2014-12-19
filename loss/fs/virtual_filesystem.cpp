@@ -106,7 +106,7 @@ namespace loss
         // Populate folders
         for (auto iter = folder->begin_folders(); iter != folder->end_folders(); ++iter)
         {
-            auto entry = new FolderEntry();
+            auto entry = new FolderEntry(this);
             auto result = to_populate->add_folder(iter->first, entry);
             if (result != SUCCESS)
             {
@@ -117,7 +117,7 @@ namespace loss
         // Populate files
         for (auto iter = folder->begin_files(); iter != folder->end_files(); ++iter)
         {
-            auto entry = new FileEntry();
+            auto entry = new FileEntry(this);
             entry->size(iter->second->size());
             auto result = to_populate->add_file(iter->first, entry);
             if (result != SUCCESS)

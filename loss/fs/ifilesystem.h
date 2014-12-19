@@ -25,17 +25,25 @@ namespace loss
             std::string _owner;
     };
 
+    class IFileSystem;
+
     class IEntry
     {
         public:
+            IEntry(IFileSystem *fs);
+
             virtual MetadataDef &metadata() = 0;
             virtual const MetadataDef &metadata() const = 0;
+
+            IFileSystem *filesystem() const;
+        private:
+            IFileSystem *_fs;
     };
 
     class FileEntry : public IEntry
     {
         public:
-            FileEntry();
+            FileEntry(IFileSystem *fs);
             
             virtual MetadataDef &metadata();
             virtual const MetadataDef &metadata() const;
@@ -51,6 +59,8 @@ namespace loss
     class FolderEntry : public IEntry
     {
         public:
+            FolderEntry(IFileSystem *fs);
+
             virtual MetadataDef &metadata();
             virtual const MetadataDef &metadata() const;
 

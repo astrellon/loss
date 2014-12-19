@@ -22,7 +22,19 @@ namespace loss
         return SUCCESS;
     }
 
-    FileEntry::FileEntry() :
+    IEntry::IEntry(IFileSystem *fs) :
+        _fs(fs)
+    {
+
+    }
+
+    IFileSystem *IEntry::filesystem() const
+    {
+        return _fs;
+    }
+
+    FileEntry::FileEntry(IFileSystem *fs) :
+        IEntry(fs),
         _size(0)
     {
 
@@ -44,6 +56,11 @@ namespace loss
         _size = size;
     }
 
+    FolderEntry::FolderEntry(IFileSystem *fs) :
+        IEntry(fs)
+    {
+
+    }
     MetadataDef &FolderEntry::metadata()
     {
         return _metadata;
