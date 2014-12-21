@@ -7,7 +7,7 @@
 
 namespace loss
 {
-    class VirtualFileSystem : public IFileSystem
+    class RamFileSystem : public IFileSystem
     {
         public:
             class Entry

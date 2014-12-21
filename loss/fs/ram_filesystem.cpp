@@ -1,10 +1,10 @@
-#include "virtual_filesystem.h"
+#include "ram_filesystem.h"
 
 #include "path.h"
 
 namespace loss
 {
-    IOResult VirtualFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
+    IOResult RamFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
         Path path(name);
         path.dir_to_filename();
@@ -41,7 +41,7 @@ namespace loss
         return IOResult(j, SUCCESS);
         */
     }
-    IOResult VirtualFileSystem::write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data)
+    IOResult RamFileSystem::write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data)
     {
         Path path(name);
         path.dir_to_filename();
@@ -71,7 +71,7 @@ namespace loss
         return file->write(offset, count, data);
     }
 
-    ReturnCode VirtualFileSystem::create_folder(const std::string &name)
+    ReturnCode RamFileSystem::create_folder(const std::string &name)
     {
         Path path(name);
         path.dir_to_filename();
@@ -88,7 +88,7 @@ namespace loss
 
         return folder->add_folder(path.filename(), new Folder());
     }
-    ReturnCode VirtualFileSystem::getdir(const std::string &name, FolderEntry *to_populate)
+    ReturnCode RamFileSystem::getdir(const std::string &name, FolderEntry *to_populate)
     {
         Path path(name);
         path.filename_to_dir();
@@ -128,20 +128,20 @@ namespace loss
         return SUCCESS;
     }
 
-    MetadataDef &VirtualFileSystem::Entry::metadata()
+    MetadataDef &RamFileSystem::Entry::metadata()
     {
         return _metadata;
     }
-    const MetadataDef &VirtualFileSystem::Entry::metadata() const
+    const MetadataDef &RamFileSystem::Entry::metadata() const
     {
         return _metadata;
     }
 
-    uint32_t VirtualFileSystem::DataFile::size() const
+    uint32_t RamFileSystem::DataFile::size() const
     {
         return static_cast<uint32_t>(_data.size());
     }
-    IOResult VirtualFileSystem::DataFile::read(uint32_t offset, uint32_t count, uint8_t *buffer)
+    IOResult RamFileSystem::DataFile::read(uint32_t offset, uint32_t count, uint8_t *buffer)
     {
         if (buffer == nullptr)
         {
@@ -166,7 +166,7 @@ namespace loss
         }
         return IOResult(read_count, SUCCESS);
     }
-    IOResult VirtualFileSystem::DataFile::write(uint32_t offset, uint32_t count, const uint8_t *data)
+    IOResult RamFileSystem::DataFile::write(uint32_t offset, uint32_t count, const uint8_t *data)
     {
         if (data == nullptr)
         {
@@ -192,7 +192,7 @@ namespace loss
         return IOResult(count, SUCCESS);
     }
     
-    ReturnCode VirtualFileSystem::Folder::add_file(const std::string &name, VirtualFileSystem::File *file)
+    ReturnCode RamFileSystem::Folder::add_file(const std::string &name, RamFileSystem::File *file)
     {
         bool name_taken = has_entry(name);
         if (name_taken)
@@ -203,7 +203,7 @@ namespace loss
         _files[name] = file;
         return SUCCESS;
     }
-    ReturnCode VirtualFileSystem::Folder::find_file(const std::string &name, VirtualFileSystem::File **file) const
+    ReturnCode RamFileSystem::Folder::find_file(const std::string &name, RamFileSystem::File **file) const
     {
         auto find = _files.find(name);
         if (find == _files.end())
@@ -220,7 +220,7 @@ namespace loss
         return SUCCESS;
     }
 
-    ReturnCode VirtualFileSystem::Folder::add_folder(const std::string &name, VirtualFileSystem::Folder *folder)
+    ReturnCode RamFileSystem::Folder::add_folder(const std::string &name, RamFileSystem::Folder *folder)
     {
         bool name_taken = has_entry(name);
         if (name_taken)
@@ -231,7 +231,7 @@ namespace loss
         _folders[name] = folder;
         return SUCCESS;
     }
-    ReturnCode VirtualFileSystem::Folder::find_folder(const std::string &name, VirtualFileSystem::Folder **folder) const
+    ReturnCode RamFileSystem::Folder::find_folder(const std::string &name, RamFileSystem::Folder **folder) const
     {
         auto find = _folders.find(name);
         if (find == _folders.end())
@@ -248,7 +248,7 @@ namespace loss
         return SUCCESS;
     }
 
-    ReturnCode VirtualFileSystem::Folder::find_entry(const std::string &name, VirtualFileSystem::Entry *entry) const
+    ReturnCode RamFileSystem::Folder::find_entry(const std::string &name, RamFileSystem::Entry *entry) const
     {
         auto find = _files.find(name);
         if (find == _files.end())
@@ -265,7 +265,7 @@ namespace loss
         entry = find->second;
         return SUCCESS;
     }
-    bool VirtualFileSystem::Folder::has_entry(const std::string &name) const
+    bool RamFileSystem::Folder::has_entry(const std::string &name) const
     {
         auto find = _files.find(name);
         if (find != _files.end())
@@ -280,28 +280,28 @@ namespace loss
         return false;
     }
 
-    VirtualFileSystem::Folder::FileMap::const_iterator VirtualFileSystem::Folder::begin_files() const
+    RamFileSystem::Folder::FileMap::const_iterator RamFileSystem::Folder::begin_files() const
     {
         return _files.begin();
     }
-    VirtualFileSystem::Folder::FileMap::const_iterator VirtualFileSystem::Folder::end_files() const
+    RamFileSystem::Folder::FileMap::const_iterator RamFileSystem::Folder::end_files() const
     {
         return _files.end();
     }
-    uint32_t VirtualFileSystem::Folder::num_files() const
+    uint32_t RamFileSystem::Folder::num_files() const
     {
         return static_cast<uint32_t>(_files.size());
     }
 
-    VirtualFileSystem::Folder::FolderMap::const_iterator VirtualFileSystem::Folder::begin_folders() const
+    RamFileSystem::Folder::FolderMap::const_iterator RamFileSystem::Folder::begin_folders() const
     {
         return _folders.begin();
     }
-    VirtualFileSystem::Folder::FolderMap::const_iterator VirtualFileSystem::Folder::end_folders() const
+    RamFileSystem::Folder::FolderMap::const_iterator RamFileSystem::Folder::end_folders() const
     {
         return _folders.end();
     }
-    uint32_t VirtualFileSystem::Folder::num_folders() const
+    uint32_t RamFileSystem::Folder::num_folders() const
     {
         return static_cast<uint32_t>(_folders.size());
     }

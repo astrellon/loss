@@ -8,7 +8,7 @@ extern "C"
 #	include <lua/src/lstate.h>
 } 
 
-#include <loss/fs/virtual_filesystem.h>
+#include <loss/fs/ram_filesystem.h>
 #include <loss/return_codes.h>
 #include <loss/fs/path.h>
 #include <string>
@@ -59,7 +59,7 @@ int main()
     lua_close(lua);
     */
 
-    loss::VirtualFileSystem fs;
+    loss::RamFileSystem fs;
 
     auto write_result = fs.write_string(std::string("/test.txt"), 0, std::string("Whut urp"));
     if (write_result.status() != loss::SUCCESS)
