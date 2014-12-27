@@ -9,9 +9,9 @@ namespace loss
         _folder_index[1] = &_root;
     }
 
-    IOResult RamFileSystem::read(FolderEntry *folder, const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
+    IOResult RamFileSystem::read(uint32_t folder_id, const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
-        if (folder == nullptr || name.size() == 0 || buffer == nullptr)
+        if (folder_id == 0 || name.size() == 0 || buffer == nullptr)
         {
             return IOResult(0, NULL_PARAMETER);
         }
@@ -20,7 +20,7 @@ namespace loss
             return IOResult(0, SUCCESS);
         }
 
-        auto find = _folder_index.find(folder->id());  
+        auto find = _folder_index.find(folder_id);  
         if (find == _folder_index.end())
         {
             return IOResult(0, ENTRY_NOT_FOUND);
@@ -35,7 +35,7 @@ namespace loss
 
         return file->read(offset, count, buffer);
     }
-    IOResult RamFileSystem::write(FolderEntry *folder, const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data)
+    IOResult RamFileSystem::write(uint32_t folder_id, const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data)
     {
 /*
  *        Path path(name);
@@ -65,7 +65,7 @@ namespace loss
  *
  *        return file->write(offset, count, data);
  */
-        if (folder == nullptr || name.size() == 0 || data == nullptr)
+        if (folder_id == 0 || name.size() == 0 || data == nullptr)
         {
             return IOResult(0, NULL_PARAMETER);
         }
@@ -74,7 +74,7 @@ namespace loss
             return IOResult(0, SUCCESS);
         }
 
-        auto find = _folder_index.find(folder->id());  
+        auto find = _folder_index.find(folder_id);  
         if (find == _folder_index.end())
         {
             return IOResult(0, ENTRY_NOT_FOUND);
@@ -90,14 +90,14 @@ namespace loss
         return file->write(offset, count, data);
     }
 
-    ReturnCode RamFileSystem::create_folder(FolderEntry *folder, const std::string &name)
+    ReturnCode RamFileSystem::create_folder(uint32_t folder_id, const std::string &name)
     {
-        if (folder == nullptr || name.size() == 0)
+        if (folder_id == 0 || name.size() == 0)
         {
             return NULL_PARAMETER;
         }
 
-        auto find = _folder_index.find(folder->id());
+        auto find = _folder_index.find(folder_id);
         if (find == _folder_index.end())
         {
             return ENTRY_NOT_FOUND;
@@ -121,25 +121,19 @@ namespace loss
         return folder->add_folder(path.filename(), new Folder());
         */
     }
-    ReturnCode RamFileSystem::read_folder(FolderEntry *folder, const std::string &name, FolderEntry *to_populate)
+    ReturnCode RamFileSystem::read_folder(uint32_t folder_id, const std::string &name, FolderEntry *to_populate)
     {
         if (to_populate == nullptr || name.size() == 0 || to_populate == nullptr)
         {
             return NULL_PARAMETER;
         }
 
-        auto ram_folder = &_root;
-        auto id = ram_folder->id();
-        if (folder != nullptr)
+        auto find = _folder_index.find(folder_id);
+        if (find == _folder_index.end())
         {
-            id = folder->id();
-            auto find = _folder_index.find(id);
-            if (find == _folder_index.end())
-            {
-                return ENTRY_NOT_FOUND;
-            }
-            ram_folder = find->second;
+            return ENTRY_NOT_FOUND;
         }
+        auto ram_folder = find->second;
 
         // Populate folders
         for (auto iter = ram_folder->begin_folders(); iter != ram_folder->end_folders(); ++iter)
@@ -168,9 +162,17 @@ namespace loss
         return SUCCESS;
     }
 
-    FindFolderResult RamFileSystem::find_folder(uint32_t id, const std::string &name)
+    FindFolderResult RamFileSystem::find_folder(uint32_t folder_id, const std::string &name)
     {
-        return FindFolderResult(0, SUCCESS, this);
+        auto find = _folder_index.find(folder_id);
+        if (find == _folder_index.end())
+        {
+            return FindFolderResult(0, ENTRY_NOT_FOUND, this);
+        }
+
+        Folder *found = nullptr;
+        auto status = find->second->find_folder(name, &found);
+        return FindFolderResult(status == SUCCESS ? found->id() : 0, status, this);
     }
 
     RamFileSystem::Entry::Entry(uint32_t id) :

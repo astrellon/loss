@@ -90,7 +90,14 @@ int main()
     loss::VirtualFileSystem vfs;
     loss::RamFileSystem ramfs;
     vfs.root_filesystem(&ramfs);
+    
     auto result = vfs.create_folder("/home");
+    if (result != loss::SUCCESS)
+    {
+        std::cout << "Error creating folder: " << loss::ReturnCodes::desc(result) << "\n";
+    }
+    
+    result = vfs.create_folder("/home/alan");
     if (result != loss::SUCCESS)
     {
         std::cout << "Error creating folder: " << loss::ReturnCodes::desc(result) << "\n";

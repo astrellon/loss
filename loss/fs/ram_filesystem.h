@@ -90,12 +90,12 @@ namespace loss
             };
             // }}}
 
-            virtual IOResult read(FolderEntry *folder, const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
-            virtual IOResult write(FolderEntry *folder, const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
-            virtual ReturnCode create_folder(FolderEntry *folder, const std::string &name);
+            virtual IOResult read(uint32_t folder_id, const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
+            virtual IOResult write(uint32_t folder_id, const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
+            virtual ReturnCode create_folder(uint32_t folder_id, const std::string &name);
 
-            virtual ReturnCode read_folder(FolderEntry *folder, const std::string &name, FolderEntry *to_populate);
-            virtual FindFolderResult find_folder(uint32_t id, const std::string &name);
+            virtual ReturnCode read_folder(uint32_t folder_id, const std::string &name, FolderEntry *to_populate);
+            virtual FindFolderResult find_folder(uint32_t folder_id, const std::string &name);
 
             ReturnCode add_file(const std::string &name, File *file);
             ReturnCode add_folder(const std::string &name, Folder *folder); 
