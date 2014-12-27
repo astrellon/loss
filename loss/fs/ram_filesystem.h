@@ -1,28 +1,44 @@
 #pragma once
 
 #include "ifilesystem.h"
+#include "ifilesystem_enties.h"
 #include <map>
 #include <vector>
 #include <string>
 
 namespace loss
 {
+    class FolderEntry;
+
     class RamFileSystem : public IFileSystem
     {
         public:
+            RamFileSystem();
+
+            // BaseEntry {{{
             class Entry
             {
                 public:
+                    Entry(uint32_t id);
+
+                    uint32_t id() const;
+
                     MetadataDef &metadata();
                     const MetadataDef &metadata() const;
 
                 private:
+                    uint32_t _id;
                     MetadataDef _metadata;
 
             };
+            // }}}
+            
+            // File Entry {{{
             class File : public Entry
             {
                 public:
+                    File(uint32_t id);
+
                     virtual uint32_t size() const = 0;
 
                     virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
@@ -31,6 +47,8 @@ namespace loss
             class DataFile : public File
             {
                 public:
+                    DataFile(uint32_t id);
+
                     virtual uint32_t size() const;
 
                     virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer);
@@ -39,9 +57,14 @@ namespace loss
                 private:
                     std::vector<uint8_t> _data;
             };
+            // }}}
+            
+            // Folder Entry {{{
             class Folder : public Entry
             {
                 public:
+                    Folder(uint32_t id);
+
                     ReturnCode add_file(const std::string &name, File *file);
                     ReturnCode find_file(const std::string &name, File **file) const;
                     ReturnCode add_folder(const std::string &name, Folder *folder);
@@ -65,18 +88,28 @@ namespace loss
                     FileMap _files;
                     FolderMap _folders;
             };
+            // }}}
 
-            virtual IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
-            virtual IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
-            virtual ReturnCode create_folder(const std::string &name);
+            virtual IOResult read(FolderEntry *folder, const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
+            virtual IOResult write(FolderEntry *folder, const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
+            virtual ReturnCode create_folder(FolderEntry *folder, const std::string &name);
 
-            virtual ReturnCode getdir(const std::string &name, FolderEntry *to_populate);
+            virtual ReturnCode read_folder(FolderEntry *folder, const std::string &name, FolderEntry *to_populate);
+            virtual FindFolderResult find_folder(uint32_t id, const std::string &name);
 
             ReturnCode add_file(const std::string &name, File *file);
             ReturnCode add_folder(const std::string &name, Folder *folder); 
 
         private:
             Folder _root;
-    };
+            uint32_t _id_counter;
+            std::map<uint32_t, File *> _file_index;
+            std::map<uint32_t, Folder *> _folder_index;
 
+            uint32_t next_id();
+
+            Folder *new_folder();
+            DataFile *new_file();
+    };
 }
+

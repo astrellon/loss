@@ -1,69 +1,88 @@
 #include "ram_filesystem.h"
 
-#include "path.h"
-
 namespace loss
 {
-    IOResult RamFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
+    RamFileSystem::RamFileSystem() :
+        _root(1),
+        _id_counter(1)
     {
-        Path path(name);
-        path.dir_to_filename();
+        _folder_index[1] = &_root;
+    }
 
-        auto folder = &_root;
-        for (auto part : path.dirs())
+    IOResult RamFileSystem::read(FolderEntry *folder, const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
+    {
+        if (folder == nullptr || name.size() == 0 || buffer == nullptr)
         {
-            ReturnCode result = folder->find_folder(part, &folder);
-            if (result != SUCCESS)
-            {
-                return IOResult(0, result);
-            }
+            return IOResult(0, NULL_PARAMETER);
+        }
+        if (count == 0)
+        {
+            return IOResult(0, SUCCESS);
+        }
+
+        auto find = _folder_index.find(folder->id());  
+        if (find == _folder_index.end())
+        {
+            return IOResult(0, ENTRY_NOT_FOUND);
         }
 
         File *file = nullptr;
-        ReturnCode result = folder->find_file(path.filename(), &file);
+        auto result = find->second->find_file(name, &file);
         if (result != SUCCESS)
         {
             return IOResult(0, result);
         }
 
         return file->read(offset, count, buffer);
-        /*
-        uint32_t j = 0, i = offset;
-        for (; j < count && i < file->.size(); i++, j++)
-        {
-            buffer[j] = test[i];
-        }
-        if (j < count)
-        {
-            buffer[j++] = '\0';
-        }
-
-        return IOResult(j, SUCCESS);
-        */
     }
-    IOResult RamFileSystem::write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data)
+    IOResult RamFileSystem::write(FolderEntry *folder, const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data)
     {
-        Path path(name);
-        path.dir_to_filename();
-
-        auto folder = &_root;
-        for (auto part : path.dirs())
+/*
+ *        Path path(name);
+ *        path.dir_to_filename();
+ *
+ *        auto folder = &_root;
+ *        for (auto part : path.dirs())
+ *        {
+ *            ReturnCode result = folder->find_folder(part, &folder);
+ *            if (result != SUCCESS)
+ *            {
+ *                return IOResult(0, result);
+ *            }
+ *        }
+ *
+ *        File *file = nullptr;
+ *        ReturnCode result = folder->find_file(path.filename(), &file);
+ *        if (result == ENTRY_NOT_FOUND)
+ *        {
+ *            file = new DataFile();
+ *            folder->add_file(path.filename(), file);
+ *        }
+ *        else if (result != SUCCESS)
+ *        {
+ *            return IOResult(0, result);
+ *        }
+ *
+ *        return file->write(offset, count, data);
+ */
+        if (folder == nullptr || name.size() == 0 || data == nullptr)
         {
-            ReturnCode result = folder->find_folder(part, &folder);
-            if (result != SUCCESS)
-            {
-                return IOResult(0, result);
-            }
+            return IOResult(0, NULL_PARAMETER);
+        }
+        if (count == 0)
+        {
+            return IOResult(0, SUCCESS);
+        }
+
+        auto find = _folder_index.find(folder->id());  
+        if (find == _folder_index.end())
+        {
+            return IOResult(0, ENTRY_NOT_FOUND);
         }
 
         File *file = nullptr;
-        ReturnCode result = folder->find_file(path.filename(), &file);
-        if (result == ENTRY_NOT_FOUND)
-        {
-            file = new DataFile();
-            folder->add_file(path.filename(), file);
-        }
-        else if (result != SUCCESS)
+        auto result = find->second->find_file(name, &file);
+        if (result != SUCCESS)
         {
             return IOResult(0, result);
         }
@@ -71,8 +90,21 @@ namespace loss
         return file->write(offset, count, data);
     }
 
-    ReturnCode RamFileSystem::create_folder(const std::string &name)
+    ReturnCode RamFileSystem::create_folder(FolderEntry *folder, const std::string &name)
     {
+        if (folder == nullptr || name.size() == 0)
+        {
+            return NULL_PARAMETER;
+        }
+
+        auto find = _folder_index.find(folder->id());
+        if (find == _folder_index.end())
+        {
+            return ENTRY_NOT_FOUND;
+        }
+
+        return find->second->add_folder(name, new_folder());
+        /*
         Path path(name);
         path.dir_to_filename();
         
@@ -87,26 +119,33 @@ namespace loss
         }
 
         return folder->add_folder(path.filename(), new Folder());
+        */
     }
-    ReturnCode RamFileSystem::getdir(const std::string &name, FolderEntry *to_populate)
+    ReturnCode RamFileSystem::read_folder(FolderEntry *folder, const std::string &name, FolderEntry *to_populate)
     {
-        Path path(name);
-        path.filename_to_dir();
-
-        auto folder = &_root;
-        for (auto part : path.dirs())
+        if (to_populate == nullptr || name.size() == 0 || to_populate == nullptr)
         {
-            ReturnCode result = folder->find_folder(part, &folder);
-            if (result != SUCCESS)
+            return NULL_PARAMETER;
+        }
+
+        auto ram_folder = &_root;
+        auto id = ram_folder->id();
+        if (folder != nullptr)
+        {
+            id = folder->id();
+            auto find = _folder_index.find(id);
+            if (find == _folder_index.end())
             {
-                return result;
+                return ENTRY_NOT_FOUND;
             }
+            ram_folder = find->second;
         }
 
         // Populate folders
-        for (auto iter = folder->begin_folders(); iter != folder->end_folders(); ++iter)
+        for (auto iter = ram_folder->begin_folders(); iter != ram_folder->end_folders(); ++iter)
         {
             auto entry = new FolderEntry(this);
+            entry->id(iter->second->id());
             auto result = to_populate->add_folder(iter->first, entry);
             if (result != SUCCESS)
             {
@@ -115,10 +154,11 @@ namespace loss
         }
 
         // Populate files
-        for (auto iter = folder->begin_files(); iter != folder->end_files(); ++iter)
+        for (auto iter = ram_folder->begin_files(); iter != ram_folder->end_files(); ++iter)
         {
             auto entry = new FileEntry(this);
             entry->size(iter->second->size());
+            entry->id(iter->second->id());
             auto result = to_populate->add_file(iter->first, entry);
             if (result != SUCCESS)
             {
@@ -126,6 +166,21 @@ namespace loss
             }
         }
         return SUCCESS;
+    }
+
+    FindFolderResult RamFileSystem::find_folder(uint32_t id, const std::string &name)
+    {
+        return FindFolderResult(0, SUCCESS, this);
+    }
+
+    RamFileSystem::Entry::Entry(uint32_t id) :
+        _id(id)
+    {
+
+    }
+    uint32_t RamFileSystem::Entry::id() const
+    {
+        return _id;
     }
 
     MetadataDef &RamFileSystem::Entry::metadata()
@@ -137,6 +192,17 @@ namespace loss
         return _metadata;
     }
 
+    RamFileSystem::File::File(uint32_t id) :
+        Entry(id)
+    {
+
+    }
+
+    RamFileSystem::DataFile::DataFile(uint32_t id) :
+        File(id)
+    {
+
+    }
     uint32_t RamFileSystem::DataFile::size() const
     {
         return static_cast<uint32_t>(_data.size());
@@ -192,6 +258,11 @@ namespace loss
         return IOResult(count, SUCCESS);
     }
     
+    RamFileSystem::Folder::Folder(uint32_t id) :
+        Entry(id)
+    {
+
+    }
     ReturnCode RamFileSystem::Folder::add_file(const std::string &name, RamFileSystem::File *file)
     {
         bool name_taken = has_entry(name);
@@ -304,5 +375,25 @@ namespace loss
     uint32_t RamFileSystem::Folder::num_folders() const
     {
         return static_cast<uint32_t>(_folders.size());
+    }
+
+    uint32_t RamFileSystem::next_id()
+    {
+        return ++_id_counter;
+    }
+
+    RamFileSystem::Folder *RamFileSystem::new_folder()
+    {
+        auto id = next_id();
+        auto result = new Folder(id);
+        _folder_index[id] = result;
+        return result;
+    }
+    RamFileSystem::DataFile *RamFileSystem::new_file()
+    {
+        auto id = next_id();
+        auto result = new DataFile(id);
+        _file_index[id] = result;
+        return result;
     }
 }

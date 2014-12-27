@@ -8,11 +8,13 @@ extern "C"
 #	include <lua/src/lstate.h>
 } 
 
+#include <loss/fs/virtual_fileystem.h>
 #include <loss/fs/ram_filesystem.h>
 #include <loss/return_codes.h>
 #include <loss/fs/path.h>
 #include <string>
 
+/*
 void output_folder(loss::IFileSystem &fs, const std::string &name)
 {
     std::cout << "Outputting: " << name << "\n";
@@ -47,6 +49,7 @@ void output_folder(loss::IFileSystem &fs, const std::string &name)
         }
     }
 }
+*/
 
 int main()
 {
@@ -59,6 +62,7 @@ int main()
     lua_close(lua);
     */
 
+    /*
     loss::RamFileSystem fs;
 
     auto write_result = fs.write_string(std::string("/test.txt"), 0, std::string("Whut urp"));
@@ -81,6 +85,16 @@ int main()
 
     output_folder(fs, "/");
     output_folder(fs, "/home");
+    */
+
+    loss::VirtualFileSystem vfs;
+    loss::RamFileSystem ramfs;
+    vfs.root_filesystem(&ramfs);
+    auto result = vfs.create_folder("/home");
+    if (result != loss::SUCCESS)
+    {
+        std::cout << "Error creating folder: " << loss::ReturnCodes::desc(result) << "\n";
+    }
 	
 #ifdef _WIN32
 	std::cin.get();
