@@ -19,19 +19,32 @@ namespace loss
     {
         return _root_filesystem;
     }
+    
+    ReturnCode VirtualFileSystem::create_file(const std::string &name)
+    {
+        Path path(name);
+        path.dir_to_filename();
+
+        auto result = follow_path(path, 1);
+        if (result.status() != SUCCESS)
+        {
+            return result.status();
+        }
+
+        return result.fs()->create_file(result.id(), path.filename());
+    }
     IOResult VirtualFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
         Path path(name);
         path.dir_to_filename();
 
-        FolderEntry *folder = nullptr;
         auto result = follow_path(path, 1);
         if (result.status() != SUCCESS)
         {
             return IOResult(0, result.status());
         }
 
-        return folder->filesystem()->read(result.id(), path.filename(), offset, count, buffer);
+        return result.fs()->read(result.id(), path.filename(), offset, count, buffer);
     }
     IOResult VirtualFileSystem::read_stream(const std::string &name, uint32_t offset, uint32_t count, std::ostream &ss)
     {
@@ -51,14 +64,13 @@ namespace loss
         Path path(name);
         path.dir_to_filename();
 
-        FolderEntry *folder = nullptr;
         auto result = follow_path(path, 1);
         if (result.status() != SUCCESS)
         {
             return IOResult(0, result.status());
         }
 
-        return folder->filesystem()->write(result.id(), path.filename(), offset, count, data);
+        return result.fs()->write(result.id(), path.filename(), offset, count, data);
     }
     IOResult VirtualFileSystem::write_string(const std::string &name, uint32_t offset, const std::string &data)
     {
@@ -70,15 +82,26 @@ namespace loss
         Path path(name);
         path.dir_to_filename();
 
-        uint32_t folder_id = 1;
-        auto result = follow_path(path, folder_id);
+        auto result = follow_path(path, 1);
         if (result.status() != SUCCESS)
         {
             return result.status();
         }
 
-        auto fs = result.fs();
-        return fs->create_folder(result.id(), path.filename());
+        return result.fs()->create_folder(result.id(), path.filename());
+    }
+    ReturnCode VirtualFileSystem::read_folder(const std::string &name, FolderEntry *folder)
+    {
+        Path path(name);
+        path.dir_to_filename();
+
+        auto result = follow_path(path, 1);
+        if (result.status() != SUCCESS)
+        {
+            return result.status();
+        }
+
+        return result.fs()->read_folder(result.id(), path.filename(), folder);
     }
 
     FindFolderResult VirtualFileSystem::follow_path(const Path &path, uint32_t folder_id)

@@ -102,6 +102,40 @@ int main()
     {
         std::cout << "Error creating folder: " << loss::ReturnCodes::desc(result) << "\n";
     }
+
+    uint8_t buffer[256];
+    auto ioresult = vfs.read("/home/alan/test.txt", 0, 255, buffer);
+    if (ioresult.status() != loss::SUCCESS)
+    {
+        std::cout << "Error reading: " << loss::ReturnCodes::desc(ioresult.status()) << "\n";
+    }
+
+    result = vfs.create_file("/home/alan/test.txt");
+    if (result != loss::SUCCESS)
+    {
+        std::cout << "Error creating file: " << loss::ReturnCodes::desc(result) << "\n";
+    }
+
+    ioresult = vfs.write_string("/home/alan/test.txt", 0, "whut up brah");
+    if (ioresult.status() != loss::SUCCESS)
+    {
+        std::cout << "Error writing: " << loss::ReturnCodes::desc(ioresult.status()) << "\n";
+    }
+
+    ioresult = vfs.read("/home/alan/test.txt", 0, 255, buffer);
+    if (ioresult.status() != loss::SUCCESS)
+    {
+        std::cout << "Error reading: " << loss::ReturnCodes::desc(ioresult.status()) << "\n";
+    }
+    else
+    {
+        std::cout << "Buffer size: " << ioresult.bytes() << "\n";
+        for (uint32_t i = 0; i < ioresult.bytes(); i++)
+        {
+            std::cout << (char)buffer[i];
+        }
+        std::cout << "\n";
+    }
 	
 #ifdef _WIN32
 	std::cin.get();

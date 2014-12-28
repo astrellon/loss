@@ -25,9 +25,12 @@ namespace loss
             //virtual ReturnCode symlink(const std::string &link_filename, const std::string &destination) = 0;
             
             // Change to a stream version at some point.
+            ReturnCode create_file(const std::string &name);
             IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
             IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
+            
             ReturnCode create_folder(const std::string &name);
+            ReturnCode read_folder(const std::string &name, FolderEntry *folder);
 
             // Helpers
             IOResult read_stream(const std::string &name, uint32_t offset, uint32_t count, std::ostream &ss);

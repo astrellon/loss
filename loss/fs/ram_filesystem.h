@@ -92,6 +92,7 @@ namespace loss
 
             virtual IOResult read(uint32_t folder_id, const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
             virtual IOResult write(uint32_t folder_id, const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
+            virtual ReturnCode create_file(uint32_t folder_id, const std::string &name);
             virtual ReturnCode create_folder(uint32_t folder_id, const std::string &name);
 
             virtual ReturnCode read_folder(uint32_t folder_id, const std::string &name, FolderEntry *to_populate);

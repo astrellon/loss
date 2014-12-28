@@ -90,6 +90,21 @@ namespace loss
         return file->write(offset, count, data);
     }
 
+    ReturnCode RamFileSystem::create_file(uint32_t folder_id, const std::string &name)
+    {
+        if (folder_id == 0 || name.size() == 0)
+        {
+            return NULL_PARAMETER;
+        }
+
+        auto find = _folder_index.find(folder_id);
+        if (find == _folder_index.end())
+        {
+            return ENTRY_NOT_FOUND;
+        }
+
+        return find->second->add_file(name, new_file());
+    }
     ReturnCode RamFileSystem::create_folder(uint32_t folder_id, const std::string &name)
     {
         if (folder_id == 0 || name.size() == 0)
@@ -104,26 +119,10 @@ namespace loss
         }
 
         return find->second->add_folder(name, new_folder());
-        /*
-        Path path(name);
-        path.dir_to_filename();
-        
-        auto folder = &_root;
-        for (auto part : path.dirs())
-        {
-            ReturnCode result = folder->find_folder(part, &folder);
-            if (result != SUCCESS)
-            {
-                return result;
-            }
-        }
-
-        return folder->add_folder(path.filename(), new Folder());
-        */
     }
     ReturnCode RamFileSystem::read_folder(uint32_t folder_id, const std::string &name, FolderEntry *to_populate)
     {
-        if (to_populate == nullptr || name.size() == 0 || to_populate == nullptr)
+        if (name.size() == 0 || to_populate == nullptr)
         {
             return NULL_PARAMETER;
         }
