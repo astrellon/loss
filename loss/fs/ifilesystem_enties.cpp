@@ -24,9 +24,10 @@ namespace loss
         return SUCCESS;
     }
 
-    IEntry::IEntry(IFileSystem *fs) :
+    IEntry::IEntry(uint32_t parent_id, IFileSystem *fs) :
         _fs(fs),
-        _id(-1u)
+        _id(0),
+        _parent_folder_id(parent_id)
     {
 
     }
@@ -38,6 +39,15 @@ namespace loss
     uint32_t IEntry::id() const
     {
         return _id;
+    }
+    
+    void IEntry::parent_folder_id(uint32_t id)
+    {
+        _parent_folder_id = id;
+    }
+    uint32_t IEntry::parent_folder_id() const
+    {
+        return _parent_folder_id;
     }
 
     MetadataDef &IEntry::metadata()
@@ -54,8 +64,8 @@ namespace loss
         return _fs;
     }
 
-    FileEntry::FileEntry(IFileSystem *fs) :
-        IEntry(fs),
+    FileEntry::FileEntry(uint32_t parent_id, IFileSystem *fs) :
+        IEntry(parent_id, fs),
         _size(0)
     {
 
@@ -69,8 +79,13 @@ namespace loss
         _size = size;
     }
 
-    FolderEntry::FolderEntry(IFileSystem *fs) :
-        IEntry(fs)
+    FolderEntry::FolderEntry() :
+        IEntry(0, nullptr)
+    {
+
+    }
+    FolderEntry::FolderEntry(uint32_t parent_id, IFileSystem *fs) :
+        IEntry(parent_id, fs)
     {
 
     }

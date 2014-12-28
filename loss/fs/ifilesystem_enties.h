@@ -31,10 +31,13 @@ namespace loss
     class IEntry
     {
         public:
-            IEntry(IFileSystem *fs);
+            IEntry(uint32_t parent_id, IFileSystem *fs);
             
             void id(uint32_t value);
             uint32_t id() const;
+
+            void parent_folder_id(uint32_t id);
+            uint32_t parent_folder_id() const;
 
             MetadataDef &metadata();
             const MetadataDef &metadata() const;
@@ -43,13 +46,14 @@ namespace loss
         private:
             IFileSystem *_fs;
             uint32_t _id;
+            uint32_t _parent_folder_id;
             MetadataDef _metadata;
     };
 
     class FileEntry : public IEntry
     {
         public:
-            FileEntry(IFileSystem *fs);
+            FileEntry(uint32_t parent_id, IFileSystem *fs);
             
             uint32_t size() const;
             void size(uint32_t size);
@@ -61,7 +65,8 @@ namespace loss
     class FolderEntry : public IEntry
     {
         public:
-            FolderEntry(IFileSystem *fs);
+            FolderEntry();
+            FolderEntry(uint32_t parent_id, IFileSystem *fs);
 
             ReturnCode add_file(const std::string &name, FileEntry *file);
             ReturnCode find_file(const std::string &name, FileEntry *file) const;
