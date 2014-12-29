@@ -12,10 +12,11 @@ namespace loss
             ReturnCode _status;
 
         public:
-            inline IOResult(uint32_t bytes, ReturnCode status)
+            inline IOResult(uint32_t bytes, ReturnCode status) :
+                _bytes(bytes),
+                _status(status)
             {
-                _bytes = bytes;
-                _status = status;
+
             }
 
             inline uint32_t bytes() const
@@ -28,12 +29,36 @@ namespace loss
             }
     };
 
+    class CreateEntryResult
+    {
+        private:
+            uint32_t _id;
+            ReturnCode _status;
+
+        public:
+            inline CreateEntryResult(uint32_t id, ReturnCode status) :
+                _id(id),
+                _status(status)
+            {
+
+            }
+
+            inline uint32_t id() const
+            {
+                return _id;
+            }
+            inline ReturnCode status() const
+            {
+                return _status;
+            }
+    };
+
     class IFileSystem;
 
-    class FindFolderResult
+    class FindEntryResult
     {
         public:
-            FindFolderResult(uint32_t id, ReturnCode status, IFileSystem *fs) :
+            FindEntryResult(uint32_t id, ReturnCode status, IFileSystem *fs) :
                 _id(id),
                 _status(status),
                 _fs(fs)

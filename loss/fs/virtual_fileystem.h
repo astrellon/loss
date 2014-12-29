@@ -50,6 +50,6 @@ namespace loss
         private:
             IFileSystem *_root_filesystem;
 
-            FindFolderResult follow_path(const Path &path, uint32_t folder_id = 1);
+            FindEntryResult follow_path(const Path &path, uint32_t folder_id);
     };
 }

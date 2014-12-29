@@ -9,44 +9,6 @@ namespace loss
         _entry_index[1] = &_root;
     }
 
-    IOResult RamFileSystem::read(uint32_t folder_id, const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
-    {
-        if (folder_id == 0 || name.size() == 0 || buffer == nullptr)
-        {
-            return IOResult(0, NULL_PARAMETER);
-        }
-        if (count == 0)
-        {
-            return IOResult(0, SUCCESS);
-        }
-
-        auto find = _entry_index.find(folder_id);  
-        if (find == _entry_index.end())
-        {
-            return IOResult(0, ENTRY_NOT_FOUND);
-        }
-
-        auto folder = dynamic_cast<Folder *>(find->second);
-        if (folder == nullptr)
-        {
-            return IOResult(0, WRONG_ENTRY_TYPE);
-        }
-
-        Entry *entry = nullptr;
-        auto result = folder->find_entry(name, &entry);
-        if (result != SUCCESS)
-        {
-            return IOResult(0, result);
-        }
-
-        auto file = dynamic_cast<File *>(entry);
-        if (file == nullptr)
-        {
-            return IOResult(0, WRONG_ENTRY_TYPE);
-        }
-
-        return file->read(offset, count, buffer);
-    }
     IOResult RamFileSystem::read(uint32_t file_id, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
         if (file_id == 0 || buffer == nullptr)
@@ -73,43 +35,6 @@ namespace loss
         return file->read(offset, count, buffer);
     }
 
-    IOResult RamFileSystem::write(uint32_t folder_id, const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data)
-    {
-        if (folder_id == 0 || name.size() == 0 || data == nullptr)
-        {
-            return IOResult(0, NULL_PARAMETER);
-        }
-        if (count == 0)
-        {
-            return IOResult(0, SUCCESS);
-        }
-
-        auto find = _entry_index.find(folder_id);  
-        if (find == _entry_index.end())
-        {
-            return IOResult(0, ENTRY_NOT_FOUND);
-        }
-
-        auto folder = dynamic_cast<Folder *>(find->second);
-        if (folder == nullptr)
-        {
-            return IOResult(0, WRONG_ENTRY_TYPE);
-        }
-
-        Entry *entry = nullptr;
-        auto result = folder->find_entry(name, &entry);
-        if (result != SUCCESS)
-        {
-            return IOResult(0, result);
-        }
-
-        auto file = dynamic_cast<File *>(entry);
-        if (file == nullptr)
-        {
-            return IOResult(0, WRONG_ENTRY_TYPE);
-        }
-        return file->write(offset, count, data);
-    }
     IOResult RamFileSystem::write(uint32_t file_id, uint32_t offset, uint32_t count, const uint8_t *data)
     {
         if (file_id == 0 || data == nullptr)
@@ -297,41 +222,6 @@ namespace loss
         return folder->add_entry(name, result);
     }
 
-    ReturnCode RamFileSystem::remove_entry(uint32_t folder_id, const std::string &name)
-    {
-        if (folder_id == 0 || name.size() == 0)
-        {
-            return NULL_PARAMETER;
-        }
-
-        auto parent_find = _entry_index.find(folder_id);
-        if (parent_find == _entry_index.end())
-        {
-            return ENTRY_NOT_FOUND;
-        }
-
-        auto folder = dynamic_cast<Folder *>(parent_find->second);
-        if (folder == nullptr)
-        {
-            return WRONG_ENTRY_TYPE;
-        }
-
-        Entry *entry = nullptr;
-        auto result = folder->find_entry(name, &entry);
-        if (result != SUCCESS)
-        {
-            return result;
-        }
-        
-        result = folder->remove_entry(name);
-        if (result == SUCCESS)
-        {
-            auto find = _entry_index.find(entry->id());
-            _entry_index.erase(find);
-        }
-
-        return result;
-    }
     ReturnCode RamFileSystem::remove_entry(uint32_t entry_id)
     {
         if (entry_id == 0)

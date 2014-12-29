@@ -25,26 +25,31 @@ namespace loss
         Path path(name);
         path.dir_to_filename();
 
-        auto result = follow_path(path, 1);
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
         if (result.status() != SUCCESS)
         {
             return result.status();
         }
 
-        return result.fs()->create_file(result.id(), path.filename());
+        return result.fs()->create_file(result.id(), path.filename()).status();
     }
     IOResult VirtualFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
         Path path(name);
         path.dir_to_filename();
 
-        auto result = follow_path(path, 1);
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
         if (result.status() != SUCCESS)
         {
             return IOResult(0, result.status());
         }
 
-        return result.fs()->read(result.id(), path.filename(), offset, count, buffer);
+        auto find = result.fs()->find_entry(result.id(), path.filename());
+        if (find.status() != SUCCESS)
+        {
+            return IOResult(0, find.status());
+        }
+        return result.fs()->read(find.id(), offset, count, buffer);
     }
     IOResult VirtualFileSystem::read(FileEntry *entry, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
@@ -59,7 +64,7 @@ namespace loss
         Path path(name);
         path.filename_to_dir();
 
-        auto result = follow_path(path, 1);
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
         if (result.status() != SUCCESS)
         {
             return result.status();
@@ -86,13 +91,18 @@ namespace loss
         Path path(name);
         path.dir_to_filename();
 
-        auto result = follow_path(path, 1);
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
         if (result.status() != SUCCESS)
         {
             return IOResult(0, result.status());
         }
 
-        return result.fs()->write(result.id(), path.filename(), offset, count, data);
+        auto find = result.fs()->find_entry(result.id(), path.filename());
+        if (find.status() != SUCCESS)
+        {
+            return IOResult(0, find.status());
+        }
+        return result.fs()->write(find.id(), offset, count, data);
     }
     IOResult VirtualFileSystem::write(FileEntry *entry, uint32_t offset, uint32_t count, const uint8_t *data)
     {
@@ -112,13 +122,13 @@ namespace loss
         Path path(name);
         path.dir_to_filename();
 
-        auto result = follow_path(path, 1);
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
         if (result.status() != SUCCESS)
         {
             return result.status();
         }
 
-        return result.fs()->create_folder(result.id(), path.filename());
+        return result.fs()->create_folder(result.id(), path.filename()).status();
     }
     
     ReturnCode VirtualFileSystem::mount(const std::string &name, IFileSystem *fs)
@@ -126,13 +136,13 @@ namespace loss
         Path path(name);
         path.dir_to_filename();
 
-        auto result = follow_path(path, 1);
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
         if (result.status() != SUCCESS)
         {
             return result.status();
         }
 
-        return result.fs()->mount(result.id(), path.filename(), fs);
+        return result.fs()->mount(result.id(), path.filename(), fs).status();
     }
 
     ReturnCode VirtualFileSystem::remove_entry(const std::string &name)
@@ -140,13 +150,18 @@ namespace loss
         Path path(name);
         path.dir_to_filename();
 
-        auto result = follow_path(path, 1);
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
         if (result.status() != SUCCESS)
         {
             return result.status();
         }
 
-        return result.fs()->remove_entry(result.id(), path.filename());
+        auto find = result.fs()->find_entry(result.id(), path.filename());
+        if (find.status() != SUCCESS)
+        {
+            return find.status();
+        }
+        return result.fs()->remove_entry(find.id());
     }
     ReturnCode VirtualFileSystem::remove_entry(IEntry *entry)
     {
@@ -158,12 +173,12 @@ namespace loss
         return entry->filesystem()->remove_entry(entry->id());
     }
 
-    FindFolderResult VirtualFileSystem::follow_path(const Path &path, uint32_t folder_id)
+    FindEntryResult VirtualFileSystem::follow_path(const Path &path, uint32_t folder_id)
     {
         IFileSystem *fs = _root_filesystem;
         for (auto dir : path.dirs())
         {
-            auto result = fs->find_folder(folder_id, dir);
+            auto result = fs->find_entry(folder_id, dir);
             if (result.status() != SUCCESS)
             {
                 return result;
@@ -172,7 +187,7 @@ namespace loss
             folder_id = result.id();
         }
 
-        return FindFolderResult(folder_id, SUCCESS, fs);
+        return FindEntryResult(folder_id, SUCCESS, fs);
     }
 
 }
