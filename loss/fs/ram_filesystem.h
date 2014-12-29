@@ -101,13 +101,13 @@ namespace loss
 
             virtual IOResult read(uint32_t file_id, uint32_t offset, uint32_t count, uint8_t *buffer);
             virtual IOResult write(uint32_t file_id, uint32_t offset, uint32_t count, const uint8_t *data);
-            virtual ReturnCode create_file(uint32_t parent_id, const std::string &name);
-            virtual ReturnCode create_folder(uint32_t parent_id, const std::string &name);
 
             virtual ReturnCode read_folder(uint32_t folder_id, FolderEntry *to_populate);
             virtual FindEntryResult find_entry(uint32_t parent_id, const std::string &name);
             
-            virtual ReturnCode mount(uint32_t parent_id, const std::string &name, IFileSystem *fs);
+            virtual CreateEntryResult create_file(uint32_t parent_id, const std::string &name);
+            virtual CreateEntryResult create_folder(uint32_t parent_id, const std::string &name);
+            virtual CreateEntryResult mount(uint32_t parent_id, const std::string &name, IFileSystem *fs);
 
             virtual ReturnCode remove_entry(uint32_t entry_id);
 
@@ -124,7 +124,7 @@ namespace loss
             Folder *new_folder(uint32_t parent_id);
             DataFile *new_file(uint32_t parent_id);
 
-            ReturnCode add_entry(uint32_t folder_id, const std::string &name, Entry *entry);
+            CreateEntryResult add_entry(uint32_t folder_id, const std::string &name, Entry *entry);
             ReturnCode remove_entry(uint32_t parent_id, uint32_t entry_id);
     };
 }

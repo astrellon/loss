@@ -61,35 +61,35 @@ namespace loss
         return file->write(offset, count, data);
     }
 
-    ReturnCode RamFileSystem::create_file(uint32_t folder_id, const std::string &name)
+    CreateEntryResult RamFileSystem::create_file(uint32_t folder_id, const std::string &name)
     {
         return add_entry(folder_id, name, new_file(folder_id));
     }
-    ReturnCode RamFileSystem::create_folder(uint32_t folder_id, const std::string &name)
+    CreateEntryResult RamFileSystem::create_folder(uint32_t folder_id, const std::string &name)
     {
         return add_entry(folder_id, name, new_folder(folder_id));
     }
 
-    ReturnCode RamFileSystem::add_entry(uint32_t folder_id, const std::string &name, Entry *entry)
+    CreateEntryResult RamFileSystem::add_entry(uint32_t folder_id, const std::string &name, Entry *entry)
     {
         if (folder_id == 0 || name.size() == 0)
         {
-            return NULL_PARAMETER;
+            return CreateEntryResult(0, NULL_PARAMETER);
         }
 
         auto find = _entry_index.find(folder_id);
         if (find == _entry_index.end())
         {
-            return ENTRY_NOT_FOUND;
+            return CreateEntryResult(0, ENTRY_NOT_FOUND);
         }
 
         auto folder = dynamic_cast<Folder *>(find->second);
         if (folder == nullptr)
         {
-            return WRONG_ENTRY_TYPE;
+            return CreateEntryResult(0, WRONG_ENTRY_TYPE);
         }
 
-        return folder->add_entry(name, entry);
+        return CreateEntryResult(entry->id(), folder->add_entry(name, entry));
 
     }
     ReturnCode RamFileSystem::read_folder(uint32_t folder_id, FolderEntry *to_populate)
@@ -161,65 +161,65 @@ namespace loss
         return SUCCESS;
     }
 
-    FindFolderResult RamFileSystem::find_folder(uint32_t folder_id, const std::string &name)
+    FindEntryResult RamFileSystem::find_entry(uint32_t folder_id, const std::string &name)
     {
         auto find = _entry_index.find(folder_id);
         if (find == _entry_index.end())
         {
-            return FindFolderResult(0, ENTRY_NOT_FOUND, this);
+            return FindEntryResult(0, ENTRY_NOT_FOUND, this);
         }
 
         auto parent_folder = dynamic_cast<Folder *>(find->second);
         if (parent_folder == nullptr)
         {
-            return FindFolderResult(0, WRONG_ENTRY_TYPE, this);
+            return FindEntryResult(0, WRONG_ENTRY_TYPE, this);
         }
 
         Entry *entry = nullptr;
         auto status = parent_folder->find_entry(name, &entry);
         if (status != SUCCESS)
         {
-            return FindFolderResult(0, status, this);
+            return FindEntryResult(0, status, this);
         }
 
         auto folder = dynamic_cast<Folder *>(entry);
         if (folder != nullptr)
         {
-            return FindFolderResult(entry->id(), status, this);
+            return FindEntryResult(entry->id(), status, this);
         }
 
         auto mount_point = dynamic_cast<MountPoint *>(entry);
         if (mount_point != nullptr)
         {
-            return FindFolderResult(entry->id(), status, mount_point->fs());
+            return FindEntryResult(entry->id(), status, mount_point->fs());
         }
 
-        return FindFolderResult(0, WRONG_ENTRY_TYPE, this);
+        return FindEntryResult(0, WRONG_ENTRY_TYPE, this);
     }
             
-    ReturnCode RamFileSystem::mount(uint32_t folder_id, const std::string &name, IFileSystem *fs)
+    CreateEntryResult RamFileSystem::mount(uint32_t folder_id, const std::string &name, IFileSystem *fs)
     {
         if (name.size() == 0 || fs == nullptr)
         {
-            return NULL_PARAMETER;
+            return CreateEntryResult(0, NULL_PARAMETER);
         }
 
         auto find = _entry_index.find(folder_id);
         if (find == _entry_index.end())
         {
-            return ENTRY_NOT_FOUND;
+            return CreateEntryResult(0, ENTRY_NOT_FOUND);
         }
 
         auto folder = dynamic_cast<Folder *>(find->second);
         if (folder == nullptr)
         {
-            return WRONG_ENTRY_TYPE;
+            return CreateEntryResult(0, WRONG_ENTRY_TYPE);
         }
 
         auto id = next_id();
         auto result = new MountPoint(id, fs);
         _entry_index[id] = result;
-        return folder->add_entry(name, result);
+        return CreateEntryResult(id, folder->add_entry(name, result));
     }
 
     ReturnCode RamFileSystem::remove_entry(uint32_t entry_id)
