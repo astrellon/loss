@@ -304,19 +304,33 @@ namespace loss
             return NULL_PARAMETER;
         }
 
-        auto find = _entry_index.find(folder_id);
-        if (find == _entry_index.end())
+        auto parent_find = _entry_index.find(folder_id);
+        if (parent_find == _entry_index.end())
         {
             return ENTRY_NOT_FOUND;
         }
 
-        auto folder = dynamic_cast<Folder *>(find->second);
+        auto folder = dynamic_cast<Folder *>(parent_find->second);
         if (folder == nullptr)
         {
             return WRONG_ENTRY_TYPE;
         }
+
+        Entry *entry = nullptr;
+        auto result = folder->find_entry(name, &entry);
+        if (result != SUCCESS)
+        {
+            return result;
+        }
         
-        return folder->remove_entry(name);
+        result = folder->remove_entry(name);
+        if (result == SUCCESS)
+        {
+            auto find = _entry_index.find(entry->id());
+            _entry_index.erase(find);
+        }
+
+        return result;
     }
     ReturnCode RamFileSystem::remove_entry(uint32_t entry_id)
     {
@@ -325,7 +339,48 @@ namespace loss
             return NULL_PARAMETER;
         }
 
-        return SUCCESS;
+        // Cannot remove root
+        if (entry_id == 1)
+        {
+            return WRONG_ENTRY_TYPE;
+        }
+
+        auto find = _entry_index.find(entry_id);
+        if (find == _entry_index.end())
+        {
+            return ENTRY_NOT_FOUND;
+        }
+
+        auto folder = dynamic_cast<Folder *>(find->second);
+        if (folder != nullptr)
+        {
+            if (folder->size() > 0)
+            {
+                return FOLDER_NOT_EMPTY;
+            }
+        }
+
+        auto parent_find = _entry_index.find(find->second->parent_folder_id());
+        if (parent_find == _entry_index.end())
+        {
+            // Parent not found?
+            return ENTRY_NOT_FOUND;
+        }
+
+        auto parent_folder = dynamic_cast<Folder *>(parent_find->second);
+        if (parent_folder == nullptr)
+        {
+            // Parent wrong entry type?
+            return WRONG_ENTRY_TYPE;
+        }
+
+        auto result = parent_folder->remove_entry(entry_id);
+        if (result == SUCCESS)
+        {
+            _entry_index.erase(find);
+        }
+
+        return result;
     }
 
     RamFileSystem::Entry::Entry(uint32_t id) :
@@ -452,6 +507,18 @@ namespace loss
         }
         _entries.erase(find);
         return SUCCESS;
+    }
+    ReturnCode RamFileSystem::Folder::remove_entry(uint32_t id)
+    {
+        for (auto iter = _entries.begin(); iter != _entries.end(); ++iter)
+        {
+            if (iter->second->id() == id)
+            {
+                _entries.erase(iter);
+                return SUCCESS;
+            }
+        }
+        return ENTRY_NOT_FOUND;
     }
     ReturnCode RamFileSystem::Folder::find_entry(const std::string &name, RamFileSystem::Entry **entry) const
     {

@@ -128,6 +128,7 @@ namespace loss
             DataFile *new_file(uint32_t parent_id);
 
             ReturnCode add_entry(uint32_t folder_id, const std::string &name, Entry *entry);
+            ReturnCode remove_entry(uint32_t parent_id, uint32_t entry_id);
     };
 }
 

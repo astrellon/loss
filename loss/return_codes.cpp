@@ -12,7 +12,8 @@ namespace loss
 
         { ENTRY_ALREADY_EXITS, "entry_already_exits" },
         { WRONG_ENTRY_TYPE, "wrong_entry_type" },
-        { ENTRY_NOT_FOUND, "entry_not_found" }
+        { ENTRY_NOT_FOUND, "entry_not_found" },
+        { FOLDER_NOT_EMPTY, "folder_not_empty" }
     };
 
     std::map<ReturnCode, std::string> ReturnCodes::s_code_desc = {
@@ -25,7 +26,8 @@ namespace loss
 
         { ENTRY_ALREADY_EXITS, "an entry with the given name already exists." },
         { WRONG_ENTRY_TYPE, "an entry was found but it was not the correct type." },
-        { ENTRY_NOT_FOUND, "no entry with the given name was found." }
+        { ENTRY_NOT_FOUND, "no entry with the given name was found." },
+        { FOLDER_NOT_EMPTY, "cannot delete folder while it is not empty." }
     };
 
     const std::string &ReturnCodes::name(loss::ReturnCode code)
