@@ -75,14 +75,15 @@ SRCDIRS   = lua/src loss loss/fs
 # The executable file name.
 # If not specified, current directory name or `a.out' will be used.
 PROGRAM   = Loss
+MAIN_O    = main.o
 ifdef NAME
     PROGRAM = $(NAME)
 endif
 
 ifdef TESTING
-    MY_CFLAGS += -DTESTING=1
-	SRCDIRS += tests sys/tests
-	#echo 'Testing mode ' S(MY_CFLAGS)
+	MAIN_O = testing.o
+	PROGRAM = LossTests
+	SRCDIRS += tests tests/loss
 endif
 
 ## Implicit Section: change the following only when necessary.
@@ -236,12 +237,12 @@ ctags: $(HEADERS) $(SOURCES)
 
 # Rules for generating the executable.
 #-------------------------------------
-$(PROGRAM):$(OBJS) main.o
+$(PROGRAM):$(OBJS) $(MAIN_O)
 #ifeq ($(SRC_CXX),)              # C program
-#$(LINK.c)   $(OBJS) main.o $(MY_LIBS) -o $@
+#$(LINK.c)   $(OBJS) $(MAIN_O) $(MY_LIBS) -o $@
 #@echo Type ./$@ to execute the program.
 #else                            # C++ program
-	$(LINK.cxx) $(OBJS) main.o $(MY_LIBS) -o $@
+	$(LINK.cxx) $(OBJS) $(MAIN_O) $(MY_LIBS) -o $@
 	@echo Type ./$@ to execute the program.
 #endif
 
@@ -252,7 +253,7 @@ endif
 endif
 
 clean:
-	$(RM) $(OBJS) $(PROGRAM) $(PROGRAM).exe 
+	$(RM) $(OBJS) $(PROGRAM) $(PROGRAM).exe
 
 distclean: clean
 	$(RM) $(DEPS) TAGS
