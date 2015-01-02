@@ -5,8 +5,8 @@
 
 int main()
 {
-    uint32_t suite_count = 0;
+    loss::tests::Suites suites(std::cout);
 
-    run_suite(loss::tests::Filesystem);
+    suites.run_suite<loss::tests::Filesystem>();
     return 0;
 }

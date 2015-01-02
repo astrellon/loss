@@ -7,6 +7,12 @@ namespace loss
 {
     namespace tests 
     {
+        Filesystem::Filesystem(std::ostream &output) :
+            TestSuite(output)
+        {
+
+        }
+
         void Filesystem::run_cases()
         {
             run_case(simple_test);

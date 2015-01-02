@@ -6,9 +6,10 @@ namespace loss
 {
     namespace tests
     {
-        TestSuite::TestSuite() :
+        TestSuite::TestSuite(std::ostream &output) :
             _tests_failed(0),
-            _total_tests(0)
+            _total_tests(0),
+            _out(output)
         {
 
         }
@@ -39,29 +40,22 @@ namespace loss
 
         }
 
-        void TestSuite::run()
+        bool TestSuite::run()
         {
-            std::cout << "Starting tests for '" << suite_name() << "'\n";
+            _out << "Starting tests for '" << suite_name() << "'\n";
             before_suite();
             run_cases();
 
-            try
-            {
-
-            }
-            catch (...)
-            {
-
-            }
-            std::cout << (_total_tests - _tests_failed) << " of " << _total_tests << " passed ";
+            _out << (_total_tests - _tests_failed) << " of " << _total_tests << " passed ";
 
             if (_tests_failed > 0)
             {
-                std::cout << "FAIL!";
-                failed_test(suite_name());
+                _out << "FAIL!";
             }
-            std::cout << "\n";
+            _out << "\n";
             after_suite();
+
+            return _tests_failed > 0;
         }
 
         std::string TestSuite::suite_name() const
@@ -69,20 +63,9 @@ namespace loss
             return std::string("Unnamed");
         }
 
-        void TestSuite::failed_test(const std::string &name)
-        {
-            s_failed_tests.push_back(name);
-        }
-        const std::vector<std::string> &TestSuite::failed_tests()
-        {
-            return s_failed_tests;
-        }
-
-        std::vector<std::string> TestSuite::s_failed_tests;
-
         void TestSuite::disp_error_line(const char *file, uint32_t line) 
         {
-            std::cout << "Error in file " << file << '[' << line << "]";
+            _out << "Error in file " << file << '[' << line << "]";
         }
 
         void TestSuite::_assert(bool a, const char *file, uint32_t line) 
@@ -90,7 +73,7 @@ namespace loss
             if (!a) 
             {
                 disp_error_line(file, line);
-                std::cout << "- Assert failed!\n";
+                _out << "- Assert failed!\n";
                 throw std::runtime_error("");
             }
         }
@@ -99,7 +82,7 @@ namespace loss
             if (!a) 
             {
                 disp_error_line(file, line);
-                std::cout << "- Assert failed!\n";
+                _out << "- Assert failed!\n";
                 throw std::runtime_error("");
             }
         }
@@ -108,7 +91,7 @@ namespace loss
             if (!a) 
             {
                 disp_error_line(file, line);
-                std::cout << "- Assert failed!\n";
+                _out << "- Assert failed!\n";
                 throw std::runtime_error("");
             }
         }
@@ -209,5 +192,20 @@ namespace loss
                 throw std::runtime_error("");
             }
         }
+        
+        Suites::Suites(std::ostream &output) :
+            _out(output)
+        {
+
+        }
+        const std::vector<std::string> &Suites::passed_tests() const
+        {
+            return _passed_tests;
+        }
+        const std::vector<std::string> &Suites::failed_tests() const
+        {
+            return _failed_tests;
+        }
+
     }
 }

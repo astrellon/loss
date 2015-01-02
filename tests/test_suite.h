@@ -8,13 +8,6 @@
 
 #include <loss/return_codes.h>
 
-#define run_suite(s)	\
-	{	\
-		s suite;	\
-		suite.run();	\
-		suite_count++;	\
-	}
-	
 #define run_case(f)	\
 	before_case(); \
 	try { \
@@ -33,7 +26,7 @@ namespace loss
         class TestSuite
         {
             public:
-                TestSuite();
+                TestSuite(std::ostream &output);
                 virtual ~TestSuite();
 
                 virtual void before_suite();
@@ -44,55 +37,53 @@ namespace loss
 
                 virtual void on_error();
 
-                virtual void run();
+                virtual bool run();
                 virtual void run_cases() = 0;
 
                 virtual std::string suite_name() const;
 
-                static void failed_test(const std::string &name);
-                static const std::vector<std::string> &failed_tests();
+                void failed_test(const std::string &name);
 
             protected:
                 uint32_t _tests_failed;
                 uint32_t _total_tests;
+                std::ostream &_out;
 
-                static std::vector<std::string> s_failed_tests;
-                
-                static void disp_error_line(const char *file, uint32_t line);
-                static void _assert(bool a, const char *file, uint32_t line);
-                static void _assert(uint32_t a, const char *file, uint32_t line);
-                static void _assert(void *a, const char *file, uint32_t line);
+                void disp_error_line(const char *file, uint32_t line);
+                void _assert(bool a, const char *file, uint32_t line);
+                void _assert(uint32_t a, const char *file, uint32_t line);
+                void _assert(void *a, const char *file, uint32_t line);
 
                 template <class T>
-                    static void disp_error(T expected, T actual, const char *file, uint32_t line) 
+                    void disp_error(T expected, T actual, const char *file, uint32_t line) 
                     {
                         disp_error_line(file, line);
-                        std::cout << "\n- Expected: >" << expected << "<\n- Actual: >" << actual << "<\n";
+                        _out << "\n- Expected: >" << expected << "<\n- Actual: >" << actual << "<\n";
                     }
 
                 template <class T>
-                    static void disp_not_error(T expected, const char *file, uint32_t line) 
+                    void disp_not_error(T expected, const char *file, uint32_t line) 
                     {
                         disp_error_line(file, line);
-                        std::cout << "- Did not expect: " << expected << "\n";
+                        _out << "- Did not expect: " << expected << "\n";
                     }
 
                 template <class T>
-                    static void disp_error(T expected, T actual, double delta, const char *file, uint32_t line) 
+                    void disp_error(T expected, T actual, double delta, const char *file, uint32_t line) 
                     {
                         disp_error_line(file, line);
-                        std::cout << "- Expected: " << expected << "\n- Actual  : " << actual << "\n- Delta   : " << delta << "\n";
+                        _out << "- Expected: " << expected << "\n- Actual  : " << actual << "\n- Delta   : " << delta << "\n";
                     }
 
                 template <class T>
-                    static void disp_not_error(T expected, double delta, const char *file, uint32_t line) 
+                    void disp_not_error(T expected, double delta, const char *file, uint32_t line) 
                     {
                         disp_error_line(file, line);
-                        std::cout << "- Did not expect: " << expected << "\n- Delta   : " << delta << "\n";
+                        _out << "- Did not expect: " << expected << "\n- Delta   : " << delta << "\n";
                     }
 
                 template <class T>
-                    static void concat_array(const T *array, int n, std::stringstream &ss)
+                    void concat_array(const T *array, int n, std::stringstream &ss)
                     {
                         ss << '[';
                         for (int i = 0; i < n; i++) 
@@ -107,32 +98,28 @@ namespace loss
                     }
 
                 template <class T>
-                    static void disp_array_error(const T *expected, const T *actual, int n, int errn, double delta, const char *file, uint32_t line)
+                    void disp_array_error(const T *expected, const T *actual, int n, int errn, double delta, const char *file, uint32_t line)
                     {
                         disp_error_line(file, line);
-                        std::stringstream ss;
-                        ss <<   "- Expected: ";
-                        concat_array(expected, n, ss);
-                        ss << "\n- Actual  : ";
-                        concat_array(actual, n, ss);
-                        ss << "\n- Delta   : " << delta
+                        _out <<   "- Expected: ";
+                        concat_array(expected, n, _out);
+                        _out << "\n- Actual  : ";
+                        concat_array(actual, n, _out);
+                        _out << "\n- Delta   : " << delta
                             << "\n- Index   : " << errn;
-                        std::cout << ss;
                     }
                 template <class T>
-                    static void disp_array_not_error(const T *expected, int n, int errn, double delta, const char *file, uint32_t line)
+                    void disp_array_not_error(const T *expected, int n, int errn, double delta, const char *file, uint32_t line)
                     {
                         disp_error_line(file, line);
-                        std::stringstream ss;
-                        ss << "- Did not expect: ";
-                        concat_array(expected, n, ss);
-                        ss << "\n- Delta: " << delta
+                        _out << "- Did not expect: ";
+                        concat_array(expected, n, _out);
+                        _out << "\n- Delta: " << delta
                             << "\n- Index: " << errn;
-                        std::cout << ss;
                     }
 
                 template <class T>
-                    static void _simple_compare(T expected, T actual, bool not_compare, const char *file, uint32_t line)
+                    void _simple_compare(T expected, T actual, bool not_compare, const char *file, uint32_t line)
                     {
                         if (not_compare)
                         {	
@@ -152,18 +139,18 @@ namespace loss
                         }
                     }
 
-                static void _equals(const char *file, uint32_t line, int32_t expected, int32_t actual, bool not_compare);
-                static void _equals(const char *file, uint32_t line, loss::ReturnCode expected, loss::ReturnCode actual, bool not_compare);
-                static void _equals(const char *file, uint32_t line, uint32_t expected, uint32_t actual, bool not_compare);
-                static void _equals(const char *file, uint32_t line, double expected, double actual, bool not_compare);
-                static void _equals(const char *file, uint32_t line, const char *expected, const char *actual, bool not_compare);
-                static void _equals(const char *file, uint32_t line, double expected, double actual, bool not_compare, double delta=0.00001);
+                void _equals(const char *file, uint32_t line, int32_t expected, int32_t actual, bool not_compare);
+                void _equals(const char *file, uint32_t line, loss::ReturnCode expected, loss::ReturnCode actual, bool not_compare);
+                void _equals(const char *file, uint32_t line, uint32_t expected, uint32_t actual, bool not_compare);
+                void _equals(const char *file, uint32_t line, double expected, double actual, bool not_compare);
+                void _equals(const char *file, uint32_t line, const char *expected, const char *actual, bool not_compare);
+                void _equals(const char *file, uint32_t line, double expected, double actual, bool not_compare, double delta=0.00001);
 
-                static void _equals_str(const char *file, uint32_t line, const char *expected, const char *actual, bool not_compare);
-                static void _equals_str(const char *file, uint32_t line, const char *expected, const std::string &actual, bool not_compare);
+                void _equals_str(const char *file, uint32_t line, const char *expected, const char *actual, bool not_compare);
+                void _equals_str(const char *file, uint32_t line, const char *expected, const std::string &actual, bool not_compare);
 
                 template <class T>
-                    static void _equals_array(const char *file, uint32_t line, const T *expected, const T *actual, bool not_compare, double delta=0.00001, int n=16)
+                    void _equals_array(const char *file, uint32_t line, const T *expected, const T *actual, bool not_compare, double delta=0.00001, int n=16)
                     {
                         bool equal = true;
                         int i = 0;
@@ -187,6 +174,34 @@ namespace loss
                             throw std::runtime_error("");
                         }
                     }
+        };
+
+        class Suites
+        {
+            public:
+                Suites(std::ostream &output);
+
+                template <class T>
+                    void run_suite()
+                    {
+                        T suite(_out);
+                        if (!suite.run())
+                        {
+                            _failed_tests.push_back(suite.suite_name());
+                        }
+                        else
+                        {
+                            _passed_tests.push_back(suite.suite_name());
+                        }
+                    }
+                
+                const std::vector<std::string> &passed_tests() const;
+                const std::vector<std::string> &failed_tests() const;
+
+            private:
+                std::vector<std::string> _passed_tests;
+                std::vector<std::string> _failed_tests;
+                std::ostream &_out;
         };
 
     }

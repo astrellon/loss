@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <tests/test_suite.h>
 
 namespace loss 
@@ -9,6 +10,8 @@ namespace loss
         class Filesystem : public TestSuite
         {
             public:
+                Filesystem(std::ostream &output);
+
                 virtual void run_cases();
                 virtual std::string suite_name() const;
 
