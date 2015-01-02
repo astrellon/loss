@@ -193,19 +193,13 @@ namespace loss
             }
         }
 
-        auto folder = dynamic_cast<Folder *>(entry);
-        if (folder != nullptr)
-        {
-            return FindEntryResult(entry->id(), SUCCESS, this);
-        }
-
         auto mount_point = dynamic_cast<MountPoint *>(entry);
         if (mount_point != nullptr)
         {
             return FindEntryResult(entry->id(), SUCCESS, mount_point->fs());
         }
 
-        return FindEntryResult(NULL_ID, WRONG_ENTRY_TYPE, this);
+        return FindEntryResult(entry->id(), SUCCESS, this);
     }
             
     CreateEntryResult RamFileSystem::mount(uint32_t folder_id, const std::string &name, IFileSystem *fs)

@@ -25,41 +25,66 @@ namespace loss
             vfs.root_filesystem(&ramfs);
 
             uint32_t size;
-            check_result(vfs.entry_size("/", size), "Error getting root");
+            check_result(vfs.entry_size("/", size), SUCCESS, "Error getting root");
             loss_equals(0u, size);
 
-            check_result(vfs.create_folder("/home"), "Error creating folder");
-            check_result(vfs.entry_size("/", size), "Error getting root");
+            check_result(vfs.create_folder("/home"), SUCCESS, "Error creating folder");
+            check_result(vfs.entry_size("/", size), SUCCESS, "Error getting root");
             loss_equals(1u, size);
-            check_result(vfs.entry_size("/home", size), "Error getting home");
+            check_result(vfs.entry_size("/home", size), SUCCESS, "Error getting home");
             loss_equals(0u, size);
 
-            check_result(vfs.create_folder("/home/user"), "Error creating folder");
-            check_result(vfs.entry_size("/", size), "Error getting root");
+            check_result(vfs.create_folder("/home/user"), SUCCESS, "Error creating folder");
+            check_result(vfs.entry_size("/", size), SUCCESS, "Error getting root");
             loss_equals(1u, size);
-            check_result(vfs.entry_size("/home", size), "Error getting home");
+            check_result(vfs.entry_size("/home", size), SUCCESS, "Error getting home");
             loss_equals(1u, size);
-            check_result(vfs.entry_size("/home/user", size), "Error getting user");
+            check_result(vfs.entry_size("/home/user", size), SUCCESS, "Error getting user");
             loss_equals(0u, size);
 
-            check_result(vfs.create_file("/home/user/.vimrc"), "Error creating file");
-            check_result(vfs.create_file("/home/user/.bashrc"), "Error creating file");
-            check_result(vfs.entry_size("/", size), "Error getting root");
+            check_result(vfs.create_file("/home/user/.vimrc"), SUCCESS, "Error creating file");
+            check_result(vfs.create_file("/home/user/.bashrc"), SUCCESS, "Error creating file");
+            check_result(vfs.create_folder("/home/user/.vim"), SUCCESS, "Error creating folder");
+
+            check_result(vfs.entry_size("/", size), SUCCESS, "Error getting root");
             loss_equals(1u, size);
-            check_result(vfs.entry_size("/home", size), "Error getting home");
+            check_result(vfs.entry_size("/home", size), SUCCESS, "Error getting home");
             loss_equals(1u, size);
-            check_result(vfs.entry_size("/home/user", size), "Error getting user");
+            check_result(vfs.entry_size("/home/user", size), SUCCESS, "Error getting user");
+            loss_equals(3u, size);
+            check_result(vfs.entry_size("/home/user/.vim", size), SUCCESS, "Error getting user");
+            loss_equals(0u, size);
+
+            check_result(vfs.remove_entry("/home/user"), FOLDER_NOT_EMPTY, "Deleted not empty folder");
+            check_result(vfs.remove_entry("/home/user/.vim"), SUCCESS, "Error deleting empty folder");
+            
+            check_result(vfs.entry_size("/home/user", size), SUCCESS, "Error getting user");
             loss_equals(2u, size);
+            check_result(vfs.entry_size("/home/user/.vim", size), ENTRY_NOT_FOUND, "Found deleted entry");
 
-            loss_assert(true);
+            check_result(vfs.entry_size("/home/user/.vimrc", size), SUCCESS, "Error getting .vimrc size");
+            loss_equals(0u, size);
+
+            auto write_result = vfs.write_string("/home/user/.vimrc", 0, "set autoindent");
+            check_result(write_result.status(), SUCCESS, "Error writing to .vimrc");
+            loss_equals(write_result.bytes(), 14u);
+
+            std::stringstream ss;
+            auto read_result = vfs.read_stream("/home/user/.vimrc", 0, 20u, ss);
+            check_result(read_result.status(), SUCCESS, "Error reading .vimrc");
+            loss_equals(read_result.bytes(), 14u);
+
+            loss_equals_str("set autoindent", ss.str().c_str());
         }
 
-        void Filesystem::_check_result(const char *file, uint32_t line, loss::ReturnCode result, const std::string &message)
+        void Filesystem::_check_result(const char *file, uint32_t line, loss::ReturnCode result, const std::string &message, loss::ReturnCode expected)
         {
-            if (result != loss::SUCCESS)
+            if (result != expected)
             {
-                std::cout << "Error at: " << file << "[" << line << "]\n- ";
-                std::cout << message << ": " << loss::ReturnCodes::name(result) << "\n";
+                std::cout << "Error at: " << file << "[" << line << "]\n- "
+                    << message << ": " << ReturnCodes::name(result) << "\n"
+                    << "- Expected: " << ReturnCodes::name(expected) << "\n";
+
                 throw std::runtime_error("");
             }
         }
