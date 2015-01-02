@@ -117,6 +117,87 @@ namespace loss
         return write(name, offset, data.size(), reinterpret_cast<const uint8_t *>(data.c_str()));
     }
 
+    ReturnCode VirtualFileSystem::entry_size(const std::string &name, uint32_t &size)
+    {
+        Path path(name);
+        path.dir_to_filename();
+
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
+        if (result.status() != SUCCESS)
+        {
+            return result.status();
+        }
+
+        auto find = result.fs()->find_entry(result.id(), path.filename());
+        if (find.status() != SUCCESS)
+        {
+            return find.status();
+        }
+        return result.fs()->entry_size(find.id(), size);
+    }
+    ReturnCode VirtualFileSystem::entry_size(IEntry *entry, uint32_t &size)
+    {
+        if (entry == nullptr)
+        {
+            return NULL_PARAMETER;
+        }
+        return entry->filesystem()->entry_size(entry->id(), size);
+    }
+
+    ReturnCode VirtualFileSystem::entry_metadata(const std::string &name, MetadataDef &metadata)
+    {
+        Path path(name);
+        path.dir_to_filename();
+
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
+        if (result.status() != SUCCESS)
+        {
+            return result.status();
+        }
+
+        auto find = result.fs()->find_entry(result.id(), path.filename());
+        if (find.status() != SUCCESS)
+        {
+            return find.status();
+        }
+        return result.fs()->entry_metadata(find.id(), metadata);
+    }
+    ReturnCode VirtualFileSystem::entry_metadata(IEntry *entry, MetadataDef &metadata)
+    {
+        if (entry == nullptr)
+        {
+            return NULL_PARAMETER;
+        }
+        return entry->filesystem()->entry_metadata(entry->id(), metadata);
+    }
+
+    ReturnCode VirtualFileSystem::update_entry_metadata(const std::string &name, const MetadataDef &metadata)
+    {
+        Path path(name);
+        path.dir_to_filename();
+
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
+        if (result.status() != SUCCESS)
+        {
+            return result.status();
+        }
+
+        auto find = result.fs()->find_entry(result.id(), path.filename());
+        if (find.status() != SUCCESS)
+        {
+            return find.status();
+        }
+        return result.fs()->update_entry_metadata(find.id(), metadata);
+    }
+    ReturnCode VirtualFileSystem::update_entry_metadata(IEntry *entry, const MetadataDef &metadata)
+    {
+        if (entry == nullptr)
+        {
+            return NULL_PARAMETER;
+        }
+        return entry->filesystem()->update_entry_metadata(entry->id(), metadata);
+    }
+
     ReturnCode VirtualFileSystem::create_folder(const std::string &name)
     {
         Path path(name);

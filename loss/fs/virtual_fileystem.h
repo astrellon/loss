@@ -32,6 +32,14 @@ namespace loss
 
             IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
             IOResult write(FileEntry *entry, uint32_t offset, uint32_t count, const uint8_t *data);
+            
+            ReturnCode entry_size(const std::string &name, uint32_t &size);
+            ReturnCode entry_size(IEntry *entry, uint32_t &size);
+
+            ReturnCode entry_metadata(const std::string &name, MetadataDef &metadata);
+            ReturnCode entry_metadata(IEntry *entry, MetadataDef &metadata);
+            ReturnCode update_entry_metadata(const std::string &name, const MetadataDef &metadata);
+            ReturnCode update_entry_metadata(IEntry *entry, const MetadataDef &metadata);
 
             ReturnCode create_file(const std::string &name);
             ReturnCode create_folder(const std::string &name);

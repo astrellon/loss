@@ -30,6 +30,8 @@ namespace loss
                     MetadataDef &metadata();
                     const MetadataDef &metadata() const;
 
+                    void metadata(const MetadataDef &metadata);
+
                 private:
                     uint32_t _id;
                     uint32_t _parent_folder_id;
@@ -108,6 +110,10 @@ namespace loss
             virtual CreateEntryResult create_file(uint32_t parent_id, const std::string &name);
             virtual CreateEntryResult create_folder(uint32_t parent_id, const std::string &name);
             virtual CreateEntryResult mount(uint32_t parent_id, const std::string &name, IFileSystem *fs);
+
+            virtual ReturnCode entry_size(uint32_t entry_id, uint32_t &size);
+            virtual ReturnCode entry_metadata(uint32_t entry_id, MetadataDef &metadata);
+            virtual ReturnCode update_entry_metadata(uint32_t entry_id, const MetadataDef &metadata);
 
             virtual ReturnCode remove_entry(uint32_t entry_id);
 

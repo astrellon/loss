@@ -27,9 +27,14 @@ namespace loss
             virtual CreateEntryResult create_folder(uint32_t folder_id, const std::string &name) = 0;
             virtual CreateEntryResult mount(uint32_t folder_id, const std::string &name, IFileSystem *fs) = 0;
 
+            virtual ReturnCode entry_size(uint32_t entry_id, uint32_t &size) = 0;
+            virtual ReturnCode entry_metadata(uint32_t entry_id, MetadataDef &metadata) = 0;
+            virtual ReturnCode update_entry_metadata(uint32_t entry_id, const MetadataDef &metadata) = 0;
+
             virtual ReturnCode remove_entry(uint32_t entry_id) = 0;
 
             static const uint32_t ROOT_ID;
+            static const uint32_t NULL_ID;
     };
 }
 

@@ -5,6 +5,23 @@
 
 namespace loss
 {
+    class MetadataDef
+    {
+        public:
+            MetadataDef();
+
+            const std::string &owner() const;
+            ReturnCode owner(const std::string &new_owner);
+
+            /* Not needed yet {{{
+            bool readable() const;
+            bool writable() const;
+            bool executable() const;
+            }}}*/
+        private:
+            std::string _owner;
+    };
+
     class IOResult
     {
         private:
