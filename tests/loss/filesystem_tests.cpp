@@ -7,10 +7,6 @@ namespace loss
 {
     namespace tests 
     {
-
-#define CHECK_RESULT(result, message) \
-        if (result != loss::SUCCESS) { std::cout << message << ": " << ReturnCodes::desc(result) << "\n"; return false; }
-
         void Filesystem::run_cases()
         {
             run_case(simple_test);
@@ -21,19 +17,26 @@ namespace loss
             return std::string("Filesystem");
         }
 
-        bool Filesystem::simple_test()
+        void Filesystem::simple_test()
         {
             VirtualFileSystem vfs;
             RamFileSystem ramfs;
 
             vfs.root_filesystem(&ramfs);
 
-            CHECK_RESULT(vfs.create_folder("/home"), "Error creating folder");
-            CHECK_RESULT(vfs.create_folder("/home/user"), "Error creating folder");
+            check_result(vfs.create_folder("/home"), "Error creating folder");
+            check_result(vfs.create_folder("/home/user"), "Error creating folder");
 
             loss_assert(true);
+        }
 
-            return true;
+        void Filesystem::check_result(loss::ReturnCode result, const std::string &message)
+        {
+            if (result != loss::SUCCESS)
+            {
+                std::cout << message << ": " << loss::ReturnCodes::name(result) << "\n";
+                throw std::runtime_error("");
+            }
         }
     }
 }

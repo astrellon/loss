@@ -13,7 +13,9 @@ namespace loss
                 virtual std::string suite_name() const;
 
             private:
-                bool simple_test();
+                void simple_test();
+
+                static void check_result(loss::ReturnCode result, const std::string &message);
         };
     }
 }

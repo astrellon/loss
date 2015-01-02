@@ -18,9 +18,8 @@
 #define run_case(f)	\
 	before_case(); \
 	try { \
-	if (!f()) { \
-		_tests_failed++; \
-	}}	catch (...)	{ \
+        f(); \
+	}	catch (...)	{ \
 		_tests_failed++; \
 		on_error();	\
 	}\
