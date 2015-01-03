@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <exception>
+#include <stdint.h>
 
 #include <loss/return_codes.h>
 

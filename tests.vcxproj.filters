@@ -6,16 +6,22 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="lua">
-      <UniqueIdentifier>{c21ec5a1-24ea-44ae-b932-39ac2e78c218}</UniqueIdentifier>
+      <UniqueIdentifier>{fb9f4eca-506a-4420-b6eb-33166e735736}</UniqueIdentifier>
     </Filter>
     <Filter Include="lua\src">
-      <UniqueIdentifier>{5d48cc56-d734-4b35-96f4-5323daee25aa}</UniqueIdentifier>
+      <UniqueIdentifier>{5d865f12-151c-4c57-97c3-215076e60264}</UniqueIdentifier>
     </Filter>
     <Filter Include="loss">
-      <UniqueIdentifier>{149af62c-93a9-4a16-9882-44891386720b}</UniqueIdentifier>
+      <UniqueIdentifier>{32083c34-7f9e-434b-bf43-3b2f94f2aa7b}</UniqueIdentifier>
     </Filter>
     <Filter Include="loss\fs">
-      <UniqueIdentifier>{8dfa82a5-40a8-47ef-9ad3-921b9eb7f652}</UniqueIdentifier>
+      <UniqueIdentifier>{7a47b9cb-cbb8-4718-8f5b-23c235bcd2dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests">
+      <UniqueIdentifier>{e102b88c-6c57-4e14-8752-38e72b1a1e5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests\loss">
+      <UniqueIdentifier>{993776d2-9b06-4469-a96d-f7a01b18c71c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -115,7 +121,6 @@
     <ClCompile Include="lua\src\lzio.c">
       <Filter>lua\src</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="loss\return_codes.cpp">
       <Filter>loss</Filter>
     </ClCompile>
@@ -136,6 +141,13 @@
     </ClCompile>
     <ClCompile Include="loss\fs\virtual_fileystem.cpp">
       <Filter>loss\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="testing.cpp" />
+    <ClCompile Include="tests\test_suite.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\loss\filesystem_tests.cpp">
+      <Filter>tests\loss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -246,6 +258,12 @@
     </ClInclude>
     <ClInclude Include="loss\fs\virtual_fileystem.h">
       <Filter>loss\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\test_suite.h">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\loss\filesystem_tests.h">
+      <Filter>tests\loss</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
