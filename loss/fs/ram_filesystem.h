@@ -15,6 +15,9 @@ namespace loss
         public:
             RamFileSystem();
 
+            friend class RamFileSystemSerialise;
+            friend class RamFileSystemDeserialise;
+
             // BaseEntry {{{
             class Entry
             {
@@ -117,12 +120,11 @@ namespace loss
 
             virtual ReturnCode remove_entry(uint32_t entry_id);
 
-            typedef std::map<uint32_t, Entry *> EntryMap;
-            virtual const EntryMap &entries() const;
-
         private:
             Folder _root;
             uint32_t _id_counter;
+            
+            typedef std::map<uint32_t, Entry *> EntryMap;
             EntryMap _entry_index;
 
             uint32_t next_id();

@@ -549,9 +549,4 @@ namespace loss
         _entry_index[id] = result;
         return result;
     }
-
-    const RamFileSystem::EntryMap &RamFileSystem::entries() const
-    {
-        return _entry_index;
-    }
 }

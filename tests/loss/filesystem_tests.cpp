@@ -2,6 +2,9 @@
 
 #include <loss/fs/virtual_fileystem.h>
 #include <loss/fs/ram_filesystem.h>
+#include <loss/fs/ram_filesystem_drive.h>
+
+#include <fstream>
 
 namespace loss 
 {
@@ -63,7 +66,7 @@ namespace loss
 
             check_result(vfs.remove_entry("/home/user"), FOLDER_NOT_EMPTY, "Deleted not empty folder");
             check_result(vfs.remove_entry("/home/user/.vim"), SUCCESS, "Error deleting empty folder");
-            
+
             check_result(vfs.entry_size("/home/user", size), SUCCESS, "Error getting user");
             loss_equals(2u, size);
             check_result(vfs.entry_size("/home/user/.vim", size), ENTRY_NOT_FOUND, "Found deleted entry");
@@ -81,6 +84,17 @@ namespace loss
             loss_equals(read_result.bytes(), 14u);
 
             loss_equals_str("set autoindent", ss.str().c_str());
+
+            {
+                std::ofstream output("testout.bin");
+                RamFileSystemSerialise(output, &ramfs);
+            }
+
+            {
+                RamFileSystem tempfs;
+                std::ifstream input("testout.bin");
+                RamFileSystemDeserialise(input, &tempfs);
+            }
         }
 
         void Filesystem::_check_result(const char *file, uint32_t line, loss::ReturnCode result, const std::string &message, loss::ReturnCode expected)
