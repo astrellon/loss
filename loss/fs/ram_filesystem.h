@@ -117,13 +117,13 @@ namespace loss
 
             virtual ReturnCode remove_entry(uint32_t entry_id);
 
-            ReturnCode add_file(const std::string &name, File *file);
-            ReturnCode add_folder(const std::string &name, Folder *folder); 
+            typedef std::map<uint32_t, Entry *> EntryMap;
+            virtual const EntryMap &entries() const;
 
         private:
             Folder _root;
             uint32_t _id_counter;
-            std::map<uint32_t, Entry *> _entry_index;
+            EntryMap _entry_index;
 
             uint32_t next_id();
 
