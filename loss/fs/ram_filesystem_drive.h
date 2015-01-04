@@ -14,6 +14,7 @@ namespace loss
         public:
 
             RamFileSystemSerialise(std::ostream &output, const RamFileSystem *fs);
+            void save();
 
         private:
 
@@ -39,6 +40,7 @@ namespace loss
         public:
 
             RamFileSystemDeserialise(std::istream &input, RamFileSystem *fs);
+            void load();
 
         private:
             

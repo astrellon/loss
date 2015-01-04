@@ -15,8 +15,10 @@ namespace loss
         {
             throw std::runtime_error("");
         }
-
-        for (auto iter : fs->_entry_index)
+    }
+    void RamFileSystemSerialise::save()
+    {
+        for (auto iter : _fs->_entry_index)
         {
             serialise_entry(iter.second);
         }
@@ -79,7 +81,14 @@ namespace loss
         _input(input),
         _fs(fs)
     {
-        deserialise_entry();
+
+    }
+    void RamFileSystemDeserialise::load()
+    {
+        while (_input)
+        {
+            deserialise_entry();
+        }
     }
 
     void RamFileSystemDeserialise::deserialise_entry()

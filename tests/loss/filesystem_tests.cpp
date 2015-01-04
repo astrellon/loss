@@ -87,13 +87,15 @@ namespace loss
 
             {
                 std::ofstream output("testout.bin");
-                RamFileSystemSerialise(output, &ramfs);
+                auto serialise = RamFileSystemSerialise(output, &ramfs);
+                serialise.save();
             }
 
             {
                 RamFileSystem tempfs;
                 std::ifstream input("testout.bin");
-                RamFileSystemDeserialise(input, &tempfs);
+                auto deserialise = RamFileSystemDeserialise(input, &tempfs);
+                deserialise.load();
             }
         }
 
