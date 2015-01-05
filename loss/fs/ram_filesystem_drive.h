@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <stdint.h>
+#include <memory>
 
 #include <loss/return_codes.h>
 #include <loss/fs/ram_filesystem.h>
@@ -48,6 +49,7 @@ namespace loss
             {
                 public:
                     Entry(uint32_t id);
+                    virtual ~Entry();
 
                     uint32_t id() const;
 
@@ -57,14 +59,14 @@ namespace loss
             class File : public Entry
             {
                 public:
-                    File(uint32_t id, uint32_t size, const uint8_t *data);
+                    File(uint32_t id, uint32_t size, const uint8_t data[]);
 
                     uint32_t size() const;
                     const uint8_t *data() const;
 
                 private:
                     uint32_t _size;
-                    const uint8_t *_data;
+                    std::unique_ptr<const uint8_t []> _data;
             };
 
             class Folder : public Entry
@@ -79,7 +81,7 @@ namespace loss
 
             std::istream &_input;
             RamFileSystem *_fs;
-            std::map<uint32_t, Entry *> _entries;
+            std::map<uint32_t, std::unique_ptr<Entry> > _entries;
 
             void deserialise_entry();
             void deserialise_folder(uint32_t id);

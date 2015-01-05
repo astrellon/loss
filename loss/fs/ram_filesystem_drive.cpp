@@ -3,7 +3,6 @@
 #include "ram_filesystem.h"
 
 #include <exception>
-#include <array>
 
 namespace loss
 {
@@ -18,9 +17,9 @@ namespace loss
     }
     void RamFileSystemSerialise::save()
     {
-        for (auto iter : _fs->_entry_index)
+        for (auto iter = _fs->_entry_index.begin(); iter != _fs->_entry_index.end(); ++iter)
         {
-            serialise_entry(iter.second);
+            serialise_entry(iter->second.get());
         }
     }
 
@@ -59,6 +58,7 @@ namespace loss
         uint8_t *temp = new uint8_t[file->size()];
         file->read(0, file->size(), temp);
         write_string(temp, file->size());
+        delete [] temp;
     }
 
     void RamFileSystemSerialise::write_string(const std::string &str)
@@ -95,7 +95,7 @@ namespace loss
     {
         auto id = read_binary<uint32_t>();
 
-        char type;
+        char type = '\0';
         _input.read(&type, sizeof(type));
 
         if (type == 'f')
@@ -111,7 +111,7 @@ namespace loss
     void RamFileSystemDeserialise::deserialise_folder(uint32_t id)
     {
         auto folder = new Folder(id);
-        _entries[id] = folder;
+        _entries[id] = std::unique_ptr<Entry>(folder);
 
         auto num_entries = read_binary<uint32_t>();
         for (uint32_t i = 0u; i < num_entries; i++)
@@ -128,7 +128,7 @@ namespace loss
         _input.read(reinterpret_cast<char *>(data), size);
 
         auto file = new File(id, size, data);
-        _entries[id] = file;
+        _entries[id] = std::unique_ptr<Entry>(file);
     }
 
     std::string RamFileSystemDeserialise::read_string()
@@ -149,12 +149,16 @@ namespace loss
     {
 
     }
+    RamFileSystemDeserialise::Entry::~Entry()
+    {
+
+    }
     uint32_t RamFileSystemDeserialise::Entry::id() const
     {
         return _id;
     }
 
-    RamFileSystemDeserialise::File::File(uint32_t id, uint32_t size, const uint8_t *data) :
+    RamFileSystemDeserialise::File::File(uint32_t id, uint32_t size, const uint8_t data[]) :
         Entry(id),
         _size(size),
         _data(data)
@@ -168,7 +172,7 @@ namespace loss
     }
     const uint8_t *RamFileSystemDeserialise::File::data() const
     {
-        return _data;
+        return _data.get();
     }
 
     RamFileSystemDeserialise::Folder::Folder(uint32_t id) :

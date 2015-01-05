@@ -56,7 +56,7 @@ namespace loss
             IFileSystem *root_filesystem() const;
 
         private:
-            IFileSystem *_root_filesystem;
+            std::unique_ptr<IFileSystem> _root_filesystem;
 
             FindEntryResult follow_path(const Path &path, uint32_t folder_id);
     };

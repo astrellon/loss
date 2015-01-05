@@ -3,6 +3,7 @@
 #include <string>
 #include <stdint.h>
 #include <iostream>
+#include <memory>
 
 #include <loss/return_codes.h>
 #include <loss/fs/common.h>
@@ -52,15 +53,15 @@ namespace loss
             FolderEntry(uint32_t parent_id, IFileSystem *fs);
 
             ReturnCode add_file(const std::string &name, FileEntry *file);
-            ReturnCode find_file(const std::string &name, FileEntry *file) const;
+            ReturnCode find_file(const std::string &name, FileEntry **file) const;
             ReturnCode add_folder(const std::string &name, FolderEntry *folder);
-            ReturnCode find_folder(const std::string &name, FolderEntry *folder) const;
+            ReturnCode find_folder(const std::string &name, FolderEntry **folder) const;
             
             ReturnCode find_entry(const std::string &name, IEntry *entry) const;
             bool has_entry(const std::string &name) const;
 
-            typedef std::map<std::string, FileEntry *> FileMap;
-            typedef std::map<std::string, FolderEntry *> FolderMap;
+            typedef std::map<std::string, std::unique_ptr<FileEntry> > FileMap;
+            typedef std::map<std::string, std::unique_ptr<FolderEntry> > FolderMap;
 
             FileMap::const_iterator begin_files() const;
             FileMap::const_iterator end_files() const;

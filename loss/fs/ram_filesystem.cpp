@@ -3,10 +3,10 @@
 namespace loss
 {
     RamFileSystem::RamFileSystem() :
-        _root(ROOT_ID),
         _id_counter(ROOT_ID)
     {
-        _entry_index[ROOT_ID] = &_root;
+        _root = new Folder(ROOT_ID);
+        _entry_index[ROOT_ID] = std::unique_ptr<Entry>(_root);
     }
 
     IOResult RamFileSystem::read(uint32_t file_id, uint32_t offset, uint32_t count, uint8_t *buffer)
@@ -26,7 +26,7 @@ namespace loss
             return IOResult(NULL_ID, ENTRY_NOT_FOUND);
         }
 
-        auto file = dynamic_cast<File *>(find->second);
+        auto file = dynamic_cast<File *>(find->second.get());
         if (file == nullptr)
         {
             return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
@@ -52,7 +52,7 @@ namespace loss
             return IOResult(NULL_ID, ENTRY_NOT_FOUND);
         }
 
-        auto file = dynamic_cast<File *>(find->second);
+        auto file = dynamic_cast<File *>(find->second.get());
         if (file == nullptr)
         {
             return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
@@ -83,7 +83,7 @@ namespace loss
             return CreateEntryResult(NULL_ID, ENTRY_NOT_FOUND);
         }
 
-        auto folder = dynamic_cast<Folder *>(find->second);
+        auto folder = dynamic_cast<Folder *>(find->second.get());
         if (folder == nullptr)
         {
             return CreateEntryResult(NULL_ID, WRONG_ENTRY_TYPE);
@@ -105,7 +105,7 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
         
-        auto ram_folder = dynamic_cast<Folder *>(find->second);
+        auto ram_folder = dynamic_cast<Folder *>(find->second.get());
         if (ram_folder == nullptr)
         {
             return WRONG_ENTRY_TYPE;
@@ -170,7 +170,7 @@ namespace loss
             {
                 return FindEntryResult(ROOT_ID, SUCCESS, this);
             }
-            _root.find_entry(name, &entry);
+            _root->find_entry(name, &entry);
         }
         else
         {
@@ -180,7 +180,7 @@ namespace loss
                 return FindEntryResult(NULL_ID, ENTRY_NOT_FOUND, this);
             }
 
-            auto parent_folder = dynamic_cast<Folder *>(find->second);
+            auto parent_folder = dynamic_cast<Folder *>(find->second.get());
             if (parent_folder == nullptr)
             {
                 return FindEntryResult(NULL_ID, WRONG_ENTRY_TYPE, this);
@@ -215,7 +215,7 @@ namespace loss
             return CreateEntryResult(NULL_ID, ENTRY_NOT_FOUND);
         }
 
-        auto folder = dynamic_cast<Folder *>(find->second);
+        auto folder = dynamic_cast<Folder *>(find->second.get());
         if (folder == nullptr)
         {
             return CreateEntryResult(NULL_ID, WRONG_ENTRY_TYPE);
@@ -223,7 +223,7 @@ namespace loss
 
         auto id = next_id();
         auto result = new MountPoint(id, fs);
-        _entry_index[id] = result;
+        _entry_index[id] = std::unique_ptr<Entry>(result);
         return CreateEntryResult(id, folder->add_entry(name, result));
     }
 
@@ -240,14 +240,14 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        auto file = dynamic_cast<File *>(find->second);
+        auto file = dynamic_cast<File *>(find->second.get());
         if (file != nullptr)
         {
             size = file->size();
             return SUCCESS;
         }
 
-        auto folder = dynamic_cast<Folder *>(find->second);
+        auto folder = dynamic_cast<Folder *>(find->second.get());
         if (folder != nullptr)
         {
             size = folder->size();
@@ -308,7 +308,7 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        auto folder = dynamic_cast<Folder *>(find->second);
+        auto folder = dynamic_cast<Folder *>(find->second.get());
         if (folder != nullptr)
         {
             if (folder->size() > 0)
@@ -324,7 +324,7 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        auto parent_folder = dynamic_cast<Folder *>(parent_find->second);
+        auto parent_folder = dynamic_cast<Folder *>(parent_find->second.get());
         if (parent_folder == nullptr)
         {
             // Parent wrong entry type?
@@ -538,7 +538,7 @@ namespace loss
         auto id = next_id();
         auto result = new Folder(id);
         result->parent_folder_id(parent_id);
-        _entry_index[id] = result;
+        _entry_index[id] = std::unique_ptr<Entry>(result);
         return result;
     }
     RamFileSystem::DataFile *RamFileSystem::new_file(uint32_t parent_id)
@@ -546,7 +546,7 @@ namespace loss
         auto id = next_id();
         auto result = new DataFile(id);
         result->parent_folder_id(parent_id);
-        _entry_index[id] = result;
+        _entry_index[id] = std::unique_ptr<Entry>(result);
         return result;
     }
 }

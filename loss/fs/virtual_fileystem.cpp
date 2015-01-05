@@ -5,19 +5,19 @@
 
 namespace loss
 {
-    VirtualFileSystem::VirtualFileSystem() :
-        _root_filesystem(nullptr)
+    VirtualFileSystem::VirtualFileSystem()
     {
 
     }
 
     void VirtualFileSystem::root_filesystem(IFileSystem *fs)
     {
-        _root_filesystem = fs;
+        //_root_filesystem.s = fs;
+        _root_filesystem.reset(fs);
     }
     IFileSystem *VirtualFileSystem::root_filesystem() const
     {
-        return _root_filesystem;
+        return _root_filesystem.get();
     }
     
     ReturnCode VirtualFileSystem::create_file(const std::string &name)
@@ -257,7 +257,7 @@ namespace loss
 
     FindEntryResult VirtualFileSystem::follow_path(const Path &path, uint32_t folder_id)
     {
-        IFileSystem *fs = _root_filesystem;
+        IFileSystem *fs = _root_filesystem.get();
         for (auto dir : path.dirs())
         {
             auto result = fs->find_entry(folder_id, dir);

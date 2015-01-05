@@ -29,9 +29,9 @@ namespace loss
         void Filesystem::simple_test()
         {
             VirtualFileSystem vfs;
-            RamFileSystem ramfs;
+            RamFileSystem *ramfs = new RamFileSystem();
 
-            vfs.root_filesystem(&ramfs);
+            vfs.root_filesystem(ramfs);
 
             uint32_t size;
             check_result(vfs.entry_size("/", size), SUCCESS, "Error getting root");
@@ -87,14 +87,14 @@ namespace loss
 
             {
                 std::ofstream output("testout.bin");
-                auto serialise = RamFileSystemSerialise(output, &ramfs);
+                auto serialise = RamFileSystemSerialise(output, ramfs);
                 serialise.save();
             }
 
             {
-                RamFileSystem tempfs;
+                std::unique_ptr<RamFileSystem> tempfs(new RamFileSystem());
                 std::ifstream input("testout.bin");
-                auto deserialise = RamFileSystemDeserialise(input, &tempfs);
+                auto deserialise = RamFileSystemDeserialise(input, tempfs.get());
                 deserialise.load();
             }
         }

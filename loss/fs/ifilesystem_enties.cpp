@@ -98,10 +98,10 @@ namespace loss
             return ENTRY_ALREADY_EXITS;
         }
 
-        _files[name] = file;
+        _files[name] = std::unique_ptr<FileEntry>(file);
         return SUCCESS;
     }
-    ReturnCode FolderEntry::find_file(const std::string &name, FileEntry *file) const
+    ReturnCode FolderEntry::find_file(const std::string &name, FileEntry **file) const
     {
         auto find = _files.find(name);
         if (find == _files.end())
@@ -114,7 +114,7 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        file = find->second;
+        *file = find->second.get();
         return SUCCESS;
     }
 
@@ -126,10 +126,10 @@ namespace loss
             return ENTRY_ALREADY_EXITS;
         }
 
-        _folders[name] = folder;
+        _folders[name] = std::unique_ptr<FolderEntry>(folder);
         return SUCCESS;
     }
-    ReturnCode FolderEntry::find_folder(const std::string &name, FolderEntry *folder) const
+    ReturnCode FolderEntry::find_folder(const std::string &name, FolderEntry **folder) const
     {
         auto find = _folders.find(name);
         if (find == _folders.end())
@@ -142,7 +142,7 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        folder = find->second;
+        *folder = find->second.get();
         return SUCCESS;
     }
 
@@ -154,13 +154,13 @@ namespace loss
             auto find_folder = _folders.find(name);
             if (find_folder != _folders.end())
             {
-                entry = find_folder->second;
+                entry = find_folder->second.get();
                 return SUCCESS;
             }
             return ENTRY_NOT_FOUND;
         }
 
-        entry = find->second;
+        entry = find->second.get();
         return SUCCESS;
     }
     bool FolderEntry::has_entry(const std::string &name) const

@@ -121,10 +121,10 @@ namespace loss
             virtual ReturnCode remove_entry(uint32_t entry_id);
 
         private:
-            Folder _root;
+            Folder *_root;
             uint32_t _id_counter;
             
-            typedef std::map<uint32_t, Entry *> EntryMap;
+            typedef std::map<uint32_t, std::unique_ptr<Entry> > EntryMap;
             EntryMap _entry_index;
 
             uint32_t next_id();
