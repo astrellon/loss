@@ -5,19 +5,45 @@
 
 namespace loss
 {
-    VirtualFileSystem::VirtualFileSystem()
+    VirtualFileSystem::VirtualFileSystem() : 
+        _root_filesystem(nullptr)
     {
 
     }
 
-    void VirtualFileSystem::root_filesystem(IFileSystem *fs)
+    ReturnCode VirtualFileSystem::root_filesystem(IFileSystem *fs)
     {
-        //_root_filesystem.s = fs;
-        _root_filesystem.reset(fs);
+        auto result = register_file_system(fs);
+        if (result != SUCCESS && result != ALREADY_IN_LIST)
+        {
+            return result;
+        }
+
+        _root_filesystem = fs;
+        return SUCCESS;
     }
     IFileSystem *VirtualFileSystem::root_filesystem() const
     {
-        return _root_filesystem.get();
+        return _root_filesystem;
+    }
+    
+    ReturnCode VirtualFileSystem::register_file_system(IFileSystem *fs)
+    {
+        if (fs == nullptr)
+        {
+            return NULL_PARAMETER;
+        }
+
+        for (auto iter = _file_systems.begin(); iter != _file_systems.end(); ++iter)
+        {
+            if (iter->get() == fs)
+            {
+                return ALREADY_IN_LIST;
+            }
+        }
+
+        _file_systems.push_back(std::unique_ptr<IFileSystem>(fs));
+        return SUCCESS;
     }
     
     ReturnCode VirtualFileSystem::create_file(const std::string &name)
@@ -257,7 +283,7 @@ namespace loss
 
     FindEntryResult VirtualFileSystem::follow_path(const Path &path, uint32_t folder_id)
     {
-        IFileSystem *fs = _root_filesystem.get();
+        IFileSystem *fs = _root_filesystem;
         for (auto dir : path.dirs())
         {
             auto result = fs->find_entry(folder_id, dir);
@@ -271,5 +297,4 @@ namespace loss
 
         return FindEntryResult(folder_id, SUCCESS, fs);
     }
-
 }

@@ -11,6 +11,8 @@ namespace loss
 
         // General
         SUCCESS =                    0x0001,
+        ALREADY_IN_LIST =            0x0002,
+
         NULL_PARAMETER =             0x0000,
         INTERNAL_ERROR =            -0x0001,
         FILE_NOT_FOUND =            -0x0002,

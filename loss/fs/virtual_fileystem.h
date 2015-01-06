@@ -52,11 +52,17 @@ namespace loss
             IOResult read_stream(const std::string &name, uint32_t offset, uint32_t count, std::ostream &ss);
             IOResult write_string(const std::string &name, uint32_t offset, const std::string &data);
 
-            void root_filesystem(IFileSystem *fs);
+            ReturnCode root_filesystem(IFileSystem *fs);
             IFileSystem *root_filesystem() const;
+            
+            typedef std::vector<std::unique_ptr<IFileSystem> > FileSystems;
+            const FileSystems &file_systems() const;
+            
+            ReturnCode register_file_system(IFileSystem *fs);
 
         private:
-            std::unique_ptr<IFileSystem> _root_filesystem;
+            IFileSystem *_root_filesystem;
+            FileSystems _file_systems;
 
             FindEntryResult follow_path(const Path &path, uint32_t folder_id);
     };
