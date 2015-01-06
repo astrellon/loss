@@ -75,8 +75,11 @@ namespace loss
                     Folder(uint32_t id);
                     void add_entry(const std::string &name, uint32_t id);
 
+                    typedef std::map<std::string, uint32_t> EntryMap;
+                    const EntryMap &entries() const;
+
                 private:
-                    std::map<std::string, uint32_t> _entries;
+                     EntryMap _entries;
             };
 
             std::istream &_input;
@@ -86,6 +89,7 @@ namespace loss
             void deserialise_entry();
             void deserialise_folder(uint32_t id);
             void deserialise_file(uint32_t id);
+            void finalise();
 
             template <class T>
             T read_binary()

@@ -89,6 +89,7 @@ namespace loss
         {
             deserialise_entry();
         }
+        finalise();
     }
 
     void RamFileSystemDeserialise::deserialise_entry()
@@ -129,6 +130,58 @@ namespace loss
 
         auto file = new File(id, size, data);
         _entries[id] = std::unique_ptr<Entry>(file);
+    }
+
+    void RamFileSystemDeserialise::finalise()
+    {
+        uint32_t max_id = 2;
+        std::vector<uint32_t> folders;
+        for (auto iter = _entries.begin(); iter != _entries.end(); ++iter)
+        {
+            if (iter->first > max_id)
+            {
+                max_id = iter->first;
+            }
+
+            auto file_entry = dynamic_cast<File *>(iter->second.get());
+            if (file_entry != nullptr)
+            {
+                auto file_ram_entry = new RamFileSystem::DataFile(iter->first);
+                file_ram_entry->write(0, file_entry->size(), file_entry->data());
+                _fs->_entry_index[iter->first] = std::unique_ptr<RamFileSystem::Entry>(file_ram_entry);
+                continue;
+            }
+
+            if (iter->first > 1)
+            {
+                auto folder_entry = dynamic_cast<Folder *>(iter->second.get());
+                if (folder_entry != nullptr)
+                {
+                    folders.push_back(iter->first);
+                    auto folder_ram_entry = new RamFileSystem::Folder(iter->first);
+                    _fs->_entry_index[iter->first] = std::unique_ptr<RamFileSystem::Entry>(folder_ram_entry);
+                    continue;
+                }
+            }
+            else if (iter->first == 1)
+            {
+                folders.push_back(1);
+            }
+        }
+
+        _fs->_id_counter = max_id + 1;
+
+        for (auto id : folders)
+        {
+            auto ram_folder = dynamic_cast<RamFileSystem::Folder *>(_fs->_entry_index[id].get()); 
+            auto folder = dynamic_cast<Folder *>(_entries[id].get());
+
+            auto entries = folder->entries();
+            for (auto iter = entries.begin(); iter != entries.end(); ++iter)
+            {
+                ram_folder->add_entry(iter->first, _fs->_entry_index[iter->second].get());
+            }
+        }
     }
 
     std::string RamFileSystemDeserialise::read_string()
@@ -183,5 +236,9 @@ namespace loss
     void RamFileSystemDeserialise::Folder::add_entry(const std::string &name, uint32_t id)
     {
         _entries[name] = id;
+    }
+    const RamFileSystemDeserialise::Folder::EntryMap &RamFileSystemDeserialise::Folder::entries() const
+    {
+        return _entries;
     }
 }

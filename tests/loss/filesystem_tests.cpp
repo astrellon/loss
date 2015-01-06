@@ -96,6 +96,10 @@ namespace loss
                 std::ifstream input("testout.bin");
                 auto deserialise = RamFileSystemDeserialise(input, tempfs.get());
                 deserialise.load();
+                
+                std::ofstream output("testout2.bin");
+                auto serialise = RamFileSystemSerialise(output, tempfs.get());
+                serialise.save();
             }
         }
 
