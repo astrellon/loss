@@ -2,6 +2,7 @@
 
 #include <string>
 #include <stdint.h>
+#include "process_info.h"
 
 namespace loss
 {
@@ -10,9 +11,14 @@ namespace loss
     class IProcess
     {
         public:
-            virtual const std::string &name() const = 0;
-            virtual const IUser *user() const = 0;
-            virtual const uint32_t id() const = 0;
+            IProcess();
 
+            virtual int32_t run(int argc, char **argv) = 0;
+
+            ProcessInfo &info();
+
+        private:
+
+            ProcessInfo _info;
     };
 }
