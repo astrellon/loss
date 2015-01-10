@@ -76,4 +76,15 @@ namespace loss
             FileMap _files;
             FolderMap _folders;
     };
+
+    class FileHandle
+    {
+        public:
+            FileHandle(FileEntry *entry);
+
+            FileEntry *entry() const;
+
+        private:
+            FileEntry *_entry;
+    };
 }

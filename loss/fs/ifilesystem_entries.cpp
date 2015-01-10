@@ -1,4 +1,4 @@
-#include "ifilesystem_enties.h"
+#include "ifilesystem_entries.h"
 
 #include "ifilesystem.h"
 
@@ -202,5 +202,18 @@ namespace loss
     uint32_t FolderEntry::num_folders() const
     {
         return static_cast<uint32_t>(_folders.size());
+    }
+
+    FileHandle::FileHandle(FileEntry* entry) :
+        _entry(entry)
+    {
+        if (entry == nullptr)
+        {
+            throw std::runtime_error("file entry or process is null");
+        }
+    }
+    FileEntry *FileHandle::entry() const
+    {
+        return _entry;
     }
 }

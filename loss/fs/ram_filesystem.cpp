@@ -92,13 +92,8 @@ namespace loss
         return CreateEntryResult(entry->id(), folder->add_entry(name, entry));
 
     }
-    ReturnCode RamFileSystem::read_folder(uint32_t folder_id, FolderEntry *to_populate)
+    ReturnCode RamFileSystem::read_folder(uint32_t folder_id, FolderEntry &to_populate)
     {
-        if (to_populate == nullptr)
-        {
-            return NULL_PARAMETER;
-        }
-
         auto find = _entry_index.find(folder_id);
         if (find == _entry_index.end())
         {
@@ -120,7 +115,7 @@ namespace loss
                 auto entry = new FileEntry(folder_id, this);
                 entry->size(file->size());
                 entry->id(file->id());
-                auto result = to_populate->add_file(iter.first, entry);
+                auto result = to_populate.add_file(iter.first, entry);
                 if (result != SUCCESS)
                 {
                     return result;
@@ -134,7 +129,7 @@ namespace loss
             {
                 auto entry = new FolderEntry(folder_id, this);
                 entry->id(iter.second->id());
-                auto result = to_populate->add_folder(iter.first, entry);
+                auto result = to_populate.add_folder(iter.first, entry);
                 if (result != SUCCESS)
                 {
                     return result;
@@ -148,7 +143,7 @@ namespace loss
             {
                 auto entry = new FolderEntry(folder_id, mount_point->fs());
                 entry->id(iter.second->id());
-                auto result = to_populate->add_folder(iter.first, entry);
+                auto result = to_populate.add_folder(iter.first, entry);
                 if (result != SUCCESS)
                 {
                     return result;

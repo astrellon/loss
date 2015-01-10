@@ -16,6 +16,7 @@ namespace loss
     class IEntry;
     class FileEntry;
     class FolderEntry;
+    class FileHandle;
 
     class VirtualFileSystem
     {
@@ -25,13 +26,15 @@ namespace loss
             //virtual ReturnCode open(const std::string &name) = 0;
             //virtual ReturnCode symlink(const std::string &link_filename, const std::string &destination) = 0;
             
+            ReturnCode open(const std::string &name, FileHandle **handle);
+
             // Change to a stream version at some point.
             IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
-            IOResult read(FileEntry *entry, uint32_t offset, uint32_t count, uint8_t *buffer);
+            IOResult read(FileHandle *entry, uint32_t offset, uint32_t count, uint8_t *buffer);
             ReturnCode read_folder(const std::string &name, FolderEntry *folder);
 
             IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
-            IOResult write(FileEntry *entry, uint32_t offset, uint32_t count, const uint8_t *data);
+            IOResult write(FileHandle *entry, uint32_t offset, uint32_t count, const uint8_t *data);
             
             ReturnCode entry_size(const std::string &name, uint32_t &size);
             ReturnCode entry_size(IEntry *entry, uint32_t &size);
@@ -65,5 +68,8 @@ namespace loss
             FileSystems _file_systems;
 
             FindEntryResult follow_path(const Path &path, uint32_t folder_id);
+
+            typedef std::map<std::string, std::unique_ptr<FileHandle> > NamedFileHandle;
+            std::map<uint32_t, NamedFileHandle> _process_file_handles;
     };
 }

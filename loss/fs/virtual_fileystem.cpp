@@ -1,7 +1,7 @@
 #include "virtual_fileystem.h"
 
 #include "ifilesystem.h"
-#include "ifilesystem_enties.h"
+#include "ifilesystem_entries.h"
 
 namespace loss
 {
@@ -59,6 +59,33 @@ namespace loss
 
         return result.fs()->create_file(result.id(), path.filename()).status();
     }
+
+    ReturnCode VirtualFileSystem::open(const std::string &name, FileHandle **handle)
+    {
+        if (name.empty())
+        {
+            return NULL_PARAMETER;
+        }
+
+        Path path(name);
+        path.dir_to_filename();
+
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
+        if (result.status() != SUCCESS)
+        {
+            return result.status();
+        }
+
+        auto find = result.fs()->find_entry(result.id(), path.filename());
+        if (find.status() != SUCCESS)
+        {
+            return find.status();
+        }
+
+
+        return SUCCESS;
+    }
+
     IOResult VirtualFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
         Path path(name);

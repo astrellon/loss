@@ -1,6 +1,6 @@
 #include "ifilesystem.h"
 
-#include "ifilesystem_enties.h"
+#include "ifilesystem_entries.h"
 
 namespace loss
 {
