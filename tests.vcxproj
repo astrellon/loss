@@ -72,11 +72,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="loss\fs\ifilesystem.cpp" />
-    <ClCompile Include="loss\fs\ifilesystem_enties.cpp" />
+    <ClCompile Include="loss\fs\ifilesystem_entries.cpp" />
     <ClCompile Include="loss\fs\path.cpp" />
     <ClCompile Include="loss\fs\ram_filesystem.cpp" />
     <ClCompile Include="loss\fs\ram_filesystem_drive.cpp" />
     <ClCompile Include="loss\fs\virtual_fileystem.cpp" />
+    <ClCompile Include="loss\iprocess.cpp" />
+    <ClCompile Include="loss\kernel.cpp" />
+    <ClCompile Include="loss\native_process.cpp" />
+    <ClCompile Include="loss\process_info.cpp" />
     <ClCompile Include="loss\return_codes.cpp" />
     <ClCompile Include="lua\src\lapi.c" />
     <ClCompile Include="lua\src\lauxlib.c" />
@@ -117,15 +121,17 @@
   <ItemGroup>
     <ClInclude Include="loss\fs\common.h" />
     <ClInclude Include="loss\fs\ifilesystem.h" />
-    <ClInclude Include="loss\fs\ifilesystem_enties.h" />
+    <ClInclude Include="loss\fs\ifilesystem_entries.h" />
     <ClInclude Include="loss\fs\path.h" />
     <ClInclude Include="loss\fs\ram_filesystem.h" />
     <ClInclude Include="loss\fs\ram_filesystem_drive.h" />
     <ClInclude Include="loss\fs\virtual_fileystem.h" />
     <ClInclude Include="loss\iprocess.h" />
     <ClInclude Include="loss\iuser.h" />
+    <ClInclude Include="loss\kernel.h" />
+    <ClInclude Include="loss\native_process.h" />
+    <ClInclude Include="loss\process_info.h" />
     <ClInclude Include="loss\return_codes.h" />
-    <ClInclude Include="loss\system.h" />
     <ClInclude Include="lua\src\lapi.h" />
     <ClInclude Include="lua\src\lauxlib.h" />
     <ClInclude Include="lua\src\lcode.h" />

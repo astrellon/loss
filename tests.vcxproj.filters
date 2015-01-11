@@ -127,9 +127,6 @@
     <ClCompile Include="loss\fs\ifilesystem.cpp">
       <Filter>loss\fs</Filter>
     </ClCompile>
-    <ClCompile Include="loss\fs\ifilesystem_enties.cpp">
-      <Filter>loss\fs</Filter>
-    </ClCompile>
     <ClCompile Include="loss\fs\path.cpp">
       <Filter>loss\fs</Filter>
     </ClCompile>
@@ -148,6 +145,21 @@
     </ClCompile>
     <ClCompile Include="tests\loss\filesystem_tests.cpp">
       <Filter>tests\loss</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\iprocess.cpp">
+      <Filter>loss</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\kernel.cpp">
+      <Filter>loss</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\native_process.cpp">
+      <Filter>loss</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\fs\ifilesystem_entries.cpp">
+      <Filter>loss\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\process_info.cpp">
+      <Filter>loss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -235,16 +247,10 @@
     <ClInclude Include="loss\return_codes.h">
       <Filter>loss</Filter>
     </ClInclude>
-    <ClInclude Include="loss\system.h">
-      <Filter>loss</Filter>
-    </ClInclude>
     <ClInclude Include="loss\fs\common.h">
       <Filter>loss\fs</Filter>
     </ClInclude>
     <ClInclude Include="loss\fs\ifilesystem.h">
-      <Filter>loss\fs</Filter>
-    </ClInclude>
-    <ClInclude Include="loss\fs\ifilesystem_enties.h">
       <Filter>loss\fs</Filter>
     </ClInclude>
     <ClInclude Include="loss\fs\path.h">
@@ -264,6 +270,18 @@
     </ClInclude>
     <ClInclude Include="tests\loss\filesystem_tests.h">
       <Filter>tests\loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\kernel.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\native_process.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\process_info.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\fs\ifilesystem_entries.h">
+      <Filter>loss\fs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

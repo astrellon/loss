@@ -4,15 +4,15 @@
 
 namespace loss
 {
-    NativeProcess::NativeProcess(std::ostream *stdout) :
-        IProcess(stdout)
+    NativeProcess::NativeProcess(const std::string &name, const IUser *user, uint32_t id) :
+        IProcess(name, user, id)
     {
 
     }
 
     int32_t NativeProcess::run(int argc, char **argv)
     {
-        *stdout() << "Hello thar\n";
+        *info().std_out() << "Hello thar\n";
         return 0;
     }
 }

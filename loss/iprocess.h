@@ -11,7 +11,7 @@ namespace loss
     class IProcess
     {
         public:
-            IProcess();
+            IProcess(const std::string &name, const IUser *user, uint32_t id);
 
             virtual int32_t run(int argc, char **argv) = 0;
 

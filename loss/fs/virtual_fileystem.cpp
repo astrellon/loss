@@ -82,8 +82,11 @@ namespace loss
             return find.status();
         }
 
-
         return SUCCESS;
+    }
+    ReturnCode VirtualFileSystem::close(FileHandle *entry)
+    {
+
     }
 
     IOResult VirtualFileSystem::read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer)
@@ -104,15 +107,15 @@ namespace loss
         }
         return result.fs()->read(find.id(), offset, count, buffer);
     }
-    IOResult VirtualFileSystem::read(FileEntry *entry, uint32_t offset, uint32_t count, uint8_t *buffer)
+    IOResult VirtualFileSystem::read(FileHandle *handle, uint32_t offset, uint32_t count, uint8_t *buffer)
     {
-        if (entry == nullptr || buffer == nullptr)
+        if (handle == nullptr || buffer == nullptr)
         {
             return IOResult(0, NULL_PARAMETER);
         }
-        return entry->filesystem()->read(entry->id(), offset, count, buffer);
+        return handle->entry()->filesystem()->read(handle->entry()->id(), offset, count, buffer);
     }
-    ReturnCode VirtualFileSystem::read_folder(const std::string &name, FolderEntry *folder)
+    ReturnCode VirtualFileSystem::read_folder(const std::string &name, FolderEntry &folder)
     {
         Path path(name);
         path.filename_to_dir();
@@ -158,13 +161,13 @@ namespace loss
         }
         return result.fs()->write(find.id(), offset, count, data);
     }
-    IOResult VirtualFileSystem::write(FileEntry *entry, uint32_t offset, uint32_t count, const uint8_t *data)
+    IOResult VirtualFileSystem::write(FileHandle *handle, uint32_t offset, uint32_t count, const uint8_t *data)
     {
-        if (entry == nullptr || data == nullptr)
+        if (handle == nullptr || data == nullptr)
         {
             return IOResult(0, NULL_PARAMETER);
         }
-        return entry->filesystem()->write(entry->id(), offset, count, data);
+        return handle->entry()->filesystem()->write(handle->entry()->id(), offset, count, data);
     }
     IOResult VirtualFileSystem::write_string(const std::string &name, uint32_t offset, const std::string &data)
     {

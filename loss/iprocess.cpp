@@ -2,18 +2,14 @@
 
 namespace loss
 {
-    IProcess::IProcess(std::ostream *stdout) :
-        _stdout(stdout)
+    IProcess::IProcess(const std::string &name, const IUser *user, uint32_t id) :
+        _info(name, user, id)
     {
 
     }
 
-    std::ostream *IProcess::stdout() const
+    ProcessInfo &IProcess::info()
     {
-        return _stdout;
-    }
-    void IProcess::stdout(std::ostream *value)
-    {
-        _stdout = value;
+        return _info;
     }
 }

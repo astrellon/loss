@@ -6,17 +6,14 @@
 #include <memory>
 
 #include <loss/return_codes.h>
-#include <loss/fs/common.h>
+#include "common.h"
+#include "ifilesystem_entries.h"
 
 #include "path.h"
 
 namespace loss
 {
     class IFileSystem;
-    class IEntry;
-    class FileEntry;
-    class FolderEntry;
-    class FileHandle;
 
     class VirtualFileSystem
     {
@@ -27,11 +24,12 @@ namespace loss
             //virtual ReturnCode symlink(const std::string &link_filename, const std::string &destination) = 0;
             
             ReturnCode open(const std::string &name, FileHandle **handle);
+            ReturnCode close(FileHandle *entry);
 
             // Change to a stream version at some point.
             IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
             IOResult read(FileHandle *entry, uint32_t offset, uint32_t count, uint8_t *buffer);
-            ReturnCode read_folder(const std::string &name, FolderEntry *folder);
+            ReturnCode read_folder(const std::string &name, FolderEntry &folder);
 
             IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
             IOResult write(FileHandle *entry, uint32_t offset, uint32_t count, const uint8_t *data);
