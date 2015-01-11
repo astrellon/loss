@@ -122,7 +122,7 @@
     <ClCompile Include="loss\fs\ifilesystem.cpp">
       <Filter>loss\fs</Filter>
     </ClCompile>
-    <ClCompile Include="loss\fs\ifilesystem_enties.cpp">
+    <ClCompile Include="loss\fs\ifilesystem_entries.cpp">
       <Filter>loss\fs</Filter>
     </ClCompile>
     <ClCompile Include="loss\fs\path.cpp">
@@ -232,7 +232,7 @@
     <ClInclude Include="loss\fs\ifilesystem.h">
       <Filter>loss\fs</Filter>
     </ClInclude>
-    <ClInclude Include="loss\fs\ifilesystem_enties.h">
+    <ClInclude Include="loss\fs\ifilesystem_entries.h">
       <Filter>loss\fs</Filter>
     </ClInclude>
     <ClInclude Include="loss\fs\path.h">

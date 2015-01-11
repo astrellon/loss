@@ -1,5 +1,7 @@
 #include "iprocess.h"
 
+#include "iuser.h"
+
 namespace loss
 {
     IProcess::IProcess(const std::string &name, const IUser *user, uint32_t id) :

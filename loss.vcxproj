@@ -68,7 +68,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="loss\fs\ifilesystem.cpp" />
-    <ClCompile Include="loss\fs\ifilesystem_enties.cpp" />
+    <ClCompile Include="loss\fs\ifilesystem_entries.cpp" />
     <ClCompile Include="loss\fs\path.cpp" />
     <ClCompile Include="loss\fs\ram_filesystem.cpp" />
     <ClCompile Include="loss\fs\ram_filesystem_drive.cpp" />
@@ -111,7 +111,7 @@
   <ItemGroup>
     <ClInclude Include="loss\fs\common.h" />
     <ClInclude Include="loss\fs\ifilesystem.h" />
-    <ClInclude Include="loss\fs\ifilesystem_enties.h" />
+    <ClInclude Include="loss\fs\ifilesystem_entries.h" />
     <ClInclude Include="loss\fs\path.h" />
     <ClInclude Include="loss\fs\ram_filesystem.h" />
     <ClInclude Include="loss\fs\ram_filesystem_drive.h" />
