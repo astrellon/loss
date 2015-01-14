@@ -37,6 +37,4 @@ namespace loss
     {
         return _std_out;
     }
-
-
 }

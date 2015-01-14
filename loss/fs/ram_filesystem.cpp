@@ -165,7 +165,11 @@ namespace loss
             {
                 return FindEntryResult(ROOT_ID, SUCCESS, this);
             }
-            _root->find_entry(name, &entry);
+            auto status = _root->find_entry(name, &entry);
+            if (status != SUCCESS)
+            {
+                return FindEntryResult(NULL_ID, status, this);
+            }
         }
         else
         {

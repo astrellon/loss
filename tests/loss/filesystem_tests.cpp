@@ -19,6 +19,7 @@ namespace loss
         void Filesystem::run_cases()
         {
             run_case(simple_test);
+            run_case(filehandle_test);
         }
 
         std::string Filesystem::suite_name() const
@@ -101,6 +102,28 @@ namespace loss
                 auto serialise = RamFileSystemSerialise(output, tempfs.get());
                 serialise.save();
             }
+        }
+        
+        void Filesystem::filehandle_test()
+        {
+            VirtualFileSystem vfs;
+            RamFileSystem *ramfs = new RamFileSystem();
+
+            vfs.root_filesystem(ramfs);
+            check_result(vfs.create_file("/test.log"), SUCCESS, "Error creating file");
+
+            FileHandle *file = nullptr;
+            check_result(vfs.open(1, "/whut.whut", file), ENTRY_NOT_FOUND, "Found non-existent file");
+            loss_assert(file == nullptr);
+
+            check_result(vfs.open(1, "/test.log", file), SUCCESS, "Error opening file handle");
+            loss_assert(file != nullptr);
+
+            auto ioresult = vfs.write_string(file, 0, std::string("Hello thar"));
+            check_result(ioresult.status(), SUCCESS, "Error writing to file");
+            loss_equals(10u, ioresult.bytes());
+
+            //check_result(vfs.close(0, nullptr));
         }
 
         void Filesystem::_check_result(const char *file, uint32_t line, loss::ReturnCode result, const std::string &message, loss::ReturnCode expected)

@@ -80,11 +80,30 @@ namespace loss
     class FileHandle
     {
         public:
-            FileHandle(FileEntry *entry);
+            
+            enum OpenMode
+            {
+                UNKNOWN  = -0x01,
+                READ     = 0x01,
+                WRITE    = 0x02,
+                APPEND   = 0x04
+            };
 
-            FileEntry *entry() const;
+            FileHandle(uint32_t id, OpenMode mode, IFileSystem *fs);
+
+            uint32_t id() const;
+            OpenMode mode() const;
+            IFileSystem *filesystem() const;
 
         private:
-            FileEntry *_entry;
+            uint32_t _id;
+            OpenMode _mode;
+            IFileSystem *_fs;
+
     };
+            
+    inline FileHandle::OpenMode operator |(FileHandle::OpenMode lhs, FileHandle::OpenMode rhs)
+    {
+        return static_cast<FileHandle::OpenMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
+    }
 }

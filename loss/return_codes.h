@@ -22,7 +22,12 @@ namespace loss
         ENTRY_ALREADY_EXITS =       -0x0010,
         WRONG_ENTRY_TYPE =          -0x0011,
         ENTRY_NOT_FOUND =           -0x0012,
-        FOLDER_NOT_EMPTY =          -0x0013
+        FOLDER_NOT_EMPTY =          -0x0013,
+        CANNOT_FIND_FILE_HANDLE =   -0x0014,
+        WRONG_FILE_MODE =           -0x0015,
+
+        // Process related
+        CANNOT_FIND_PROCESS =       -0x0020
     };
 
     class ReturnCodes
