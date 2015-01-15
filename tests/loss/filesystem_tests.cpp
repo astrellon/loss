@@ -125,7 +125,8 @@ namespace loss
 
             check_result(vfs.close(file), SUCCESS, "Error closing file handle");
 
-            //check_result(vfs.close(0, nullptr));
+            check_result(vfs.open(1, "/whut.whut", FileHandle::WRITE, file), SUCCESS, "Error opening file handle");
+            loss_assert(file != nullptr);
         }
 
         void Filesystem::_check_result(const char *file, uint32_t line, loss::ReturnCode result, const std::string &message, loss::ReturnCode expected)

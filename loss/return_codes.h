@@ -26,6 +26,8 @@ namespace loss
         CANNOT_FIND_FILE_HANDLE =   -0x0014,
         WRONG_FILE_MODE =           -0x0015,
         FILE_HAS_WRITE_LOCK =       -0x0016,
+        HANDLE_LACKING_WRITE =      -0x0017,
+        HANDLE_LACKING_READ =       -0x0018,
 
         // Process related
         CANNOT_FIND_PROCESS =       -0x0020

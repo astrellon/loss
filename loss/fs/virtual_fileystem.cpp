@@ -141,6 +141,10 @@ namespace loss
         {
             return IOResult(0, NULL_PARAMETER);
         }
+        if (!handle->has_read_mode())
+        {
+            return IOResult(0, HANDLE_LACKING_READ);
+        }
         return handle->filesystem()->read(handle->entry_id(), offset, count, buffer);
     }
     ReturnCode VirtualFileSystem::read_folder(const std::string &name, FolderEntry &folder)
@@ -207,6 +211,10 @@ namespace loss
         if (handle == nullptr || data == nullptr)
         {
             return IOResult(0, NULL_PARAMETER);
+        }
+        if (!handle->has_write_mode())
+        {
+            return IOResult(0, HANDLE_LACKING_WRITE);
         }
         return handle->filesystem()->write(handle->entry_id(), offset, count, data);
     }
