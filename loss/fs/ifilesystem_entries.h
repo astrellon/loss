@@ -89,14 +89,18 @@ namespace loss
                 APPEND   = 0x04
             };
 
-            FileHandle(uint32_t id, OpenMode mode, IFileSystem *fs);
+            FileHandle(uint32_t entry_id, uint32_t process_id, OpenMode mode, IFileSystem *fs);
 
-            uint32_t id() const;
+            uint32_t entry_id() const;
+            uint32_t process_id() const;
             OpenMode mode() const;
+            bool has_write_mode() const;
+            bool has_read_mode() const;
             IFileSystem *filesystem() const;
 
         private:
-            uint32_t _id;
+            uint32_t _entry_id;
+            uint32_t _process_id;
             OpenMode _mode;
             IFileSystem *_fs;
 

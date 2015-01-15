@@ -204,20 +204,25 @@ namespace loss
         return static_cast<uint32_t>(_folders.size());
     }
 
-    FileHandle::FileHandle(uint32_t id, FileHandle::OpenMode mode, IFileSystem *fs) :
-        _id(id),
+    FileHandle::FileHandle(uint32_t entry_id, uint32_t process_id, FileHandle::OpenMode mode, IFileSystem *fs) :
+        _entry_id(entry_id),
+        _process_id(process_id),
         _mode(mode),
         _fs(fs)
     {
-        if (id == 0u)
+        if (entry_id == 0u || process_id == 0u)
         {
             throw std::runtime_error("file entry or process is null");
         }
     }
 
-    uint32_t FileHandle::id() const
+    uint32_t FileHandle::entry_id() const
     {
-        return _id;
+        return _entry_id;
+    }
+    uint32_t FileHandle::process_id() const
+    {
+        return _process_id;
     }
     FileHandle::OpenMode FileHandle::mode() const
     {
@@ -226,5 +231,13 @@ namespace loss
     IFileSystem *FileHandle::filesystem() const
     {
         return _fs;
+    }
+    bool FileHandle::has_write_mode() const
+    {
+        return static_cast<uint32_t>(_mode | FileHandle::WRITE) > 0;
+    }
+    bool FileHandle::has_read_mode() const
+    {
+        return static_cast<uint32_t>(_mode | FileHandle::READ) > 0;
     }
 }

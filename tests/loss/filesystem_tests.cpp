@@ -113,15 +113,17 @@ namespace loss
             check_result(vfs.create_file("/test.log"), SUCCESS, "Error creating file");
 
             FileHandle *file = nullptr;
-            check_result(vfs.open(1, "/whut.whut", file), ENTRY_NOT_FOUND, "Found non-existent file");
+            check_result(vfs.open(1, "/whut.whut", FileHandle::READ | FileHandle::WRITE, file), ENTRY_NOT_FOUND, "Found non-existent file");
             loss_assert(file == nullptr);
 
-            check_result(vfs.open(1, "/test.log", file), SUCCESS, "Error opening file handle");
+            check_result(vfs.open(1, "/test.log", FileHandle::READ | FileHandle::WRITE,file), SUCCESS, "Error opening file handle");
             loss_assert(file != nullptr);
 
             auto ioresult = vfs.write_string(file, 0, std::string("Hello thar"));
             check_result(ioresult.status(), SUCCESS, "Error writing to file");
             loss_equals(10u, ioresult.bytes());
+
+            check_result(vfs.close(file), SUCCESS, "Error closing file handle");
 
             //check_result(vfs.close(0, nullptr));
         }

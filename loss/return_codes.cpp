@@ -17,6 +17,7 @@ namespace loss
         { FOLDER_NOT_EMPTY,    "folder_not_empty" },
         { CANNOT_FIND_FILE_HANDLE,    "cannot_find_file_handle" },
         { WRONG_FILE_MODE,     "wrong_file_mode" },
+        { FILE_HAS_WRITE_LOCK, "file_has_write_lock" },
 
         { CANNOT_FIND_PROCESS, "cannot_find_process" }
     };
@@ -36,6 +37,7 @@ namespace loss
         { FOLDER_NOT_EMPTY,    "cannot delete folder while it is not empty." },
         { CANNOT_FIND_FILE_HANDLE,    "cannot find file handle with the given process id." },
         { WRONG_FILE_MODE,     "cannot read or write to this file handle based on it's mode." },
+        { FILE_HAS_WRITE_LOCK,     "a file can only have one write handle at a time." },
         
         { CANNOT_FIND_PROCESS,    "cannot find the process with the given process_id." }
     };

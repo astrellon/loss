@@ -15,6 +15,7 @@ namespace loss
     class IFileSystem
     {
         public:
+            IFileSystem();
             virtual ~IFileSystem();
 
             virtual IOResult read(uint32_t file_id, uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
@@ -33,8 +34,14 @@ namespace loss
 
             virtual ReturnCode remove_entry(uint32_t entry_id) = 0;
 
+            void filesystem_id(uint32_t id);
+            uint32_t filesystem_id() const;
+
             static const uint32_t ROOT_ID;
             static const uint32_t NULL_ID;
+
+        private:
+            uint32_t _filesystem_id;
     };
 }
 

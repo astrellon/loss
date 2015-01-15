@@ -5,7 +5,8 @@
 namespace loss
 {
     VirtualFileSystem::VirtualFileSystem() : 
-        _root_filesystem(nullptr)
+        _root_filesystem(nullptr),
+        _filesystem_counter(0u)
     {
 
     }
@@ -41,6 +42,7 @@ namespace loss
             }
         }
 
+        fs->filesystem_id(++_filesystem_counter);
         _file_systems.push_back(std::unique_ptr<IFileSystem>(fs));
         return SUCCESS;
     }
@@ -59,7 +61,7 @@ namespace loss
         return result.fs()->create_file(result.id(), path.filename()).status();
     }
 
-    ReturnCode VirtualFileSystem::open(uint32_t process_id, const std::string &name, FileHandle *&handle)
+    ReturnCode VirtualFileSystem::open(uint32_t process_id, const std::string &name, FileHandle::OpenMode open_mode, FileHandle *&handle)
     {
         if (name.empty())
         {
@@ -81,13 +83,23 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        handle = new FileHandle(find.id(), FileHandle::READ | FileHandle::WRITE, result.fs());
+        if (open_mode | FileHandle::WRITE && find_write_handle(process_id, find.id(), find.fs()))
+        {
+            return FILE_HAS_WRITE_LOCK;
+        }
+
+        handle = new FileHandle(find.id(), process_id, open_mode, result.fs());
         _process_file_handles[process_id].push_back(std::unique_ptr<FileHandle>(handle)); 
         return SUCCESS;
     }
-    ReturnCode VirtualFileSystem::close(uint32_t process_id, FileHandle *handle)
+    ReturnCode VirtualFileSystem::close(FileHandle *handle)
     {
-        const auto find_process = _process_file_handles.find(process_id);
+        if (handle == nullptr)
+        {
+            return NULL_PARAMETER;
+        }
+
+        const auto find_process = _process_file_handles.find(handle->process_id());
         if (find_process == _process_file_handles.end())
         {
             return CANNOT_FIND_PROCESS;
@@ -129,7 +141,7 @@ namespace loss
         {
             return IOResult(0, NULL_PARAMETER);
         }
-        return handle->filesystem()->read(handle->id(), offset, count, buffer);
+        return handle->filesystem()->read(handle->entry_id(), offset, count, buffer);
     }
     ReturnCode VirtualFileSystem::read_folder(const std::string &name, FolderEntry &folder)
     {
@@ -196,7 +208,7 @@ namespace loss
         {
             return IOResult(0, NULL_PARAMETER);
         }
-        return handle->filesystem()->write(handle->id(), offset, count, data);
+        return handle->filesystem()->write(handle->entry_id(), offset, count, data);
     }
     IOResult VirtualFileSystem::write_string(const std::string &name, uint32_t offset, const std::string &data)
     {
@@ -359,5 +371,28 @@ namespace loss
         }
 
         return FindEntryResult(folder_id, SUCCESS, fs);
+    }
+
+    bool VirtualFileSystem::find_write_handle(uint32_t process_id, uint32_t entry_id, IFileSystem *fs) const
+    {
+        const auto find = _process_file_handles.find(process_id);
+        if (find == _process_file_handles.end())
+        {
+            return false;
+        }
+
+        const auto &handles = find->second;
+        for (auto iter = handles.begin(); iter != handles.end(); ++iter)
+        {
+            const auto handle = iter->get();
+            if (handle->entry_id() == entry_id && 
+                    handle->filesystem() == fs && 
+                    handle->has_write_mode())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

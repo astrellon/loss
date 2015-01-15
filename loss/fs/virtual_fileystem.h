@@ -25,8 +25,8 @@ namespace loss
             //virtual ReturnCode open(const std::string &name) = 0;
             //virtual ReturnCode symlink(const std::string &link_filename, const std::string &destination) = 0;
             
-            ReturnCode open(uint32_t process_id, const std::string &name, FileHandle *&handle);
-            ReturnCode close(uint32_t process_id, FileHandle *entry);
+            ReturnCode open(uint32_t process_id, const std::string &name, FileHandle::OpenMode open_mode, FileHandle *&handle);
+            ReturnCode close(FileHandle *entry);
 
             // Change to a stream version at some point.
             IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
@@ -68,9 +68,12 @@ namespace loss
         private:
             IFileSystem *_root_filesystem;
             FileSystems _file_systems;
+            uint32_t _filesystem_counter;
 
             FindEntryResult follow_path(const Path &path, uint32_t folder_id);
 
             std::map< uint32_t, std::vector< std::unique_ptr<FileHandle> > > _process_file_handles;
+
+            bool find_write_handle(uint32_t process_id, uint32_t entry_id, IFileSystem *fs) const;
     };
 }
