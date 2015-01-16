@@ -125,8 +125,20 @@ namespace loss
 
             check_result(vfs.close(file), SUCCESS, "Error closing file handle");
 
-            check_result(vfs.open(1, "/whut.whut", FileHandle::WRITE, file), SUCCESS, "Error opening file handle");
+            check_result(vfs.open(1, "/test.log", FileHandle::WRITE, file), SUCCESS, "Error opening file handle");
             loss_assert(file != nullptr);
+
+            FileHandle *file2 = nullptr;
+            check_result(vfs.open(1, "/test.log", FileHandle::WRITE, file2), FILE_HAS_WRITE_LOCK, "Opened a 2nd file write handle");
+            loss_assert(file2 == nullptr);
+            
+            check_result(vfs.open(2, "/test.log", FileHandle::WRITE, file2), FILE_HAS_WRITE_LOCK, "Opened a 2nd file write handle with a different process");
+            loss_assert(file2 == nullptr);
+
+            check_result(vfs.close_process_handles(1), SUCCESS, "Error closing all file handles");
+            
+            check_result(vfs.open(2, "/test.log", FileHandle::WRITE, file2), SUCCESS, "Failed to open file that shouldn't have a write lock anymore");
+            loss_assert(file2 != nullptr);
         }
 
         void Filesystem::_check_result(const char *file, uint32_t line, loss::ReturnCode result, const std::string &message, loss::ReturnCode expected)

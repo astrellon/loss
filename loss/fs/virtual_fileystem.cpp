@@ -26,6 +26,55 @@ namespace loss
     {
         return _root_filesystem;
     }
+
+    const VirtualFileSystem::FileSystems &VirtualFileSystem::file_systems() const
+    {
+        return _file_systems;
+    }
+
+    ReturnCode VirtualFileSystem::find_handles_for_processes(uint32_t process_id, VirtualFileSystem::FileHandles &result) const
+    {
+        const auto find = _process_to_id.find(process_id);
+        if (find == _process_to_id.end())
+        {
+            return CANNOT_FIND_PROCESS;
+        }
+
+        for (auto iter_id : find->second)
+        {
+            const auto find_handle = _id_to_file_handle.find(iter_id);
+            if (find_handle == _id_to_file_handle.end())
+            {
+                return INTERNAL_ERROR;
+            }
+
+            const auto &handles = find_handle->second;
+            for (auto iter = handles.begin(); iter != handles.end(); ++iter)
+            {
+                if (iter->get()->process_id() == process_id)
+                {
+                    result.push_back(iter->get());
+                }
+            }
+        }
+        return SUCCESS;
+    }
+    ReturnCode VirtualFileSystem::close_process_handles(uint32_t process_id)
+    {
+        FileHandles handles;
+        auto result = find_handles_for_processes(process_id, handles);
+        if (result != SUCCESS)
+        {
+            return result;
+        }
+
+        for (auto iter : handles)
+        {
+            close(iter);
+        }
+
+        return SUCCESS;
+    }
     
     ReturnCode VirtualFileSystem::register_file_system(IFileSystem *fs)
     {
@@ -83,13 +132,15 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        if (open_mode | FileHandle::WRITE && find_write_handle(process_id, find.id(), find.fs()))
+        if (open_mode | FileHandle::WRITE && find_write_handle(find.id(), find.fs()))
         {
             return FILE_HAS_WRITE_LOCK;
         }
 
         handle = new FileHandle(find.id(), process_id, open_mode, result.fs());
-        _process_file_handles[process_id].push_back(std::unique_ptr<FileHandle>(handle)); 
+        auto id = make_id(find.id(), find.fs());
+        _id_to_file_handle[id].push_back(std::unique_ptr<FileHandle>(handle)); 
+        _process_to_id[process_id].push_back(id);
         return SUCCESS;
     }
     ReturnCode VirtualFileSystem::close(FileHandle *handle)
@@ -99,13 +150,32 @@ namespace loss
             return NULL_PARAMETER;
         }
 
-        const auto find_process = _process_file_handles.find(handle->process_id());
-        if (find_process == _process_file_handles.end())
+        auto id = make_id(handle->entry_id(), handle->filesystem());
+
+        // Remove process to id map
+        const auto find_process_id = _process_to_id.find(handle->process_id());
+        if (find_process_id == _process_to_id.end())
+        {
+            return CANNOT_FIND_PROCESS;
+        }
+        auto &ids = find_process_id->second;
+        for (auto iter = ids.begin(); iter != ids.end(); ++iter)
+        {
+            if (*iter == id)
+            {
+                ids.erase(iter);
+                break;
+            }
+        }
+
+        // Remove file handle
+        const auto find_process_handle = _id_to_file_handle.find(id);
+        if (find_process_handle == _id_to_file_handle.end())
         {
             return CANNOT_FIND_PROCESS;
         }
 
-        auto &handles = find_process->second;
+        auto &handles = find_process_handle->second;
         for (auto iter = handles.begin(); iter != handles.end(); ++iter)
         {
             if (iter->get() == handle)
@@ -381,10 +451,11 @@ namespace loss
         return FindEntryResult(folder_id, SUCCESS, fs);
     }
 
-    bool VirtualFileSystem::find_write_handle(uint32_t process_id, uint32_t entry_id, IFileSystem *fs) const
+    bool VirtualFileSystem::find_write_handle(uint32_t entry_id, IFileSystem *fs) const
     {
-        const auto find = _process_file_handles.find(process_id);
-        if (find == _process_file_handles.end())
+        uint64_t id = make_id(entry_id, fs);
+        const auto find = _id_to_file_handle.find(id);
+        if (find == _id_to_file_handle.end())
         {
             return false;
         }
@@ -392,15 +463,17 @@ namespace loss
         const auto &handles = find->second;
         for (auto iter = handles.begin(); iter != handles.end(); ++iter)
         {
-            const auto handle = iter->get();
-            if (handle->entry_id() == entry_id && 
-                    handle->filesystem() == fs && 
-                    handle->has_write_mode())
+            if (iter->get()->has_write_mode())
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    uint64_t VirtualFileSystem::make_id(uint32_t entry_id, IFileSystem *fs) const
+    {
+        return static_cast<uint64_t>(fs->filesystem_id()) << 32lu | static_cast<uint64_t>(entry_id);
     }
 }

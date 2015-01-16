@@ -22,9 +22,6 @@ namespace loss
         public:
             VirtualFileSystem();
 
-            //virtual ReturnCode open(const std::string &name) = 0;
-            //virtual ReturnCode symlink(const std::string &link_filename, const std::string &destination) = 0;
-            
             ReturnCode open(uint32_t process_id, const std::string &name, FileHandle::OpenMode open_mode, FileHandle *&handle);
             ReturnCode close(FileHandle *entry);
 
@@ -65,6 +62,10 @@ namespace loss
             
             ReturnCode register_file_system(IFileSystem *fs);
 
+            typedef std::vector< FileHandle * > FileHandles;
+            ReturnCode find_handles_for_processes(uint32_t process_id, FileHandles &result) const;
+            ReturnCode close_process_handles(uint32_t process_id);
+
         private:
             IFileSystem *_root_filesystem;
             FileSystems _file_systems;
@@ -72,8 +73,12 @@ namespace loss
 
             FindEntryResult follow_path(const Path &path, uint32_t folder_id);
 
-            std::map< uint32_t, std::vector< std::unique_ptr<FileHandle> > > _process_file_handles;
+            // Id is the filesystem_id with the entry_id
+            std::map< uint64_t, std::vector< std::unique_ptr<FileHandle> > > _id_to_file_handle;
+            std::map< uint32_t, std::vector< uint64_t > > _process_to_id;
 
-            bool find_write_handle(uint32_t process_id, uint32_t entry_id, IFileSystem *fs) const;
+            bool find_write_handle(uint32_t entry_id, IFileSystem *fs) const;
+
+            uint64_t make_id(uint32_t entry_id, IFileSystem *fs) const;
     };
 }
