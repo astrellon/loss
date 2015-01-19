@@ -5,9 +5,15 @@
 
 namespace loss
 {
-    Kernel::Kernel()
+    Kernel::Kernel(uint32_t id) :
+        _id(id)
     {
 
+    }
+
+    uint32_t Kernel::id() const
+    {
+        return _id;
     }
 
     ReturnCode Kernel::register_user(IUser *user)

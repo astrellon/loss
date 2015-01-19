@@ -17,7 +17,9 @@ namespace loss
     {
         public:
             
-            Kernel();
+            Kernel(uint32_t id);
+
+            uint32_t id() const;
 
             // Running processes
             // File system
@@ -30,6 +32,7 @@ namespace loss
 
         private:
 
+            uint32_t _id;
             typedef std::map<uint32_t, std::unique_ptr<IProcess> > ProcessMap;
             typedef std::map<uint32_t, std::unique_ptr<IUser> > UserMap;
             ProcessMap _processes;

@@ -30,7 +30,10 @@ namespace loss
         HANDLE_LACKING_READ =       -0x0018,
 
         // Process related
-        CANNOT_FIND_PROCESS =       -0x0020
+        CANNOT_FIND_PROCESS =       -0x0020,
+            
+        // Kernel related
+        DIFFERENT_KERNEL_SAME_ID =  -0x0040
     };
 
     class ReturnCodes

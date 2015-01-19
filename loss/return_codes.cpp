@@ -21,7 +21,9 @@ namespace loss
         { HANDLE_LACKING_WRITE,    "handle_lacking_write" },
         { HANDLE_LACKING_READ,     "handle_lacking_read" },
 
-        { CANNOT_FIND_PROCESS, "cannot_find_process" }
+        { CANNOT_FIND_PROCESS, "cannot_find_process" },
+
+        { DIFFERENT_KERNEL_SAME_ID, "different_kernel_same_id" }
     };
 
     std::map<ReturnCode, std::string> ReturnCodes::s_code_desc = {
@@ -43,7 +45,9 @@ namespace loss
         { HANDLE_LACKING_WRITE,    "attempting to write with a file handle that does not have write permissions." },
         { HANDLE_LACKING_READ,     "attempting to read with a file handle that does not have read permissions." },
         
-        { CANNOT_FIND_PROCESS, "cannot find the process with the given process_id." }
+        { CANNOT_FIND_PROCESS, "cannot find the process with the given process_id." },
+
+        { DIFFERENT_KERNEL_SAME_ID, "a different kernel with the same id has already been registered." }
     };
 
     const std::string &ReturnCodes::name(loss::ReturnCode code)

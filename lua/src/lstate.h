@@ -174,7 +174,9 @@ struct lua_State {
   ptrdiff_t errfunc;  /* current error handling function (stack index) */
   CallInfo base_ci;  /* CallInfo for first level (C calling Lua) */
 
+  // Loss specific stuff
   void *kernel;
+  void *process;
 };
 
 
