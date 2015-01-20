@@ -315,14 +315,6 @@ namespace loss
         }
         return result.fs()->entry_size(find.id(), size);
     }
-    ReturnCode VirtualFileSystem::entry_size(IEntry *entry, uint32_t &size)
-    {
-        if (entry == nullptr)
-        {
-            return NULL_PARAMETER;
-        }
-        return entry->filesystem()->entry_size(entry->id(), size);
-    }
 
     ReturnCode VirtualFileSystem::entry_metadata(const std::string &name, MetadataDef &metadata)
     {
@@ -342,14 +334,6 @@ namespace loss
         }
         return result.fs()->entry_metadata(find.id(), metadata);
     }
-    ReturnCode VirtualFileSystem::entry_metadata(IEntry *entry, MetadataDef &metadata)
-    {
-        if (entry == nullptr)
-        {
-            return NULL_PARAMETER;
-        }
-        return entry->filesystem()->entry_metadata(entry->id(), metadata);
-    }
 
     ReturnCode VirtualFileSystem::update_entry_metadata(const std::string &name, const MetadataDef &metadata)
     {
@@ -368,14 +352,6 @@ namespace loss
             return find.status();
         }
         return result.fs()->update_entry_metadata(find.id(), metadata);
-    }
-    ReturnCode VirtualFileSystem::update_entry_metadata(IEntry *entry, const MetadataDef &metadata)
-    {
-        if (entry == nullptr)
-        {
-            return NULL_PARAMETER;
-        }
-        return entry->filesystem()->update_entry_metadata(entry->id(), metadata);
     }
 
     ReturnCode VirtualFileSystem::create_folder(const std::string &name)
@@ -423,15 +399,6 @@ namespace loss
             return find.status();
         }
         return result.fs()->remove_entry(find.id());
-    }
-    ReturnCode VirtualFileSystem::remove_entry(IEntry *entry)
-    {
-        if (entry == nullptr)
-        {
-            return NULL_PARAMETER;
-        }
-
-        return entry->filesystem()->remove_entry(entry->id());
     }
 
     FindEntryResult VirtualFileSystem::follow_path(const Path &path, uint32_t folder_id)

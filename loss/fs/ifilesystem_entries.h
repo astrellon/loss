@@ -34,6 +34,16 @@ namespace loss
             MetadataDef _metadata;
     };
 
+    class SymlinkEntry : public IEntry
+    {
+        public:
+            SymlinkEntry(uint32_t parent_id, IFileSystem *fs, const std::string &link);
+
+            const std::string &link() const;
+        private:
+            std::string _link;
+    };
+
     class FileEntry : public IEntry
     {
         public:

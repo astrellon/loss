@@ -8,18 +8,84 @@ namespace loss
     class MetadataDef
     {
         public:
-            MetadataDef();
+            inline MetadataDef() :
+                _owner_id(0u),
+                _permissions(0x00u)
+            {
 
-            const std::string &owner() const;
-            ReturnCode owner(const std::string &new_owner);
+            }
 
-            /* Not needed yet {{{
-            bool readable() const;
-            bool writable() const;
-            bool executable() const;
-            }}}*/
+            inline uint32_t owner_id() const
+            {
+                return _owner_id;
+            }
+            inline void owner_id(uint32_t id)
+            {
+                _owner_id = id;
+            }
+            
+            enum Permission
+            {
+                READABLE    = 0x01,
+                WRITABLE    = 0x02,
+                EXECUTABLE  = 0x04,
+                CHAR_DEVICE = 0x08
+            };
+
+#define SET_BIT(set, value, mask) \
+            set ? value | mask : value & ~mask 
+
+#define GET_BIT(value, mask) \
+            (value & mask) > 0u;
+
+            inline bool readable() const
+            {
+                return GET_BIT(_permissions, READABLE);
+            }
+            inline void readable(bool set)
+            {
+                _permissions = SET_BIT(set, _permissions, READABLE);
+            }
+
+            inline bool writable() const
+            {
+                return GET_BIT(_permissions, WRITABLE);
+            }
+            inline void writable(bool set)
+            {
+                _permissions = SET_BIT(set, _permissions, WRITABLE);
+            }
+
+            inline bool executable() const
+            {
+                return GET_BIT(_permissions, EXECUTABLE);
+            }
+            inline void executable(bool set)
+            {
+                _permissions = SET_BIT(set, _permissions, EXECUTABLE);
+            }
+
+            inline bool character_device() const
+            {
+                return GET_BIT(_permissions, CHAR_DEVICE);
+            }
+            inline void character_device(bool set)
+            {
+                _permissions = SET_BIT(set, _permissions, CHAR_DEVICE);
+            }
+
+            inline uint32_t permissions() const
+            {
+                return _permissions;
+            }
+            inline void permissions(uint32_t value)
+            {
+                _permissions = value;
+            }
+
         private:
-            std::string _owner;
+            uint32_t _owner_id;
+            uint32_t _permissions;
     };
 
     class IOResult

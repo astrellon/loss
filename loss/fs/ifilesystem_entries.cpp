@@ -4,26 +4,7 @@
 
 namespace loss
 {
-    MetadataDef::MetadataDef() :
-        _owner("No owner")
-    {
-
-    }
-    const std::string &MetadataDef::owner() const
-    {
-        return _owner;
-    }
-    ReturnCode MetadataDef::owner(const std::string &new_owner)
-    {
-        if (new_owner.empty())
-        {
-            return NULL_PARAMETER;
-        }
-
-        _owner = new_owner;
-        return SUCCESS;
-    }
-
+    // IEntry {{{
     IEntry::IEntry(uint32_t parent_id, IFileSystem *fs) :
         _fs(fs),
         _id(0),
@@ -63,13 +44,30 @@ namespace loss
     {
         return _fs;
     }
+    // }}}
+    
+    // SymlinkEntry {{{
+    SymlinkEntry::SymlinkEntry(uint32_t parent_id, IFileSystem *fs, const std::string &link) :
+        IEntry(parent_id, fs),
+        _link(link)
+    {
 
+    }
+
+    const std::string &SymlinkEntry::link() const
+    {
+        return _link;
+    }
+    // }}}
+
+    // FileEntry {{{
     FileEntry::FileEntry(uint32_t parent_id, IFileSystem *fs) :
         IEntry(parent_id, fs),
         _size(0)
     {
 
     }
+
     uint32_t FileEntry::size() const
     {
         return _size;
@@ -78,7 +76,9 @@ namespace loss
     {
         _size = size;
     }
+    // }}}
 
+    // FolderEntry {{{
     FolderEntry::FolderEntry() :
         IEntry(0, nullptr)
     {
@@ -203,7 +203,9 @@ namespace loss
     {
         return static_cast<uint32_t>(_folders.size());
     }
+    // }}}
 
+    // FileHandle {{{
     FileHandle::FileHandle(uint32_t entry_id, uint32_t process_id, FileHandle::OpenMode mode, IFileSystem *fs) :
         _entry_id(entry_id),
         _process_id(process_id),
@@ -240,4 +242,5 @@ namespace loss
     {
         return static_cast<uint32_t>(_mode | FileHandle::READ) > 0;
     }
+    // }}}
 }
