@@ -4,12 +4,11 @@
 #include <map>
 #include <stdint.h>
 #include <memory>
-#include <vector>
 
 #include <loss/fs/virtual_fileystem.h>
 #include <loss/return_codes.h>
-#include <loss/iuser.h>
-#include <loss/iprocess.h>
+#include <loss/user_manager.h>
+#include <loss/process_manager.h>
 
 namespace loss
 {
@@ -25,18 +24,21 @@ namespace loss
             // File system
             // Shared memory
             // Timers
-            ReturnCode register_user(IUser *user);
 
             VirtualFileSystem &virtual_file_system();
             const VirtualFileSystem &virtual_file_system() const;
 
+            ProcessManager &process_manager();
+            const ProcessManager &process_manager() const;
+
+            UserManager &user_manager();
+            const UserManager &user_manager() const;
+
         private:
 
             uint32_t _id;
-            typedef std::map<uint32_t, std::unique_ptr<IProcess> > ProcessMap;
-            typedef std::map<uint32_t, std::unique_ptr<IUser> > UserMap;
-            ProcessMap _processes;
-            UserMap  _users;
             VirtualFileSystem _vfs;
+            ProcessManager _process_manager;
+            UserManager _user_manager;
     };
 }

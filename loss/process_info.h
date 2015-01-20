@@ -6,16 +6,16 @@
 
 namespace loss
 {
-    class IUser;
+    class User;
 
     class ProcessInfo
     {
         public:
-            ProcessInfo(const std::string &name, const IUser *user, uint32_t id);
+            ProcessInfo(const std::string &name, const User *user, uint32_t id);
 
             void name(const std::string &name);
             const std::string &name() const;
-            const IUser *user() const;
+            const User *user() const;
             uint32_t id() const;
             
             void std_out(std::ostream *value);
@@ -23,7 +23,7 @@ namespace loss
 
         private:
             std::string _name;
-            const IUser *_user;
+            const User *_user;
             uint32_t _id;
 
             std::ostream *_std_out;

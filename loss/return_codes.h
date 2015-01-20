@@ -32,8 +32,13 @@ namespace loss
         // Process related
         CANNOT_FIND_PROCESS =       -0x0020,
             
+        // User related
+        CANNOT_FIND_USER =          -0x0040,
+        USER_ALREADY_EXISTS =       -0x0041,
+
         // Kernel related
-        DIFFERENT_KERNEL_SAME_ID =  -0x0040
+        DIFFERENT_KERNEL_SAME_ID =  -0x0100,
+
     };
 
     class ReturnCodes

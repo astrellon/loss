@@ -1,6 +1,5 @@
 #include "kernel.h"
 
-#include <loss/iuser.h>
 #include <loss/fs/ifilesystem.h>
 
 namespace loss
@@ -16,22 +15,6 @@ namespace loss
         return _id;
     }
 
-    ReturnCode Kernel::register_user(IUser *user)
-    {
-        if (user == nullptr)
-        {
-            return NULL_PARAMETER;
-        }
-
-        auto find = _users.find(user->id());
-        if (find != _users.end())
-        {
-            return ALREADY_IN_LIST;
-        }
-
-        _users[user->id()] = std::unique_ptr<IUser>(user);
-        return SUCCESS;
-    }
     VirtualFileSystem &Kernel::virtual_file_system()
     {
         return _vfs;
@@ -39,5 +22,23 @@ namespace loss
     const VirtualFileSystem &Kernel::virtual_file_system() const
     {
         return _vfs;
+    }
+
+    ProcessManager &Kernel::process_manager()
+    {
+        return _process_manager;
+    }
+    const ProcessManager &Kernel::process_manager() const
+    {
+        return _process_manager;
+    }
+
+    UserManager &Kernel::user_manager()
+    {
+        return _user_manager;
+    }
+    const UserManager &Kernel::user_manager() const
+    {
+        return _user_manager;
     }
 }

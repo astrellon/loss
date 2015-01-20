@@ -23,6 +23,9 @@ namespace loss
 
         { CANNOT_FIND_PROCESS, "cannot_find_process" },
 
+        { CANNOT_FIND_USER,    "cannot_find_user" },
+        { USER_ALREADY_EXISTS, "user_already_exists" },
+
         { DIFFERENT_KERNEL_SAME_ID, "different_kernel_same_id" }
     };
 
@@ -46,6 +49,9 @@ namespace loss
         { HANDLE_LACKING_READ,     "attempting to read with a file handle that does not have read permissions." },
         
         { CANNOT_FIND_PROCESS, "cannot find the process with the given process_id." },
+
+        { CANNOT_FIND_USER, "cannot find user by id." },
+        { USER_ALREADY_EXISTS, "a user with the given id already exists." },
 
         { DIFFERENT_KERNEL_SAME_ID, "a different kernel with the same id has already been registered." }
     };

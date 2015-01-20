@@ -2,7 +2,7 @@
 
 namespace loss
 {
-    ProcessInfo::ProcessInfo(const std::string &name, const IUser *user, uint32_t id) :
+    ProcessInfo::ProcessInfo(const std::string &name, const User *user, uint32_t id) :
         _name(name),
         _user(user),
         _id(id)
@@ -19,7 +19,7 @@ namespace loss
         return _name;
     }
 
-    const IUser *ProcessInfo::user() const
+    const User *ProcessInfo::user() const
     {
         return _user;
     }
