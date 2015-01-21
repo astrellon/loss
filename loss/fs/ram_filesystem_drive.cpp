@@ -32,7 +32,7 @@ namespace loss
             return;
         }
 
-        auto file = dynamic_cast<RamFileSystem::DataFile *>(entry);
+        auto file = dynamic_cast<RamFileSystem::File *>(entry);
         if (file != nullptr)
         {
             serialise_file(file);
@@ -51,7 +51,7 @@ namespace loss
             write_binary(iter->second->id());
         }
     }
-    void RamFileSystemSerialise::serialise_file(RamFileSystem::DataFile *file)
+    void RamFileSystemSerialise::serialise_file(RamFileSystem::File *file)
     {
         write_binary(file->id());
         _output << 'd';
@@ -146,7 +146,7 @@ namespace loss
             auto file_entry = dynamic_cast<File *>(iter->second.get());
             if (file_entry != nullptr)
             {
-                auto file_ram_entry = new RamFileSystem::DataFile(iter->first);
+                auto file_ram_entry = new RamFileSystem::File(iter->first);
                 file_ram_entry->write(0, file_entry->size(), file_entry->data());
                 _fs->_entry_index[iter->first] = std::unique_ptr<RamFileSystem::Entry>(file_ram_entry);
                 continue;

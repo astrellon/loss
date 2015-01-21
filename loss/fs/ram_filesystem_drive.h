@@ -24,7 +24,7 @@ namespace loss
 
             void serialise_entry(RamFileSystem::Entry *entry);
             void serialise_folder(RamFileSystem::Folder *folder);
-            void serialise_file(RamFileSystem::DataFile *file);
+            void serialise_file(RamFileSystem::File *file);
 
             template <class T>
             void write_binary(T value)

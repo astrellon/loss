@@ -2,6 +2,7 @@
 
 namespace loss
 {
+    // RamFileSystem {{{
     RamFileSystem::RamFileSystem() :
         _id_counter(ROOT_ID)
     {
@@ -64,6 +65,10 @@ namespace loss
     CreateEntryResult RamFileSystem::create_file(uint32_t folder_id, const std::string &name)
     {
         return add_entry(folder_id, name, new_file(folder_id));
+    }
+    CreateEntryResult RamFileSystem::create_symlink(uint32_t folder_id, const std::string &name, const std::string &link)
+    {
+        return add_entry(folder_id, name, new_symlink(folder_id, link));
     }
     CreateEntryResult RamFileSystem::create_folder(uint32_t folder_id, const std::string &name)
     {
@@ -338,7 +343,34 @@ namespace loss
 
         return result;
     }
+    
+    RamFileSystem::Folder *RamFileSystem::new_folder(uint32_t parent_id)
+    {
+        auto id = next_id();
+        auto result = new Folder(id);
+        result->parent_folder_id(parent_id);
+        _entry_index[id] = std::unique_ptr<Entry>(result);
+        return result;
+    }
+    RamFileSystem::File *RamFileSystem::new_file(uint32_t parent_id)
+    {
+        auto id = next_id();
+        auto result = new File(id);
+        result->parent_folder_id(parent_id);
+        _entry_index[id] = std::unique_ptr<Entry>(result);
+        return result;
+    }
+    RamFileSystem::Symlink *RamFileSystem::new_symlink(uint32_t parent_id, const std::string &link)
+    {
+        auto id = next_id();
+        auto result = new Symlink(id, link);
+        result->parent_folder_id(parent_id);
+        _entry_index[id] = std::unique_ptr<Entry>(result);
+        return result;
+    }
+    // }}}
 
+    // Entry {{{
     RamFileSystem::Entry::Entry(uint32_t id) :
         _id(id),
         _parent_folder_id(NULL_ID)
@@ -376,23 +408,42 @@ namespace loss
     {
         _metadata = metadata;
     }
+    // }}}
+    
+    // Symlink {{{
+    RamFileSystem::Symlink::Symlink(uint32_t id) :
+        Entry(id)
+    {
 
+    }
+    RamFileSystem::Symlink::Symlink(uint32_t id, const std::string &link) :
+        Entry(id),
+        _link(link)
+    {
+
+    }
+
+    void RamFileSystem::Symlink::link(const std::string &link)
+    {
+        _link = link;
+    }
+    const std::string &RamFileSystem::Symlink::link() const
+    {
+        return _link;
+    }
+    // }}}
+
+    // File {{{
     RamFileSystem::File::File(uint32_t id) :
         Entry(id)
     {
 
     }
-
-    RamFileSystem::DataFile::DataFile(uint32_t id) :
-        File(id)
-    {
-
-    }
-    uint32_t RamFileSystem::DataFile::size() const
+    uint32_t RamFileSystem::File::size() const
     {
         return static_cast<uint32_t>(_data.size());
     }
-    IOResult RamFileSystem::DataFile::read(uint32_t offset, uint32_t count, uint8_t *buffer)
+    IOResult RamFileSystem::File::read(uint32_t offset, uint32_t count, uint8_t *buffer)
     {
         if (buffer == nullptr)
         {
@@ -417,7 +468,7 @@ namespace loss
         }
         return IOResult(read_count, SUCCESS);
     }
-    IOResult RamFileSystem::DataFile::write(uint32_t offset, uint32_t count, const uint8_t *data)
+    IOResult RamFileSystem::File::write(uint32_t offset, uint32_t count, const uint8_t *data)
     {
         if (data == nullptr)
         {
@@ -442,7 +493,9 @@ namespace loss
         }
         return IOResult(count, SUCCESS);
     }
+    // }}}
     
+    // Folder {{{
     RamFileSystem::Folder::Folder(uint32_t id) :
         Entry(id)
     {
@@ -515,7 +568,9 @@ namespace loss
     {
         return static_cast<uint32_t>(_entries.size());
     }
+    // }}}
 
+    // MountPoint {{{
     RamFileSystem::MountPoint::MountPoint(uint32_t id, IFileSystem *fs) :
         Entry(id),
         _fs(fs)
@@ -531,21 +586,6 @@ namespace loss
     {
         return ++_id_counter;
     }
+    // }}}
 
-    RamFileSystem::Folder *RamFileSystem::new_folder(uint32_t parent_id)
-    {
-        auto id = next_id();
-        auto result = new Folder(id);
-        result->parent_folder_id(parent_id);
-        _entry_index[id] = std::unique_ptr<Entry>(result);
-        return result;
-    }
-    RamFileSystem::DataFile *RamFileSystem::new_file(uint32_t parent_id)
-    {
-        auto id = next_id();
-        auto result = new DataFile(id);
-        result->parent_folder_id(parent_id);
-        _entry_index[id] = std::unique_ptr<Entry>(result);
-        return result;
-    }
 }

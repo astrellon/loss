@@ -43,27 +43,31 @@ namespace loss
             };
             // }}}
             
+            // Symlink Entry {{{
+            class Symlink : public Entry
+            {
+                public: 
+                    Symlink(uint32_t id);
+                    Symlink(uint32_t id, const std::string &link);
+
+                    void link(const std::string &link);
+                    const std::string &link() const;
+
+                private:
+                    std::string _link;
+            };
+            // }}}
+            
             // File Entry {{{
             class File : public Entry
             {
                 public:
                     File(uint32_t id);
 
-                    virtual uint32_t size() const = 0;
-
-                    virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
-                    virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data) = 0;
-            };
-            class DataFile : public File
-            {
-                public:
-                    DataFile(uint32_t id);
-
                     virtual uint32_t size() const;
 
                     virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer);
                     virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data);
-
                 private:
                     std::vector<uint8_t> _data;
             };
@@ -111,6 +115,7 @@ namespace loss
             virtual FindEntryResult find_entry(uint32_t parent_id, const std::string &name);
             
             virtual CreateEntryResult create_file(uint32_t parent_id, const std::string &name);
+            virtual CreateEntryResult create_symlink(uint32_t folder_id, const std::string &name, const std::string &link);
             virtual CreateEntryResult create_folder(uint32_t parent_id, const std::string &name);
             virtual CreateEntryResult mount(uint32_t parent_id, const std::string &name, IFileSystem *fs);
 
@@ -130,7 +135,9 @@ namespace loss
             uint32_t next_id();
 
             Folder *new_folder(uint32_t parent_id);
-            DataFile *new_file(uint32_t parent_id);
+            File *new_file(uint32_t parent_id);
+            Symlink *new_symlink(uint32_t parent_id, const std::string &link);
+            
 
             CreateEntryResult add_entry(uint32_t folder_id, const std::string &name, Entry *entry);
             ReturnCode remove_entry(uint32_t parent_id, uint32_t entry_id);

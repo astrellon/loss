@@ -25,6 +25,7 @@ namespace loss
             virtual FindEntryResult find_entry(uint32_t parent_id, const std::string &name) = 0;
             
             virtual CreateEntryResult create_file(uint32_t folder_id, const std::string &name) = 0;
+            virtual CreateEntryResult create_symlink(uint32_t folder_id, const std::string &name, const std::string &link) = 0;
             virtual CreateEntryResult create_folder(uint32_t folder_id, const std::string &name) = 0;
             virtual CreateEntryResult mount(uint32_t folder_id, const std::string &name, IFileSystem *fs) = 0;
 
