@@ -90,118 +90,60 @@ namespace loss
 
     }
 
-    ReturnCode FolderEntry::add_file(const std::string &name, FileEntry *file)
+    ReturnCode FolderEntry::add_entry(const std::string &name, IEntry *entry)
     {
-        bool name_taken = has_entry(name);
+        if (name.empty() || entry == nullptr)
+        {
+            return NULL_PARAMETER;
+        }
+
+        auto name_taken = has_entry(name);
         if (name_taken)
         {
             return ENTRY_ALREADY_EXITS;
         }
 
-        _files[name] = std::unique_ptr<FileEntry>(file);
+        _entries[name] = std::unique_ptr<IEntry>(entry);
+
         return SUCCESS;
     }
-    ReturnCode FolderEntry::find_file(const std::string &name, FileEntry **file) const
+
+    ReturnCode FolderEntry::find_entry(const std::string &name, IEntry **entry) const
     {
-        auto find = _files.find(name);
-        if (find == _files.end())
+        if (name.empty() || entry == nullptr)
         {
-            auto find_folder = _folders.find(name);
-            if (find_folder != _folders.end())
-            {
-                return WRONG_ENTRY_TYPE;
-            }
+            return NULL_PARAMETER;
+        }
+        auto find = _entries.find(name);
+        if (find == _entries.end())
+        {
             return ENTRY_NOT_FOUND;
         }
 
-        *file = find->second.get();
-        return SUCCESS;
-    }
-
-    ReturnCode FolderEntry::add_folder(const std::string &name, FolderEntry *folder)
-    {
-        bool name_taken = has_entry(name);
-        if (name_taken)
-        {
-            return ENTRY_ALREADY_EXITS;
-        }
-
-        _folders[name] = std::unique_ptr<FolderEntry>(folder);
-        return SUCCESS;
-    }
-    ReturnCode FolderEntry::find_folder(const std::string &name, FolderEntry **folder) const
-    {
-        auto find = _folders.find(name);
-        if (find == _folders.end())
-        {
-            auto find_file = _files.find(name);
-            if (find_file != _files.end())
-            {
-                return WRONG_ENTRY_TYPE;
-            }
-            return ENTRY_NOT_FOUND;
-        }
-
-        *folder = find->second.get();
-        return SUCCESS;
-    }
-
-    ReturnCode FolderEntry::find_entry(const std::string &name, IEntry *entry) const
-    {
-        auto find = _files.find(name);
-        if (find == _files.end())
-        {
-            auto find_folder = _folders.find(name);
-            if (find_folder != _folders.end())
-            {
-                entry = find_folder->second.get();
-                return SUCCESS;
-            }
-            return ENTRY_NOT_FOUND;
-        }
-
-        entry = find->second.get();
+        *entry = find->second.get();
         return SUCCESS;
     }
     bool FolderEntry::has_entry(const std::string &name) const
     {
-        auto find = _files.find(name);
-        if (find != _files.end())
-        {
-            return true;
-        }
-        auto find_folder = _folders.find(name);
-        if (find_folder != _folders.end())
+        auto find = _entries.find(name);
+        if (find != _entries.end())
         {
             return true;
         }
         return false;
     }
 
-    FolderEntry::FileMap::const_iterator FolderEntry::begin_files() const
+    FolderEntry::EntryMap::const_iterator FolderEntry::begin() const
     {
-        return _files.begin();
+        return _entries.begin();
     }
-    FolderEntry::FileMap::const_iterator FolderEntry::end_files() const
+    FolderEntry::EntryMap::const_iterator FolderEntry::end() const
     {
-        return _files.end();
+        return _entries.end();
     }
-    uint32_t FolderEntry::num_files() const
+    uint32_t FolderEntry::size() const
     {
-        return static_cast<uint32_t>(_files.size());
-    }
-
-    FolderEntry::FolderMap::const_iterator FolderEntry::begin_folders() const
-    {
-        return _folders.begin();
-    }
-    FolderEntry::FolderMap::const_iterator FolderEntry::end_folders() const
-    {
-        return _folders.end();
-    }
-    uint32_t FolderEntry::num_folders() const
-    {
-        return static_cast<uint32_t>(_folders.size());
+        return static_cast<uint32_t>(_entries.size());
     }
     // }}}
 

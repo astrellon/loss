@@ -114,13 +114,15 @@ namespace loss
         // Populate folders
         for (auto iter : *ram_folder)
         {
+            // TODO See if dynamic_cast-ing is better or to stick a virtual method on
+            // entry to figure out the type.
             auto file = dynamic_cast<File *>(iter.second);
             if (file != nullptr)
             {
                 auto entry = new FileEntry(folder_id, this);
                 entry->size(file->size());
                 entry->id(file->id());
-                auto result = to_populate.add_file(iter.first, entry);
+                auto result = to_populate.add_entry(iter.first, entry);
                 if (result != SUCCESS)
                 {
                     return result;
@@ -134,7 +136,7 @@ namespace loss
             {
                 auto entry = new FolderEntry(folder_id, this);
                 entry->id(iter.second->id());
-                auto result = to_populate.add_folder(iter.first, entry);
+                auto result = to_populate.add_entry(iter.first, entry);
                 if (result != SUCCESS)
                 {
                     return result;
@@ -143,12 +145,24 @@ namespace loss
                 continue;
             }
 
+            auto symlink = dynamic_cast<Symlink *>(iter.second);
+            if (symlink != nullptr)
+            {
+                auto entry = new SymlinkEntry(folder_id, this, symlink->link());
+                auto result = to_populate.add_entry(iter.first, entry);
+                if (result != SUCCESS)
+                {
+                    return result;
+                }
+                continue;
+            }
+
             auto mount_point = dynamic_cast<MountPoint *>(iter.second);
             if (mount_point != nullptr)
             {
                 auto entry = new FolderEntry(folder_id, mount_point->fs());
                 entry->id(iter.second->id());
-                auto result = to_populate.add_folder(iter.first, entry);
+                auto result = to_populate.add_entry(iter.first, entry);
                 if (result != SUCCESS)
                 {
                     return result;
@@ -587,5 +601,4 @@ namespace loss
         return ++_id_counter;
     }
     // }}}
-
 }

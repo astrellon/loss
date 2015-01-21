@@ -62,29 +62,19 @@ namespace loss
             FolderEntry();
             FolderEntry(uint32_t parent_id, IFileSystem *fs);
 
-            ReturnCode add_file(const std::string &name, FileEntry *file);
-            ReturnCode find_file(const std::string &name, FileEntry **file) const;
-            ReturnCode add_folder(const std::string &name, FolderEntry *folder);
-            ReturnCode find_folder(const std::string &name, FolderEntry **folder) const;
-            
-            ReturnCode find_entry(const std::string &name, IEntry *entry) const;
+            ReturnCode add_entry(const std::string &name, IEntry *entry);
+            ReturnCode find_entry(const std::string &name, IEntry **entry) const;
             bool has_entry(const std::string &name) const;
 
-            typedef std::map<std::string, std::unique_ptr<FileEntry> > FileMap;
-            typedef std::map<std::string, std::unique_ptr<FolderEntry> > FolderMap;
+            typedef std::map<std::string, std::unique_ptr<IEntry> > EntryMap;
 
-            FileMap::const_iterator begin_files() const;
-            FileMap::const_iterator end_files() const;
-            uint32_t num_files() const;
-
-            FolderMap::const_iterator begin_folders() const;
-            FolderMap::const_iterator end_folders() const;
-            uint32_t num_folders() const;
+            EntryMap::const_iterator begin() const;
+            EntryMap::const_iterator end() const;
+            uint32_t size() const;
 
         private:
             uint32_t _id;
-            FileMap _files;
-            FolderMap _folders;
+            EntryMap _entries;
     };
 
     class FileHandle
