@@ -25,6 +25,7 @@ namespace loss
 
             MetadataDef &metadata();
             const MetadataDef &metadata() const;
+            void metadata(const MetadataDef &metadata);
 
             IFileSystem *filesystem() const;
         private:

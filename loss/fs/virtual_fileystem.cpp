@@ -96,20 +96,6 @@ namespace loss
         return SUCCESS;
     }
     
-    ReturnCode VirtualFileSystem::create_file(const std::string &name)
-    {
-        Path path(name);
-        path.dir_to_filename();
-
-        auto result = follow_path(path, IFileSystem::ROOT_ID);
-        if (result.status() != SUCCESS)
-        {
-            return result.status();
-        }
-
-        return result.fs()->create_file(result.id(), path.filename()).status();
-    }
-
     ReturnCode VirtualFileSystem::open(uint32_t process_id, const std::string &name, FileHandle::OpenMode open_mode, FileHandle *&handle)
     {
         if (name.empty())
@@ -354,6 +340,33 @@ namespace loss
         return result.fs()->update_entry_metadata(find.id(), metadata);
     }
 
+    ReturnCode VirtualFileSystem::create_file(const std::string &name)
+    {
+        Path path(name);
+        path.dir_to_filename();
+
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
+        if (result.status() != SUCCESS)
+        {
+            return result.status();
+        }
+
+        return result.fs()->create_file(result.id(), path.filename()).status();
+    }
+    ReturnCode VirtualFileSystem::create_symlink(const std::string &name, const std::string &link)
+    {
+        Path path(name);
+        path.dir_to_filename();
+
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
+        if (result.status() != SUCCESS)
+        {
+            return result.status();
+        }
+
+        return result.fs()->create_symlink(result.id(), path.filename(), link).status();
+    
+    }
     ReturnCode VirtualFileSystem::create_folder(const std::string &name)
     {
         Path path(name);
@@ -368,6 +381,7 @@ namespace loss
         return result.fs()->create_folder(result.id(), path.filename()).status();
     }
     
+
     ReturnCode VirtualFileSystem::mount(const std::string &name, IFileSystem *fs)
     {
         Path path(name);
@@ -411,6 +425,7 @@ namespace loss
             {
                 return result;
             }
+            // Do something with symlinks!
             fs = result.fs();
             folder_id = result.id();
         }

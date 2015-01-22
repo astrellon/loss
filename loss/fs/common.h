@@ -148,6 +148,14 @@ namespace loss
             {
 
             }
+            FindEntryResult(uint32_t id, ReturnCode status, IFileSystem *fs, const MetadataDef &metadata) :
+                _id(id),
+                _status(status),
+                _fs(fs),
+                _metadata(metadata)
+            {
+
+            }
 
             inline uint32_t id() const
             {
@@ -161,10 +169,15 @@ namespace loss
             {
                 return _fs;
             }
+            inline const MetadataDef &metadata() const
+            {
+                return _metadata;
+            }
 
         private:
             uint32_t _id;
             ReturnCode _status;
             IFileSystem *_fs;
+            MetadataDef _metadata;
     };
 }

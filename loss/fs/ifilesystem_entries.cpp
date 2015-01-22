@@ -39,6 +39,10 @@ namespace loss
     {
         return _metadata;
     }
+    void IEntry::metadata(const MetadataDef &metadata)
+    {
+        _metadata = metadata;
+    }
 
     IFileSystem *IEntry::filesystem() const
     {

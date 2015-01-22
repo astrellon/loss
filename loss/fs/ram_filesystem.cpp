@@ -182,7 +182,7 @@ namespace loss
         {
             if (name.empty())
             {
-                return FindEntryResult(ROOT_ID, SUCCESS, this);
+                return FindEntryResult(ROOT_ID, SUCCESS, this, _root->metadata());
             }
             auto status = _root->find_entry(name, &entry);
             if (status != SUCCESS)
@@ -214,10 +214,10 @@ namespace loss
         auto mount_point = dynamic_cast<MountPoint *>(entry);
         if (mount_point != nullptr)
         {
-            return FindEntryResult(entry->id(), SUCCESS, mount_point->fs());
+            return FindEntryResult(entry->id(), SUCCESS, mount_point->fs(), mount_point->metadata());
         }
 
-        return FindEntryResult(entry->id(), SUCCESS, this);
+        return FindEntryResult(entry->id(), SUCCESS, this, entry->metadata());
     }
             
     CreateEntryResult RamFileSystem::mount(uint32_t folder_id, const std::string &name, IFileSystem *fs)
