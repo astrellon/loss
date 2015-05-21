@@ -20,6 +20,7 @@ namespace loss
         {
             run_case(simple_test);
             run_case(filehandle_test);
+            run_case(symlink_test);
         }
 
         std::string Filesystem::suite_name() const
@@ -139,6 +140,18 @@ namespace loss
             
             check_result(vfs.open(2, "/test.log", FileHandle::WRITE, file2), SUCCESS, "Failed to open file that shouldn't have a write lock anymore");
             loss_assert(file2 != nullptr);
+        }
+
+        void Filesystem::symlink_test()
+        {
+            VirtualFileSystem vfs;
+            RamFileSystem *ramfs = new RamFileSystem();
+            
+            check_result(vfs.create_file("/test1.txt", SUCCESS, "Failed to create original file"));
+            auto write_result = vfs.write_string("/test1.txt", 0, "hellor thar");
+            check_result(write_result.status(), SUCCESS, "Error writing to test1.txtk");
+
+            check_result(vfs.create_symlink("/test2.txt", "/test1.txt"), SUCCESS, "Error creating symlink");
         }
 
         void Filesystem::_check_result(const char *file, uint32_t line, loss::ReturnCode result, const std::string &message, loss::ReturnCode expected)

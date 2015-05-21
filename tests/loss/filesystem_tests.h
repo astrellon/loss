@@ -18,6 +18,7 @@ namespace loss
             private:
                 void simple_test();
                 void filehandle_test();
+                void symlink_test();
 
                 static void _check_result(const char *file, uint32_t line, ReturnCode result, const std::string &message, ReturnCode expected);
         };
