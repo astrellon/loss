@@ -425,8 +425,19 @@ namespace loss
             {
                 return result;
             }
-            // Do something with symlinks!
+
             fs = result.fs();
+            if (result.metadata().type() == SYMLINK_ENTRY)
+            {
+                std::string symlink;
+                auto symlink_result = fs->read_symlink(result.id(), symlink);
+                if (symlink_result != SUCCESS)
+                {
+                    return FindEntryResult(folder_id, symlink_result, fs);
+                }
+            }
+
+            // Do something with symlinks!
             folder_id = result.id();
         }
 

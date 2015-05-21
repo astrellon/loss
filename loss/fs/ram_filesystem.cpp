@@ -27,6 +27,11 @@ namespace loss
             return IOResult(NULL_ID, ENTRY_NOT_FOUND);
         }
 
+        if (find->second->metadata().type() != FILE_ENTRY)
+        {
+            return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
+        }
+        
         auto file = dynamic_cast<File *>(find->second.get());
         if (file == nullptr)
         {
@@ -53,10 +58,15 @@ namespace loss
             return IOResult(NULL_ID, ENTRY_NOT_FOUND);
         }
 
+        if (find->second->metadata().type() != FILE_ENTRY)
+        {
+            return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
+        }
+
         auto file = dynamic_cast<File *>(find->second.get());
         if (file == nullptr)
         {
-            return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
+            return IOResult(NULL_ID, INTERNAL_ERROR);
         }
 
         return file->write(offset, count, data);
@@ -85,13 +95,19 @@ namespace loss
         auto find = _entry_index.find(folder_id);
         if (find == _entry_index.end())
         {
+            std::cout << "Failed to add entry: " << name << " with " << folder_id << "\n";
             return CreateEntryResult(NULL_ID, ENTRY_NOT_FOUND);
+        }
+
+        if (find->second->metadata().type() != FOLDER_ENTRY)
+        {
+            return CreateEntryResult(NULL_ID, WRONG_ENTRY_TYPE);
         }
 
         auto folder = dynamic_cast<Folder *>(find->second.get());
         if (folder == nullptr)
         {
-            return CreateEntryResult(NULL_ID, WRONG_ENTRY_TYPE);
+            return CreateEntryResult(NULL_ID, INTERNAL_ERROR);
         }
 
         return CreateEntryResult(entry->id(), folder->add_entry(name, entry));
@@ -105,73 +121,115 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
         
+        if (find->second->metadata().type() != FOLDER_ENTRY)
+        {
+            return WRONG_ENTRY_TYPE;
+        }
+
         auto ram_folder = dynamic_cast<Folder *>(find->second.get());
         if (ram_folder == nullptr)
         {
-            return WRONG_ENTRY_TYPE;
+            return INTERNAL_ERROR;
         }
 
         // Populate folders
         for (auto iter : *ram_folder)
         {
+            auto type = iter.second->metadata().type();
+
             // TODO See if dynamic_cast-ing is better or to stick a virtual method on
             // entry to figure out the type.
-            auto file = dynamic_cast<File *>(iter.second);
-            if (file != nullptr)
+            if (type == FILE_ENTRY)
             {
-                auto entry = new FileEntry(folder_id, this);
-                entry->size(file->size());
-                entry->id(file->id());
-                auto result = to_populate.add_entry(iter.first, entry);
-                if (result != SUCCESS)
+                auto file = dynamic_cast<File *>(iter.second);
+                if (file != nullptr)
                 {
-                    return result;
-                }
+                    auto entry = new FileEntry(folder_id, this);
+                    entry->size(file->size());
+                    entry->id(file->id());
+                    auto result = to_populate.add_entry(iter.first, entry);
+                    if (result != SUCCESS)
+                    {
+                        return result;
+                    }
 
-                continue;
+                    continue;
+                }
             }
 
-            auto folder = dynamic_cast<Folder *>(iter.second);
-            if (folder != nullptr)
+            if (type == FOLDER_ENTRY)
             {
-                auto entry = new FolderEntry(folder_id, this);
-                entry->id(iter.second->id());
-                auto result = to_populate.add_entry(iter.first, entry);
-                if (result != SUCCESS)
+                auto folder = dynamic_cast<Folder *>(iter.second);
+                if (folder != nullptr)
                 {
-                    return result;
-                }
+                    auto entry = new FolderEntry(folder_id, this);
+                    entry->id(iter.second->id());
+                    auto result = to_populate.add_entry(iter.first, entry);
+                    if (result != SUCCESS)
+                    {
+                        return result;
+                    }
 
-                continue;
+                    continue;
+                }
             }
 
-            auto symlink = dynamic_cast<Symlink *>(iter.second);
-            if (symlink != nullptr)
+            if (type == SYMLINK_ENTRY)
             {
-                auto entry = new SymlinkEntry(folder_id, this, symlink->link());
-                auto result = to_populate.add_entry(iter.first, entry);
-                if (result != SUCCESS)
+                auto symlink = dynamic_cast<Symlink *>(iter.second);
+                if (symlink != nullptr)
                 {
-                    return result;
+                    auto entry = new SymlinkEntry(folder_id, this, symlink->link());
+                    auto result = to_populate.add_entry(iter.first, entry);
+                    if (result != SUCCESS)
+                    {
+                        return result;
+                    }
+                    continue;
                 }
-                continue;
             }
 
-            auto mount_point = dynamic_cast<MountPoint *>(iter.second);
-            if (mount_point != nullptr)
+            if (type == MOUNT_POINT_ENTRY)
             {
-                auto entry = new FolderEntry(folder_id, mount_point->fs());
-                entry->id(iter.second->id());
-                auto result = to_populate.add_entry(iter.first, entry);
-                if (result != SUCCESS)
+                auto mount_point = dynamic_cast<MountPoint *>(iter.second);
+                if (mount_point != nullptr)
                 {
-                    return result;
-                }
+                    auto entry = new FolderEntry(folder_id, mount_point->fs());
+                    entry->id(iter.second->id());
+                    auto result = to_populate.add_entry(iter.first, entry);
+                    if (result != SUCCESS)
+                    {
+                        return result;
+                    }
 
-                continue;
+                    continue;
+                }
             }
         }
 
+        return SUCCESS;
+    }
+
+    ReturnCode RamFileSystem::read_symlink(uint32_t symlink_id, std::string &link)
+    {
+        auto find = _entry_index.find(symlink_id);
+        if (find == _entry_index.end())
+        {
+            return ENTRY_NOT_FOUND;
+        }
+
+        if (find->second->metadata().type() != SYMLINK_ENTRY)
+        {
+            return WRONG_ENTRY_TYPE;
+        }
+
+        auto symlink = dynamic_cast<Symlink *>(find->second.get());
+        if (symlink == nullptr)
+        {
+            return INTERNAL_ERROR;
+        }
+
+        link = symlink->link();
         return SUCCESS;
     }
 
@@ -201,7 +259,7 @@ namespace loss
             auto parent_folder = dynamic_cast<Folder *>(find->second.get());
             if (parent_folder == nullptr)
             {
-                return FindEntryResult(NULL_ID, WRONG_ENTRY_TYPE, this);
+                return FindEntryResult(NULL_ID, INTERNAL_ERROR, this);
             }
 
             auto status = parent_folder->find_entry(name, &entry);
@@ -211,10 +269,14 @@ namespace loss
             }
         }
 
-        auto mount_point = dynamic_cast<MountPoint *>(entry);
-        if (mount_point != nullptr)
+        if (entry->metadata().type() == MOUNT_POINT_ENTRY)
         {
-            return FindEntryResult(entry->id(), SUCCESS, mount_point->fs(), mount_point->metadata());
+            auto mount_point = dynamic_cast<MountPoint *>(entry);
+            if (mount_point != nullptr)
+            {
+                // Mount points always mount the root folder.
+                return FindEntryResult(ROOT_ID, SUCCESS, mount_point->fs(), mount_point->metadata());
+            }
         }
 
         return FindEntryResult(entry->id(), SUCCESS, this, entry->metadata());
@@ -233,10 +295,14 @@ namespace loss
             return CreateEntryResult(NULL_ID, ENTRY_NOT_FOUND);
         }
 
+        if (find->second->metadata().type() != FOLDER_ENTRY)
+        {
+            return CreateEntryResult(NULL_ID, WRONG_ENTRY_TYPE);
+        }
         auto folder = dynamic_cast<Folder *>(find->second.get());
         if (folder == nullptr)
         {
-            return CreateEntryResult(NULL_ID, WRONG_ENTRY_TYPE);
+            return CreateEntryResult(NULL_ID, INTERNAL_ERROR);
         }
 
         auto id = next_id();
@@ -258,18 +324,26 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        auto file = dynamic_cast<File *>(find->second.get());
-        if (file != nullptr)
+        auto type = find->second->metadata().type();
+
+        if (type == FILE_ENTRY)
         {
-            size = file->size();
-            return SUCCESS;
+            auto file = dynamic_cast<File *>(find->second.get());
+            if (file != nullptr)
+            {
+                size = file->size();
+                return SUCCESS;
+            }
         }
 
-        auto folder = dynamic_cast<Folder *>(find->second.get());
-        if (folder != nullptr)
+        if (type == FOLDER_ENTRY)
         {
-            size = folder->size();
-            return SUCCESS;
+            auto folder = dynamic_cast<Folder *>(find->second.get());
+            if (folder != nullptr)
+            {
+                size = folder->size();
+                return SUCCESS;
+            }
         }
 
         return WRONG_ENTRY_TYPE;
@@ -326,12 +400,17 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
-        auto folder = dynamic_cast<Folder *>(find->second.get());
-        if (folder != nullptr)
+        auto type = find->second->metadata().type();
+
+        if (type == FOLDER_ENTRY)
         {
-            if (folder->size() > 0)
+            auto folder = dynamic_cast<Folder *>(find->second.get());
+            if (folder != nullptr)
             {
-                return FOLDER_NOT_EMPTY;
+                if (folder->size() > 0)
+                {
+                    return FOLDER_NOT_EMPTY;
+                }
             }
         }
 
@@ -385,9 +464,10 @@ namespace loss
     // }}}
 
     // Entry {{{
-    RamFileSystem::Entry::Entry(uint32_t id) :
+    RamFileSystem::Entry::Entry(EntryType type, uint32_t id) :
         _id(id),
-        _parent_folder_id(NULL_ID)
+        _parent_folder_id(NULL_ID),
+        _metadata(type)
     {
 
     }
@@ -426,12 +506,12 @@ namespace loss
     
     // Symlink {{{
     RamFileSystem::Symlink::Symlink(uint32_t id) :
-        Entry(id)
+        Entry(SYMLINK_ENTRY, id)
     {
 
     }
     RamFileSystem::Symlink::Symlink(uint32_t id, const std::string &link) :
-        Entry(id),
+        Entry(SYMLINK_ENTRY, id),
         _link(link)
     {
 
@@ -449,7 +529,7 @@ namespace loss
 
     // File {{{
     RamFileSystem::File::File(uint32_t id) :
-        Entry(id)
+        Entry(FILE_ENTRY, id)
     {
 
     }
@@ -511,7 +591,7 @@ namespace loss
     
     // Folder {{{
     RamFileSystem::Folder::Folder(uint32_t id) :
-        Entry(id)
+        Entry(FOLDER_ENTRY, id)
     {
 
     }
@@ -586,7 +666,7 @@ namespace loss
 
     // MountPoint {{{
     RamFileSystem::MountPoint::MountPoint(uint32_t id, IFileSystem *fs) :
-        Entry(id),
+        Entry(MOUNT_POINT_ENTRY, id),
         _fs(fs)
     {
 

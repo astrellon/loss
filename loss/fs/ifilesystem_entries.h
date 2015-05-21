@@ -15,7 +15,7 @@ namespace loss
     class IEntry
     {
         public:
-            IEntry(uint32_t parent_id, IFileSystem *fs);
+            IEntry(EntryType type, uint32_t parent_id, IFileSystem *fs);
             
             void id(uint32_t value);
             uint32_t id() const;

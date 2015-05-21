@@ -13,19 +13,23 @@ extern "C"
 #include <loss/return_codes.h>
 #include <loss/fs/path.h>
 #include <string>
+#include <fstream>
+#include <loss/fs/ram_filesystem_drive.h>
 
 void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
 {
     std::cout << "Output: " << name << "\n";
     auto folder = new loss::FolderEntry();
-    auto folder_result = vfs.read_folder(name, folder);
+    auto folder_result = vfs.read_folder(name, *folder);
     if (folder_result == loss::SUCCESS)
     {
-        for (auto iter = folder->begin_folders(); iter != folder->end_folders(); ++iter)
+        //for (auto iter = folder->begin_folders(); iter != folder->end_folders(); ++iter)
+        for (auto &iter : *folder)
         {
-            std::cout << "Folder: " << iter->first << "/\n";
+            std::cout << "Entry: " << iter.first << "/\n";
         }
 
+        /*
         for (auto iter = folder->begin_files(); iter != folder->end_files(); ++iter)
         {
             std::cout << "File: " << iter->first << "\n";
@@ -46,6 +50,7 @@ void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
                 std::cout << "\n";
             }
         }
+        */
     }
     delete folder;
 
@@ -64,11 +69,12 @@ int main()
     */
 
     loss::VirtualFileSystem vfs;
-    loss::RamFileSystem ramfs;
-    loss::RamFileSystem ramfs2;
+    auto ramfs = new loss::RamFileSystem();
+    auto ramfs2 = new loss::RamFileSystem();
 
-    vfs.root_filesystem(&ramfs);
+    vfs.root_filesystem(ramfs);
     
+    /*
     auto result = vfs.create_folder("/home");
     if (result != loss::SUCCESS)
     {
@@ -93,16 +99,47 @@ int main()
         std::cout << "Error writing: " << loss::ReturnCodes::desc(ioresult.status()) << "\n";
     }
 
+    result = vfs.register_file_system(ramfs2);
+    if (result != loss::SUCCESS)
+    {
+        std::cout << "Failed to register_file_system: " << loss::ReturnCodes::desc(result) << "\n";
+    }
 
-    result = vfs.mount("/home/alan/other_fs", &ramfs2);
+    result = vfs.mount("/home/alan/other_fs", ramfs2);
     if (result != loss::SUCCESS)
     {
         std::cout << "Error mounting: " << loss::ReturnCodes::desc(result) << "\n";
     }
+
+    result = vfs.create_file("/home/alan/other_fs/other.txt");
+    if (result != loss::SUCCESS)
+    {
+        std::cout << "Error creating file in mounted: " << loss::ReturnCodes::desc(result) << "\n";
+    }
+
+    ioresult = vfs.write_string("/home/alan/other_fs/other.txt", 0, "hurr durr");
+    if (ioresult.status() != loss::SUCCESS)
+    {
+        std::cout << "Error writing to other: " << loss::ReturnCodes::desc(ioresult.status()) << "\n";
+    }
+    */
     
     output_folder(vfs, "/");
     output_folder(vfs, "/home");
     output_folder(vfs, "/home/alan");
+    output_folder(vfs, "/home/alan/other_fs");
+                
+    {
+        std::ofstream output("testout.bin");
+        auto serialise = loss::RamFileSystemSerialise(output, ramfs);
+        serialise.save();
+    }
+    {
+        std::ofstream output("testout2.bin");
+        auto serialise = loss::RamFileSystemSerialise(output, ramfs2);
+        serialise.save();
+    }
+
 	
 #ifdef _WIN32
 	std::cin.get();

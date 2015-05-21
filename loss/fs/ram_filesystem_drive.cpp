@@ -47,6 +47,12 @@ namespace loss
         write_binary(folder->size());
         for (auto iter = folder->begin(); iter != folder->end(); ++iter)
         {
+            // We don't want to serialise mount points.
+            auto mount = dynamic_cast<RamFileSystem::MountPoint *>(iter->second);
+            if (mount != nullptr)
+            {
+                continue;
+            }
             write_string(iter->first);
             write_binary(iter->second->id());
         }

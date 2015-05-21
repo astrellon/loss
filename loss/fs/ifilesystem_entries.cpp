@@ -5,10 +5,11 @@
 namespace loss
 {
     // IEntry {{{
-    IEntry::IEntry(uint32_t parent_id, IFileSystem *fs) :
+    IEntry::IEntry(EntryType type, uint32_t parent_id, IFileSystem *fs) :
         _fs(fs),
         _id(0),
-        _parent_folder_id(parent_id)
+        _parent_folder_id(parent_id),
+        _metadata(type)
     {
 
     }
@@ -52,7 +53,7 @@ namespace loss
     
     // SymlinkEntry {{{
     SymlinkEntry::SymlinkEntry(uint32_t parent_id, IFileSystem *fs, const std::string &link) :
-        IEntry(parent_id, fs),
+        IEntry(SYMLINK_ENTRY, parent_id, fs),
         _link(link)
     {
 
@@ -66,7 +67,7 @@ namespace loss
 
     // FileEntry {{{
     FileEntry::FileEntry(uint32_t parent_id, IFileSystem *fs) :
-        IEntry(parent_id, fs),
+        IEntry(FILE_ENTRY, parent_id, fs),
         _size(0)
     {
 
@@ -84,12 +85,12 @@ namespace loss
 
     // FolderEntry {{{
     FolderEntry::FolderEntry() :
-        IEntry(0, nullptr)
+        IEntry(FOLDER_ENTRY, 0, nullptr)
     {
 
     }
     FolderEntry::FolderEntry(uint32_t parent_id, IFileSystem *fs) :
-        IEntry(parent_id, fs)
+        IEntry(FOLDER_ENTRY, parent_id, fs)
     {
 
     }

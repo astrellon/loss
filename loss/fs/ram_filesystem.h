@@ -22,7 +22,7 @@ namespace loss
             class Entry
             {
                 public:
-                    Entry(uint32_t id);
+                    Entry(EntryType type, uint32_t id);
                     virtual ~Entry();
 
                     uint32_t id() const;
@@ -112,6 +112,7 @@ namespace loss
             virtual IOResult write(uint32_t file_id, uint32_t offset, uint32_t count, const uint8_t *data);
 
             virtual ReturnCode read_folder(uint32_t folder_id, FolderEntry &to_populate);
+            virtual ReturnCode read_symlink(uint32_t symlink_id, std::string &link);
             virtual FindEntryResult find_entry(uint32_t parent_id, const std::string &name);
             
             virtual CreateEntryResult create_file(uint32_t parent_id, const std::string &name);

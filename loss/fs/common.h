@@ -5,12 +5,23 @@
 
 namespace loss
 {
+    enum EntryType
+    {
+        UNKNOWN_ENTRY,
+        FILE_ENTRY,
+        SYMLINK_ENTRY,
+        FOLDER_ENTRY,
+        MOUNT_POINT_ENTRY
+    };
+
     class MetadataDef
     {
         public:
-            inline MetadataDef() :
+
+            inline MetadataDef(EntryType type) :
                 _owner_id(0u),
-                _permissions(0x00u)
+                _permissions(0x00u),
+                _type(type)
             {
 
             }
@@ -83,9 +94,15 @@ namespace loss
                 _permissions = value;
             }
 
+            inline EntryType type() const
+            {
+                return _type;
+            }
+
         private:
             uint32_t _owner_id;
             uint32_t _permissions;
+            EntryType _type;
     };
 
     class IOResult
@@ -144,7 +161,8 @@ namespace loss
             FindEntryResult(uint32_t id, ReturnCode status, IFileSystem *fs) :
                 _id(id),
                 _status(status),
-                _fs(fs)
+                _fs(fs),
+                _metadata(UNKNOWN_ENTRY)
             {
 
             }
