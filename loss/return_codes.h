@@ -28,6 +28,7 @@ namespace loss
         FILE_HAS_WRITE_LOCK =       -0x0016,
         HANDLE_LACKING_WRITE =      -0x0017,
         HANDLE_LACKING_READ =       -0x0018,
+        VFS_HAS_NO_ROOT =           -0x0019,
 
         // Process related
         CANNOT_FIND_PROCESS =       -0x0020,

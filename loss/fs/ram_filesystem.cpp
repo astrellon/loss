@@ -278,6 +278,14 @@ namespace loss
                 return FindEntryResult(ROOT_ID, SUCCESS, mount_point->fs(), mount_point->metadata());
             }
         }
+        if (entry->metadata().type() == SYMLINK_ENTRY)
+        {
+            auto link = dynamic_cast<Symlink *>(entry);
+            if (link != nullptr)
+            {
+                return FindEntryResult(entry->id(), SUCCESS, this, entry->metadata());
+            }
+        }
 
         return FindEntryResult(entry->id(), SUCCESS, this, entry->metadata());
     }

@@ -185,6 +185,11 @@ namespace loss
         }
 
         auto find = result.fs()->find_entry(result.id(), path.filename());
+        if (find.metadata().type() == SYMLINK_ENTRY)
+        {
+            std::cout << "Attempting to read symlink\n";
+        }
+
         if (find.status() != SUCCESS)
         {
             return IOResult(0, find.status());
@@ -417,7 +422,12 @@ namespace loss
 
     FindEntryResult VirtualFileSystem::follow_path(const Path &path, uint32_t folder_id)
     {
-        IFileSystem *fs = _root_filesystem;
+        if (_root_filesystem == nullptr)
+        {
+            return FindEntryResult(0, VFS_HAS_NO_ROOT, nullptr);
+        }
+
+        auto fs = _root_filesystem;
         for (auto dir : path.dirs())
         {
             auto result = fs->find_entry(folder_id, dir);
@@ -435,6 +445,7 @@ namespace loss
                 {
                     return FindEntryResult(folder_id, symlink_result, fs);
                 }
+                std::cout << "Symlink: " << symlink << "\n";
             }
 
             // Do something with symlinks!

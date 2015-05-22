@@ -20,6 +20,7 @@ namespace loss
         { FILE_HAS_WRITE_LOCK,     "file_has_write_lock" },
         { HANDLE_LACKING_WRITE,    "handle_lacking_write" },
         { HANDLE_LACKING_READ,     "handle_lacking_read" },
+        { VFS_HAS_NO_ROOT,         "vfs_has_no_root" },
 
         { CANNOT_FIND_PROCESS, "cannot_find_process" },
 
@@ -47,6 +48,7 @@ namespace loss
         { FILE_HAS_WRITE_LOCK,     "a file can only have one write handle at a time." },
         { HANDLE_LACKING_WRITE,    "attempting to write with a file handle that does not have write permissions." },
         { HANDLE_LACKING_READ,     "attempting to read with a file handle that does not have read permissions." },
+        { VFS_HAS_NO_ROOT,         "vfs has no root filesystem set." },
         
         { CANNOT_FIND_PROCESS, "cannot find the process with the given process_id." },
 

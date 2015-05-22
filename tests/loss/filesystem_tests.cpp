@@ -147,11 +147,22 @@ namespace loss
             VirtualFileSystem vfs;
             RamFileSystem *ramfs = new RamFileSystem();
             
-            check_result(vfs.create_file("/test1.txt", SUCCESS, "Failed to create original file"));
+            vfs.root_filesystem(ramfs);
+            check_result(vfs.create_file("/test1.txt"), SUCCESS, "Failed to create original file");
             auto write_result = vfs.write_string("/test1.txt", 0, "hellor thar");
             check_result(write_result.status(), SUCCESS, "Error writing to test1.txtk");
 
             check_result(vfs.create_symlink("/test2.txt", "/test1.txt"), SUCCESS, "Error creating symlink");
+
+            std::stringstream file_contents;
+            auto read_result = vfs.read_stream("/test1.txt", 0, 256, file_contents); 
+            check_result(read_result.status(), SUCCESS, "Failed to read test1 contents");
+
+            std::stringstream file_contents2;
+            read_result = vfs.read_stream("/test2.txt", 0, 256, file_contents2);
+            check_result(read_result.status(), SUCCESS, "Failed to read test2 contents");
+
+            std::cout << "File outputs:\n" << file_contents.str() << "\n" << file_contents2.str() << "\n";
         }
 
         void Filesystem::_check_result(const char *file, uint32_t line, loss::ReturnCode result, const std::string &message, loss::ReturnCode expected)
