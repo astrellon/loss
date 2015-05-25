@@ -47,8 +47,17 @@ namespace loss
 
         clear();
 
-        _text = new char[width * height];
-        _data = new CharData[width * height];
+        auto total = width * height;
+        _text = new char[total];
+        for (auto i = 0u; i < total; i++)
+        {
+            _text[i] = '\0';
+        }
+        _data = new CharData[total];
+        for (auto i = 0u; i < total; i++)
+        {
+            _data[i] = CharData();
+        }
     }
 
     uint32_t TTY::width() const

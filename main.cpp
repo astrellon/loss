@@ -15,8 +15,10 @@ extern "C"
 #include <loss/return_codes.h>
 #include <loss/fs/path.h>
 #include <loss/fs/ram_filesystem_drive.h>
-//#include <loss/tty.h>
+#include <loss/tty.h>
 #include <loss/tty_renderer.h>
+
+#include <pthread.h>
 
 void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
 {
@@ -142,7 +144,12 @@ int main()
         serialise.save();
     }
 
+    loss::TTY tty;
+    tty.size(80, 24);
+    tty.put_string("Hello");
     loss::TTYRenderer renderer;
+    renderer.tty(&tty);
+    renderer.render();
 	
 //#ifdef _WIN32
 	std::cin.get();

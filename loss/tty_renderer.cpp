@@ -24,11 +24,6 @@ namespace loss
 
         noecho();
 
-        mvwaddstr(_window, 1, 4, "Move the window");
-        mvwaddstr(_window, 2, 2, "with the arrow keys");
-        mvwaddstr(_window, 3, 6, "or HOME/END");
-        mvwaddstr(_window, 5, 3, "Press 'q' to quit");
-
         refresh();
     }
 
@@ -53,6 +48,28 @@ namespace loss
 
     void TTYRenderer::render()
     {
+        clear();
 
+        if (_tty == nullptr)
+        {
+            return;
+        }
+
+        auto chars = _tty->get();
+        auto i = 0u;
+        for (auto y = 0u; y < _tty->height(); y++)
+        {
+            for (auto x = 0u; x < _tty->width(); x++)
+            {
+                auto c = chars[i++];
+                if (c == '\0')
+                {
+                    continue;
+                }
+                mvwaddch(_window, y, x, c);
+            }
+        }
+
+        refresh();
     }
 }
