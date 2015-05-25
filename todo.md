@@ -25,3 +25,10 @@ Devices
 - TTY
 - Graphics
 - Sound?
+
+
+
+Thoughts:
+- TTY
+  Kernel level TTYs?
+  - 

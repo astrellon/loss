@@ -2,8 +2,10 @@
 
 namespace loss
 {
-    TTY::Char::Char(char c) :
-        _char(c)
+    // TTY {{{
+    TTY::CharData::CharData() :
+        colour_back(0x00000000),
+        colour_text(0xFFFFFFFF)
     {
 
     }
@@ -11,16 +13,31 @@ namespace loss
     TTY::TTY() :
         _width(0u),
         _height(0u),
-        _buffer(nullptr)
+        _cursor_x(0u),
+        _cursor_y(0u),
+        _text(nullptr),
+        _data(nullptr)
     {
 
     }
     TTY::~TTY()
     {
-        if (_buffer != nullptr)
+        clear();
+    }
+
+    void TTY::clear()
+    {
+        if (_text != nullptr)
         {
-            delete []_buffer;
+            delete []_text;
         }
+        if (_data != nullptr)
+        {
+            delete []_data;
+        }
+
+        _text = nullptr;
+        _data = nullptr;
     }
 
     void TTY::size(uint32_t width, uint32_t height)
@@ -28,11 +45,10 @@ namespace loss
         _width = width;
         _height = height;
 
-        if (_buffer != nullptr)
-        {
-            delete []_buffer;
-        }
-        _buffer = new Char[width * height];
+        clear();
+
+        _text = new char[width * height];
+        _data = new CharData[width * height];
     }
 
     uint32_t TTY::width() const
@@ -44,17 +60,68 @@ namespace loss
         return _height;
     }
 
-    void TTY::set(uint32_t x, uint32_t y, const Char &c)
+    void TTY::set(uint32_t x, uint32_t y, const char &c)
     {
-        _buffer[x + y * _width] = c;
+        _text[x + y * _width] = c;
     }
-    TTY::Char TTY::get(uint32_t x, uint32_t y) const
+    char TTY::get(uint32_t x, uint32_t y) const
     {
-        return _buffer[x + y * _width];
+        return _text[x + y * _width];
     }
 
-    const TTY::Char *TTY::get() const
+    void TTY::put(const char &c)
     {
-        return _buffer;
+        _text[_cursor_x + _cursor_y * _width] = c;
+        ++_cursor_x;
+
+        if (_cursor_x >= _width)
+        {
+            ++_cursor_y;
+            _cursor_x = 0u;
+
+            // TODO Handle end of buffer;
+        }
     }
+    void TTY::put_string(const std::string &str)
+    {
+        for (auto c : str)
+        {
+            put(c);
+        }
+    }
+
+    const char *TTY::get() const
+    {
+        return _text;
+    }
+    const TTY::CharData *TTY::get_data() const
+    {
+        return _data;
+    }
+    // }}}
+    
+    // TTYManager {{{
+    TTYManager::TTYManager()
+    {
+
+    }
+
+    const TTYManager::TTYMap *TTYManager::ttys() const
+    {
+        return &_ttys;
+    }
+
+    TTY *TTYManager::get(const std::string &name)
+    {
+        auto find = _ttys.find(name);
+        if (find != _ttys.end())
+        {
+            return find->second.get();
+        }
+
+        auto new_tty = new TTY();
+        _ttys[name] = std::unique_ptr<TTY>(new_tty);
+        return new_tty;
+    }
+    // }}}
 }

@@ -41,4 +41,13 @@ namespace loss
     {
         return _user_manager;
     }
+
+    TTYManager &Kernel::tty_manager()
+    {
+        return _tty_manager;
+    }
+    const TTYManager &Kernel::tty_manager() const
+    {
+        return _tty_manager;
+    }
 }

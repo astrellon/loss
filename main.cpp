@@ -8,13 +8,15 @@ extern "C"
 #	include <lua/src/lstate.h>
 } 
 
+#include <string>
+#include <fstream>
 #include <loss/fs/virtual_fileystem.h>
 #include <loss/fs/ram_filesystem.h>
 #include <loss/return_codes.h>
 #include <loss/fs/path.h>
-#include <string>
-#include <fstream>
 #include <loss/fs/ram_filesystem_drive.h>
+//#include <loss/tty.h>
+#include <loss/tty_renderer.h>
 
 void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
 {
@@ -140,10 +142,11 @@ int main()
         serialise.save();
     }
 
+    loss::TTYRenderer renderer;
 	
-#ifdef _WIN32
+//#ifdef _WIN32
 	std::cin.get();
-#endif
+//#endif
 
     return 0;
 }
