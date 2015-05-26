@@ -78,6 +78,14 @@ namespace loss
             EntryMap _entries;
     };
 
+    class ICharacterDeviceEntry
+    {
+        public:
+            virtual uint32_t size() const = 0;
+            virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
+            virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data) = 0;
+    };
+
     class FileHandle
     {
         public:

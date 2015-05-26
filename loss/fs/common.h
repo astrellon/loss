@@ -11,7 +11,8 @@ namespace loss
         FILE_ENTRY,
         SYMLINK_ENTRY,
         FOLDER_ENTRY,
-        MOUNT_POINT_ENTRY
+        MOUNT_POINT_ENTRY,
+        CHARACTER_DEVICE_ENTRY
     };
 
     class MetadataDef

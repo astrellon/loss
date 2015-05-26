@@ -84,6 +84,10 @@ namespace loss
     {
         return add_entry(folder_id, name, new_folder(folder_id));
     }
+    CreateEntryResult RamFileSystem::create_char_device(uint32_t folder_id, const std::string &name, ICharacterDeviceEntry *device)
+    {
+        return add_entry(folder_id, name, new_char_device(folder_id, device));
+    }
 
     CreateEntryResult RamFileSystem::add_entry(uint32_t folder_id, const std::string &name, Entry *entry)
     {
@@ -469,6 +473,14 @@ namespace loss
         _entry_index[id] = std::unique_ptr<Entry>(result);
         return result;
     }
+    RamFileSystem::CharacterDevice *RamFileSystem::new_char_device(uint32_t parent_id, ICharacterDeviceEntry *device)
+    {
+        auto id = next_id();
+        auto result = new CharacterDevice(parent_id, device);
+        result->parent_folder_id(parent_id);
+        _entry_index[id] = std::unique_ptr<Entry>(result);
+        return result;
+    }
     // }}}
 
     // Entry {{{
@@ -687,6 +699,27 @@ namespace loss
     uint32_t RamFileSystem::next_id()
     {
         return ++_id_counter;
+    }
+    // }}}
+    
+    // Character Device {{{
+    RamFileSystem::CharacterDevice::CharacterDevice(uint32_t id, ICharacterDeviceEntry *device) :
+        Entry(CHARACTER_DEVICE_ENTRY, id),
+        _device(device)
+    {
+
+    }
+    uint32_t RamFileSystem::CharacterDevice::size() const
+    {
+        return static_cast<uint32_t>(_device->size());
+    }
+    IOResult RamFileSystem::CharacterDevice::read(uint32_t offset, uint32_t count, uint8_t *buffer)
+    {
+        return _device->read(offset, count, buffer);
+    }
+    IOResult RamFileSystem::CharacterDevice::write(uint32_t offset, uint32_t count, const uint8_t *data)
+    {
+        return _device->write(offset, count, data);
     }
     // }}}
 }

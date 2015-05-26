@@ -17,6 +17,7 @@ extern "C"
 #include <loss/fs/ram_filesystem_drive.h>
 #include <loss/tty.h>
 #include <loss/tty_renderer.h>
+#include <loss/fs/stream_device.h>
 
 #include <pthread.h>
 
@@ -144,16 +145,40 @@ int main()
         serialise.save();
     }
 
+    /*
     loss::TTY tty;
     tty.size(80, 24);
     tty.put_string("Hello");
     loss::TTYRenderer renderer;
     renderer.tty(&tty);
     renderer.render();
+    */
+
+    loss::StreamDevice device;
+    std::string str("Hello thar");
+    device.write(0, str.size(), (const uint8_t *)str.c_str());
+
+    std::cout << "Size: " << device.size() << "\n";
+
+    char buff[11];
+    auto read = device.read(0, 7, (uint8_t *)buff);
+    buff[read.bytes()] = '\0';
+    std::string str_read(buff);
+
+    std::cout << "READ THE THING >" << str_read << "<\n";
+    std::cout << "Size: " << device.size() << "\n";
+    
+    read = device.read(0, 5, (uint8_t *)buff);
+    buff[read.bytes()] = '\0';
+    str_read = std::string(buff);
 	
-//#ifdef _WIN32
+    std::cout << "READ THE THING >" << str_read << "<\n";
+    std::cout << "Size: " << device.size() << "\n";
+
+
+#ifdef _WIN32
 	std::cin.get();
-//#endif
+#endif
 
     return 0;
 }
