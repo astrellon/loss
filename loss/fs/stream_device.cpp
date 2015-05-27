@@ -11,6 +11,7 @@ namespace loss
 
     uint32_t StreamDevice::size() const
     {
+        std::lock_guard<std::mutex> lock_guard(_lock);
         return _data.size();
     }
 
@@ -20,6 +21,8 @@ namespace loss
         {
             return IOResult(0, NULL_PARAMETER);
         }
+
+        std::lock_guard<std::mutex> lock_guard(_lock);
 
         auto max = count;
         if (max > _data.size())
@@ -45,6 +48,7 @@ namespace loss
             return IOResult(0, NULL_PARAMETER);
         }
 
+        std::lock_guard<std::mutex> lock_guard(_lock);
         for (auto i = offset; i < offset + count; i++)
         {
             //_data << data[i];

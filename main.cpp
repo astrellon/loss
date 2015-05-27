@@ -10,6 +10,11 @@ extern "C"
 
 #include <string>
 #include <fstream>
+#include <thread>
+#include <mutex>
+#include <sstream>
+#include <chrono>
+
 #include <loss/fs/virtual_fileystem.h>
 #include <loss/fs/ram_filesystem.h>
 #include <loss/return_codes.h>
@@ -18,8 +23,6 @@ extern "C"
 #include <loss/tty.h>
 #include <loss/tty_renderer.h>
 #include <loss/fs/stream_device.h>
-
-#include <pthread.h>
 
 void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
 {
@@ -154,27 +157,65 @@ int main()
     renderer.render();
     */
 
+    /*
     loss::StreamDevice device;
-    std::string str("Hello thar");
-    device.write(0, str.size(), (const uint8_t *)str.c_str());
+    device.write_string(std::string("Hello thar"));
 
     std::cout << "Size: " << device.size() << "\n";
 
-    char buff[11];
-    auto read = device.read(0, 7, (uint8_t *)buff);
-    buff[read.bytes()] = '\0';
-    std::string str_read(buff);
+    std::stringstream read_buff;
+    device.read_string(read_buff);
 
-    std::cout << "READ THE THING >" << str_read << "<\n";
+    std::cout << "READ THE THING >" << read_buff.str() << "<\n";
     std::cout << "Size: " << device.size() << "\n";
     
-    read = device.read(0, 5, (uint8_t *)buff);
-    buff[read.bytes()] = '\0';
-    str_read = std::string(buff);
+    std::stringstream read_buff2;
+    device.read_string(read_buff2);
 	
-    std::cout << "READ THE THING >" << str_read << "<\n";
+    std::cout << "READ THE THING >" << read_buff2.str() << "<\n";
     std::cout << "Size: " << device.size() << "\n";
+    */
 
+    loss::StreamDevice device;
+#define NUM_THREADS 50
+    std::thread write_threads[NUM_THREADS];
+    for (auto i = 0; i < NUM_THREADS; i++)
+    {
+        write_threads[i] = std::thread([] (int n, loss::StreamDevice &d)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::stringstream ss;
+            ss << "Thread: " << n << "!\n";
+            d.write_string(ss.str());
+        }, i, std::ref(device));
+    }
+
+    auto done = false;
+    std::thread read_thread([] (loss::StreamDevice &d, bool &done)
+    {
+        std::stringstream buff;
+        while (!done)
+        {
+            buff.str("");
+            d.read_string(buff);
+
+            if (buff.str().size() > 0u)
+            {
+                std::cout << "-- >" << buff.str() << "< --\n";
+            }
+        }
+    }, std::ref(device), std::ref(done));
+
+    for (auto i = 0; i < NUM_THREADS; i++)
+    {
+        write_threads[i].join();
+    }
+
+    std::cout << "***\n";
+    done = true;
+    read_thread.join();
+
+    std::cout << " - DONE\n";
 
 #ifdef _WIN32
 	std::cin.get();

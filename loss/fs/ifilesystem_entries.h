@@ -84,6 +84,9 @@ namespace loss
             virtual uint32_t size() const = 0;
             virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
             virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data) = 0;
+
+            virtual IOResult read_string(std::stringstream &buffer);
+            virtual IOResult write_string(const std::string &data);
     };
 
     class FileHandle

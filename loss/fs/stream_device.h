@@ -3,10 +3,8 @@
 #include "ifilesystem_entries.h"
 
 #include <stdint.h>
-//#include <string>
 #include <vector>
-
-#include <pthread.h>
+#include <mutex>
 
 namespace loss
 {
@@ -20,8 +18,8 @@ namespace loss
             virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data);
 
         private:
-            //std::stringstream _data;
             std::vector<uint8_t> _data;
+            mutable std::mutex _lock;
 
     };
 }

@@ -60,7 +60,7 @@
 MY_CFLAGS = 
 
 # The linker options.
-MY_LIBS   = -lncurses
+MY_LIBS   = -lncurses -lpthread
 
 # The pre-processor options used by the cpp (man cpp for more).
 CPPFLAGS  = -I./ 

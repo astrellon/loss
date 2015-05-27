@@ -2,6 +2,8 @@
 
 #include "ifilesystem.h"
 
+#include <sstream>
+
 namespace loss
 {
     // IEntry {{{
@@ -149,6 +151,32 @@ namespace loss
     uint32_t FolderEntry::size() const
     {
         return static_cast<uint32_t>(_entries.size());
+    }
+    // }}}
+    
+    // ICharacterDeviceEntry {{{
+    IOResult ICharacterDeviceEntry::read_string(std::stringstream &buffer)
+    {
+        auto read_total = 0u;
+        uint8_t temp[128];
+        while (size() > 0)
+        {
+            auto result = read(0, 127, temp);
+            if (result.status() != SUCCESS)
+            {
+                return result;
+            }
+
+            read_total += result.bytes();
+            temp[result.bytes()] = '\0';
+            buffer.write(reinterpret_cast<const char *>(temp), result.bytes());
+        }
+
+        return IOResult(read_total, SUCCESS);
+    }
+    IOResult ICharacterDeviceEntry::write_string(const std::string &data)
+    {
+        return write(0, data.size(), reinterpret_cast<const uint8_t *>(data.c_str()));
     }
     // }}}
 
