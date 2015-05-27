@@ -137,6 +137,9 @@
     <ClCompile Include="loss\fs\virtual_fileystem.cpp">
       <Filter>loss\fs</Filter>
     </ClCompile>
+    <ClCompile Include="loss\fs\stream_device.cpp">
+      <Filter>loss\fs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lua\src\lapi.h">
@@ -245,6 +248,9 @@
       <Filter>loss\fs</Filter>
     </ClInclude>
     <ClInclude Include="loss\fs\virtual_fileystem.h">
+      <Filter>loss\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\fs\stream_device.h">
       <Filter>loss\fs</Filter>
     </ClInclude>
   </ItemGroup>

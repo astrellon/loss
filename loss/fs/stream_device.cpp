@@ -4,11 +4,6 @@
 
 namespace loss
 {
-    StreamDevice::StreamDevice()
-    {
-
-    }
-
     uint32_t StreamDevice::size() const
     {
         std::lock_guard<std::mutex> lock_guard(_lock);
@@ -22,7 +17,12 @@ namespace loss
             return IOResult(0, NULL_PARAMETER);
         }
 
-        std::lock_guard<std::mutex> lock_guard(_lock);
+        std::unique_lock<std::mutex> lock_guard(_lock);
+        _cv.wait(lock_guard, [this]()
+        {
+            std::cout << "DATA SIZE: " << _data.size() << "\n";
+            return _data.size() > 0u;
+        });
 
         auto max = count;
         if (max > _data.size())
@@ -54,6 +54,8 @@ namespace loss
             //_data << data[i];
             _data.push_back(data[i]);
         }
+
+        _cv.notify_one();
         return IOResult(count, SUCCESS);
     }
 }

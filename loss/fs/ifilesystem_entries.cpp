@@ -159,7 +159,8 @@ namespace loss
     {
         auto read_total = 0u;
         uint8_t temp[128];
-        while (size() > 0)
+        //while (size() > 0)
+        do
         {
             auto result = read(0, 127, temp);
             if (result.status() != SUCCESS)
@@ -170,7 +171,7 @@ namespace loss
             read_total += result.bytes();
             temp[result.bytes()] = '\0';
             buffer.write(reinterpret_cast<const char *>(temp), result.bytes());
-        }
+        } while (size() > 0u);
 
         return IOResult(read_total, SUCCESS);
     }

@@ -30,6 +30,8 @@ namespace loss
             IOResult read(FileHandle *entry, uint32_t offset, uint32_t count, uint8_t *buffer);
             ReturnCode read_folder(const std::string &name, FolderEntry &folder);
 
+            ReturnCode select(const std::string &name);
+
             IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
             IOResult write(FileHandle *entry, uint32_t offset, uint32_t count, const uint8_t *data);
             

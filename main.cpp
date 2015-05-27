@@ -14,6 +14,7 @@ extern "C"
 #include <mutex>
 #include <sstream>
 #include <chrono>
+#include <condition_variable>
 
 #include <loss/fs/virtual_fileystem.h>
 #include <loss/fs/ram_filesystem.h>
@@ -183,7 +184,7 @@ int main()
     {
         write_threads[i] = std::thread([] (int n, loss::StreamDevice &d)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(50 * n));
             std::stringstream ss;
             ss << "Thread: " << n << "!\n";
             d.write_string(ss.str());
@@ -199,10 +200,11 @@ int main()
             buff.str("");
             d.read_string(buff);
 
-            if (buff.str().size() > 0u)
+            //if (buff.str().size() > 0u)
             {
                 std::cout << "-- >" << buff.str() << "< --\n";
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }, std::ref(device), std::ref(done));
 
@@ -212,7 +214,7 @@ int main()
     }
 
     std::cout << "***\n";
-    done = true;
+    //done = true;
     read_thread.join();
 
     std::cout << " - DONE\n";

@@ -72,6 +72,7 @@
     <ClCompile Include="loss\fs\path.cpp" />
     <ClCompile Include="loss\fs\ram_filesystem.cpp" />
     <ClCompile Include="loss\fs\ram_filesystem_drive.cpp" />
+    <ClCompile Include="loss\fs\stream_device.cpp" />
     <ClCompile Include="loss\fs\virtual_fileystem.cpp" />
     <ClCompile Include="loss\return_codes.cpp" />
     <ClCompile Include="lua\src\lapi.c" />
@@ -115,6 +116,7 @@
     <ClInclude Include="loss\fs\path.h" />
     <ClInclude Include="loss\fs\ram_filesystem.h" />
     <ClInclude Include="loss\fs\ram_filesystem_drive.h" />
+    <ClInclude Include="loss\fs\stream_device.h" />
     <ClInclude Include="loss\fs\virtual_fileystem.h" />
     <ClInclude Include="loss\iprocess.h" />
     <ClInclude Include="loss\iuser.h" />
