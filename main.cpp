@@ -87,6 +87,13 @@ int main()
     vfs.create_char_device("/tty0", device);
 
     vfs.create_file("/what.txt");
+
+    vfs.write_string("/tty0", 0, "hellor");
+
+    std::stringstream output;
+    vfs.read_stream("/tty0", 0, 10, output);
+
+    std::cout << "Read from tty0: " << output.str() << "\n";
     /*
     auto result = vfs.create_folder("/home");
     if (result != loss::SUCCESS)

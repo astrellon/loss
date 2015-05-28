@@ -27,18 +27,25 @@ namespace loss
             return IOResult(NULL_ID, ENTRY_NOT_FOUND);
         }
 
-        if (find->second->metadata().type() != FILE_ENTRY)
+        auto type = find->second->metadata().type();
+        if (type == FILE_ENTRY)
         {
-            return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
+            auto file = dynamic_cast<File *>(find->second.get());
+            if (file != nullptr)
+            {
+                return file->read(offset, count, buffer);
+            }
         }
-        
-        auto file = dynamic_cast<File *>(find->second.get());
-        if (file == nullptr)
+        else if (type == CHARACTER_DEVICE_ENTRY)
         {
-            return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
+            auto char_device = dynamic_cast<CharacterDevice *>(find->second.get());
+            if (char_device != nullptr)
+            {
+                return char_device->read(offset, count, buffer);
+            }
         }
 
-        return file->read(offset, count, buffer);
+        return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
     }
 
     IOResult RamFileSystem::write(uint32_t file_id, uint32_t offset, uint32_t count, const uint8_t *data)
@@ -58,18 +65,25 @@ namespace loss
             return IOResult(NULL_ID, ENTRY_NOT_FOUND);
         }
 
-        if (find->second->metadata().type() != FILE_ENTRY)
+        auto type = find->second->metadata().type();
+        if (type == FILE_ENTRY)
         {
-            return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
+            auto file = dynamic_cast<File *>(find->second.get());
+            if (file != nullptr)
+            {
+                return file->write(offset, count, data);
+            }
+        }
+        else if (type == CHARACTER_DEVICE_ENTRY)
+        {
+            auto char_device = dynamic_cast<CharacterDevice *>(find->second.get());
+            if (char_device != nullptr)
+            {
+                return char_device->write(offset, count, data);
+            }
         }
 
-        auto file = dynamic_cast<File *>(find->second.get());
-        if (file == nullptr)
-        {
-            return IOResult(NULL_ID, INTERNAL_ERROR);
-        }
-
-        return file->write(offset, count, data);
+        return IOResult(NULL_ID, WRONG_ENTRY_TYPE);
     }
 
     CreateEntryResult RamFileSystem::create_file(uint32_t folder_id, const std::string &name)
@@ -493,7 +507,7 @@ namespace loss
     RamFileSystem::CharacterDevice *RamFileSystem::new_char_device(uint32_t parent_id, ICharacterDevice *device)
     {
         auto id = next_id();
-        auto result = new CharacterDevice(parent_id, device);
+        auto result = new CharacterDevice(id, device);
         result->parent_folder_id(parent_id);
         _entry_index[id] = std::unique_ptr<Entry>(result);
         return result;
