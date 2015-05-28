@@ -78,7 +78,7 @@ namespace loss
             EntryMap _entries;
     };
 
-    class ICharacterDeviceEntry
+    class ICharacterDevice
     {
         public:
             virtual uint32_t size() const = 0;
@@ -87,6 +87,19 @@ namespace loss
 
             virtual IOResult read_string(std::stringstream &buffer);
             virtual IOResult write_string(const std::string &data);
+    };
+
+    class CharacterDeviceEntry : public IEntry
+    {
+        public:
+            CharacterDeviceEntry(uint32_t parent_id, IFileSystem *fs, ICharacterDevice *device);
+
+            ICharacterDevice *device() const;
+
+            uint32_t size() const;
+        private:
+            ICharacterDevice *_device;
+
     };
 
     class FileHandle

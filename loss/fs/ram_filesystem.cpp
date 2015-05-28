@@ -84,7 +84,7 @@ namespace loss
     {
         return add_entry(folder_id, name, new_folder(folder_id));
     }
-    CreateEntryResult RamFileSystem::create_char_device(uint32_t folder_id, const std::string &name, ICharacterDeviceEntry *device)
+    CreateEntryResult RamFileSystem::create_char_device(uint32_t folder_id, const std::string &name, ICharacterDevice *device)
     {
         return add_entry(folder_id, name, new_char_device(folder_id, device));
     }
@@ -199,6 +199,23 @@ namespace loss
                 if (mount_point != nullptr)
                 {
                     auto entry = new FolderEntry(folder_id, mount_point->fs());
+                    entry->id(iter.second->id());
+                    auto result = to_populate.add_entry(iter.first, entry);
+                    if (result != SUCCESS)
+                    {
+                        return result;
+                    }
+
+                    continue;
+                }
+            }
+
+            if (type == CHARACTER_DEVICE_ENTRY)
+            {
+                auto char_device = dynamic_cast<CharacterDevice *>(iter.second);
+                if (char_device != nullptr)
+                {
+                    auto entry = new CharacterDeviceEntry(folder_id, this, char_device->device());
                     entry->id(iter.second->id());
                     auto result = to_populate.add_entry(iter.first, entry);
                     if (result != SUCCESS)
@@ -473,7 +490,7 @@ namespace loss
         _entry_index[id] = std::unique_ptr<Entry>(result);
         return result;
     }
-    RamFileSystem::CharacterDevice *RamFileSystem::new_char_device(uint32_t parent_id, ICharacterDeviceEntry *device)
+    RamFileSystem::CharacterDevice *RamFileSystem::new_char_device(uint32_t parent_id, ICharacterDevice *device)
     {
         auto id = next_id();
         auto result = new CharacterDevice(parent_id, device);
@@ -703,11 +720,16 @@ namespace loss
     // }}}
     
     // Character Device {{{
-    RamFileSystem::CharacterDevice::CharacterDevice(uint32_t id, ICharacterDeviceEntry *device) :
+    RamFileSystem::CharacterDevice::CharacterDevice(uint32_t id, ICharacterDevice *device) :
         Entry(CHARACTER_DEVICE_ENTRY, id),
         _device(device)
     {
 
+    }
+
+    ICharacterDevice *RamFileSystem::CharacterDevice::device() const
+    {
+        return _device;
     }
     uint32_t RamFileSystem::CharacterDevice::size() const
     {

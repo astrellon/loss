@@ -43,6 +43,7 @@ namespace loss
             ReturnCode create_file(const std::string &name);
             ReturnCode create_symlink(const std::string &name, const std::string &link);
             ReturnCode create_folder(const std::string &name);
+            ReturnCode create_char_device(const std::string &name, ICharacterDevice *device);
             ReturnCode mount(const std::string &name, IFileSystem *fs);
             
             ReturnCode remove_entry(const std::string &name);

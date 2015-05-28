@@ -154,12 +154,11 @@ namespace loss
     }
     // }}}
     
-    // ICharacterDeviceEntry {{{
-    IOResult ICharacterDeviceEntry::read_string(std::stringstream &buffer)
+    // ICharacterDevice {{{
+    IOResult ICharacterDevice::read_string(std::stringstream &buffer)
     {
         auto read_total = 0u;
         uint8_t temp[128];
-        //while (size() > 0)
         do
         {
             auto result = read(0, 127, temp);
@@ -175,9 +174,28 @@ namespace loss
 
         return IOResult(read_total, SUCCESS);
     }
-    IOResult ICharacterDeviceEntry::write_string(const std::string &data)
+    IOResult ICharacterDevice::write_string(const std::string &data)
     {
         return write(0, data.size(), reinterpret_cast<const uint8_t *>(data.c_str()));
+    }
+    // }}}
+    
+    // CharacterDeviceEntry {{{
+    CharacterDeviceEntry::CharacterDeviceEntry(uint32_t parent_id, IFileSystem *fs, ICharacterDevice *device) :
+        IEntry(CHARACTER_DEVICE_ENTRY, parent_id, fs),
+        _device(device)
+    {
+
+    }
+
+    uint32_t CharacterDeviceEntry::size() const
+    {
+        return _device->size();
+    }
+
+    ICharacterDevice *CharacterDeviceEntry::device() const
+    {
+        return _device;
     }
     // }}}
 

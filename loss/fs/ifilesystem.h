@@ -11,7 +11,7 @@ namespace loss
 {
     class FolderEntry;
     class FileEntry;
-    class ICharacterDeviceEntry;
+    class ICharacterDevice;
 
     class IFileSystem
     {
@@ -29,7 +29,7 @@ namespace loss
             virtual CreateEntryResult create_file(uint32_t folder_id, const std::string &name) = 0;
             virtual CreateEntryResult create_symlink(uint32_t folder_id, const std::string &name, const std::string &link) = 0;
             virtual CreateEntryResult create_folder(uint32_t folder_id, const std::string &name) = 0;
-            virtual CreateEntryResult create_char_device(uint32_t folder_id, const std::string &name, ICharacterDeviceEntry *device) = 0;
+            virtual CreateEntryResult create_char_device(uint32_t folder_id, const std::string &name, ICharacterDevice *device) = 0;
             virtual CreateEntryResult mount(uint32_t folder_id, const std::string &name, IFileSystem *fs) = 0;
 
             virtual ReturnCode entry_size(uint32_t entry_id, uint32_t &size) = 0;

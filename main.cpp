@@ -82,7 +82,11 @@ int main()
     auto ramfs2 = new loss::RamFileSystem();
 
     vfs.root_filesystem(ramfs);
-    
+
+    auto device = new loss::StreamDevice();
+    vfs.create_char_device("/tty0", device);
+
+    vfs.create_file("/what.txt");
     /*
     auto result = vfs.create_folder("/home");
     if (result != loss::SUCCESS)
@@ -177,6 +181,7 @@ int main()
     std::cout << "Size: " << device.size() << "\n";
     */
 
+    /*
     loss::StreamDevice device;
 #define NUM_THREADS 50
     std::thread write_threads[NUM_THREADS];
@@ -218,6 +223,7 @@ int main()
     read_thread.join();
 
     std::cout << " - DONE\n";
+    */
 
 #ifdef _WIN32
 	std::cin.get();

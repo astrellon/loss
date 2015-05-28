@@ -20,7 +20,6 @@ namespace loss
         std::unique_lock<std::mutex> lock_guard(_lock);
         _cv.wait(lock_guard, [this]()
         {
-            std::cout << "DATA SIZE: " << _data.size() << "\n";
             return _data.size() > 0u;
         });
 

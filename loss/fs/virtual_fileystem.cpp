@@ -385,6 +385,19 @@ namespace loss
 
         return result.fs()->create_folder(result.id(), path.filename()).status();
     }
+    ReturnCode VirtualFileSystem::create_char_device(const std::string &name, ICharacterDevice *device)
+    {
+        Path path(name);
+        path.dir_to_filename();
+
+        auto result = follow_path(path, IFileSystem::ROOT_ID);
+        if (result.status() != SUCCESS)
+        {
+            return result.status();
+        }
+
+        return result.fs()->create_char_device(result.id(), path.filename(), device).status();
+    }
     
 
     ReturnCode VirtualFileSystem::mount(const std::string &name, IFileSystem *fs)

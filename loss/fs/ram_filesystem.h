@@ -112,16 +112,16 @@ namespace loss
             class CharacterDevice : public Entry
             {
                 public:
-                    CharacterDevice(uint32_t id, ICharacterDeviceEntry *device);
+                    CharacterDevice(uint32_t id, ICharacterDevice *device);
 
-                    ICharacterDeviceEntry *device() const;
+                    ICharacterDevice *device() const;
 
                     virtual uint32_t size() const;
 
                     virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer);
                     virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data);
                 private:
-                    ICharacterDeviceEntry *_device;
+                    ICharacterDevice *_device;
             };
             // }}}
 
@@ -135,7 +135,7 @@ namespace loss
             virtual CreateEntryResult create_file(uint32_t parent_id, const std::string &name);
             virtual CreateEntryResult create_symlink(uint32_t folder_id, const std::string &name, const std::string &link);
             virtual CreateEntryResult create_folder(uint32_t parent_id, const std::string &name);
-            virtual CreateEntryResult create_char_device(uint32_t folder_id, const std::string &name, ICharacterDeviceEntry *device);
+            virtual CreateEntryResult create_char_device(uint32_t folder_id, const std::string &name, ICharacterDevice *device);
             virtual CreateEntryResult mount(uint32_t parent_id, const std::string &name, IFileSystem *fs);
 
             virtual ReturnCode entry_size(uint32_t entry_id, uint32_t &size);
@@ -156,7 +156,7 @@ namespace loss
             Folder *new_folder(uint32_t parent_id);
             File *new_file(uint32_t parent_id);
             Symlink *new_symlink(uint32_t parent_id, const std::string &link);
-            CharacterDevice *new_char_device(uint32_t parent_id, ICharacterDeviceEntry *device);
+            CharacterDevice *new_char_device(uint32_t parent_id, ICharacterDevice *device);
 
             CreateEntryResult add_entry(uint32_t folder_id, const std::string &name, Entry *entry);
             ReturnCode remove_entry(uint32_t parent_id, uint32_t entry_id);

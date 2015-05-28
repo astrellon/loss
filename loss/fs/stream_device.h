@@ -9,7 +9,7 @@
 
 namespace loss
 {
-    class StreamDevice : public ICharacterDeviceEntry
+    class StreamDevice : public ICharacterDevice
     {
         public:
             virtual uint32_t size() const;
