@@ -16,6 +16,7 @@ extern "C"
 #include <chrono>
 #include <condition_variable>
 
+#include <loss/kernel.h>
 #include <loss/fs/virtual_fileystem.h>
 #include <loss/fs/ram_filesystem.h>
 #include <loss/return_codes.h>
@@ -77,9 +78,9 @@ int main()
     lua_close(lua);
     */
 
-    loss::VirtualFileSystem vfs;
+    loss::Kernel kernel(1u);
+    auto &vfs = kernel.virtual_file_system();
     auto ramfs = new loss::RamFileSystem();
-    auto ramfs2 = new loss::RamFileSystem();
 
     vfs.root_filesystem(ramfs);
 
@@ -88,12 +89,39 @@ int main()
 
     vfs.create_file("/what.txt");
 
+    loss::FileHandle *handle = nullptr;
+    auto result = vfs.open(1u, "/tty0", loss::FileHandle::READ | loss::FileHandle::WRITE, handle);
+    vfs.write_string(handle, 0, "hellor");
+
+    loss::TTYRenderer renderer;
+    renderer.kernel(&kernel);
+    renderer.file_handle(handle);
+    
+    std::thread write_thread([] (loss::Kernel &kernel)
+    {
+        auto n = 0u;
+        while (true)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::stringstream ss;
+            ss << "Writing: " << n;
+            kernel.virtual_file_system().write_string("/tty0", 0, ss.str());
+            n++;
+        }
+    }, std::ref(kernel));
+
+    renderer.render();
+
+    vfs.close(handle);
+
+    /*
     vfs.write_string("/tty0", 0, "hellor");
 
     std::stringstream output;
     vfs.read_stream("/tty0", 0, 10, output);
 
     std::cout << "Read from tty0: " << output.str() << "\n";
+    */
     /*
     auto result = vfs.create_folder("/home");
     if (result != loss::SUCCESS)
@@ -152,11 +180,6 @@ int main()
     {
         std::ofstream output("testout.bin");
         auto serialise = loss::RamFileSystemSerialise(output, ramfs);
-        serialise.save();
-    }
-    {
-        std::ofstream output("testout2.bin");
-        auto serialise = loss::RamFileSystemSerialise(output, ramfs2);
         serialise.save();
     }
 

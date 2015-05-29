@@ -5,7 +5,8 @@ typedef struct _win_st WINDOW;
 
 namespace loss
 {
-    class TTY;
+    class Kernel;
+    class FileHandle;
 
     class TTYRenderer
     {
@@ -13,13 +14,21 @@ namespace loss
             TTYRenderer();
             ~TTYRenderer();
 
-            void tty(TTY *tty);
-            TTY *tty() const;
+            void kernel(Kernel *kernel);
+            Kernel *kernel() const;
+
+            void file_handle(FileHandle *file_handle);
+            FileHandle *file_handle() const;
+
+            void is_open(bool open);
+            bool is_open() const;
 
             void render();
 
         private:
-            TTY *_tty;
+            bool _open;
+            Kernel *_kernel;
+            FileHandle *_file_handle;
 
             WINDOW *_window;
     };
