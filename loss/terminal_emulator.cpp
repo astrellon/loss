@@ -11,7 +11,6 @@ extern "C"
 #include <ncurses.h>
 }
 
-
 namespace loss
 {
     TerminalEmulator::TerminalEmulator() :
@@ -70,8 +69,6 @@ namespace loss
 
     void TerminalEmulator::render()
     {
-        //clear();
-
         if (_kernel == nullptr || _file_handle == nullptr)
         {
             return;
@@ -91,36 +88,32 @@ namespace loss
 
             for (auto i = 0u; i < result.bytes(); i++)
             {
-                mvwaddch(_window, y, x, static_cast<char>(buff[i]));
-                
-                x++;
-                if (x > 80)
+                auto c = static_cast<char>(buff[i]);
+                if (c == '\n')
+                {
+                    y++;
+                    x = 0;
+                }
+                else if (c == '\r')
                 {
                     x = 0;
-                    y++;
                 }
+                else
+                {
+                    mvwaddch(_window, y, x, c);
+                    x++;
+                    if (x > 80)
+                    {
+                        x = 0;
+                        y++;
+                    }
+                }
+                
             }
 
             refresh();
         }
         while (_open);
-
-        /*
-        auto chars = _tty->get();
-        auto i = 0u;
-        for (auto y = 0u; y < _tty->height(); y++)
-        {
-            for (auto x = 0u; x < _tty->width(); x++)
-            {
-                auto c = chars[i++];
-                if (c == '\0')
-                {
-                    continue;
-                }
-                mvwaddch(_window, y, x, c);
-            }
-        }
-        */
 
         refresh();
     }

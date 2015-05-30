@@ -118,10 +118,13 @@ namespace loss
             return ENTRY_NOT_FOUND;
         }
 
+        /*
+         * Handle this differently!
         if ((open_mode | FileHandle::WRITE) && find_write_handle(find.id(), find.fs()))
         {
             return FILE_HAS_WRITE_LOCK;
         }
+        */
 
         handle = new FileHandle(find.id(), process_id, open_mode, result.fs());
         auto id = make_id(find.id(), find.fs());

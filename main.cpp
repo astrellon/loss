@@ -78,19 +78,13 @@ int main()
     */
 
     loss::Kernel kernel(1u);
+    kernel.init();
+
     auto &vfs = kernel.virtual_file_system();
-    auto ramfs = new loss::RamFileSystem();
-
-    vfs.root_filesystem(ramfs);
-
-    auto device = new loss::StreamDevice();
-    vfs.create_char_device("/tty0", device);
-
     vfs.create_file("/what.txt");
 
     loss::FileHandle *handle = nullptr;
-    auto result = vfs.open(1u, "/tty0", loss::FileHandle::READ | loss::FileHandle::WRITE, handle);
-    vfs.write_string(handle, 0, "hellor");
+    auto result = vfs.open(2u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
 
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
@@ -98,13 +92,22 @@ int main()
     
     std::thread write_thread([] (loss::Kernel &kernel)
     {
+        loss::FileHandle *handle = nullptr;
+        auto result = kernel.virtual_file_system().open(3u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
+
+        if (result != loss::SUCCESS)
+        {
+            std::cout << "Failed to open TTY for writing: " << loss::ReturnCodes::desc(result) << "\n";
+            return;
+        }
+
         auto n = 0u;
         while (true)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             std::stringstream ss;
-            ss << "Writing: " << n;
-            kernel.virtual_file_system().write_string("/tty0", 0, ss.str());
+            ss << "Writing: " << n << "\n";
+            kernel.virtual_file_system().write_string(handle, 0, ss.str());
             n++;
         }
     }, std::ref(kernel));
@@ -170,17 +173,21 @@ int main()
         std::cout << "Error writing to other: " << loss::ReturnCodes::desc(ioresult.status()) << "\n";
     }
     */
-    
+
+    /*
     output_folder(vfs, "/");
     output_folder(vfs, "/home");
     output_folder(vfs, "/home/alan");
     output_folder(vfs, "/home/alan/other_fs");
+    */
                 
+    /*
     {
         std::ofstream output("testout.bin");
         auto serialise = loss::RamFileSystemSerialise(output, ramfs);
         serialise.save();
     }
+    */
 
     /*
     loss::TTY tty;

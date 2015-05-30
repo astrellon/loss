@@ -1,6 +1,8 @@
 #include "kernel.h"
 
 #include <loss/fs/ifilesystem.h>
+#include <loss/fs/stream_device.h>
+#include <loss/fs/ram_filesystem.h>
 
 namespace loss
 {
@@ -8,6 +10,36 @@ namespace loss
         _id(id)
     {
 
+    }
+
+    ReturnCode Kernel::init()
+    {
+        auto ramfs = new loss::RamFileSystem();
+        _vfs.root_filesystem(ramfs);
+
+        _vfs.create_folder("/dev");
+    
+        auto device = new loss::StreamDevice();
+        _vfs.create_char_device("/dev/tty0", device);
+
+        loss::FileHandle *handle = nullptr;
+        auto result = _vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE, handle);
+        if (result != SUCCESS)
+        {
+            return result;
+        }
+
+        _vfs.write_string(handle, 0, "[ SUCCESS ] - Setup VFS and TTY0\n");
+
+        return SUCCESS;
+    }
+    ReturnCode Kernel::boot()
+    {
+        return SUCCESS;
+    }
+    ReturnCode Kernel::shutdown()
+    {
+        return SUCCESS;
     }
 
     uint32_t Kernel::id() const

@@ -18,6 +18,10 @@ namespace loss
             
             Kernel(uint32_t id);
 
+            ReturnCode init();
+            ReturnCode boot();
+            ReturnCode shutdown();
+
             uint32_t id() const;
 
             // Running processes
