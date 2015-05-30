@@ -9,7 +9,6 @@
 #include <loss/return_codes.h>
 #include <loss/user_manager.h>
 #include <loss/process_manager.h>
-#include <loss/tty.h>
 
 namespace loss
 {
@@ -35,15 +34,11 @@ namespace loss
             UserManager &user_manager();
             const UserManager &user_manager() const;
 
-            TTYManager &tty_manager();
-            const TTYManager &tty_manager() const;
-
         private:
 
             uint32_t _id;
             VirtualFileSystem _vfs;
             ProcessManager _process_manager;
             UserManager _user_manager;
-            TTYManager _tty_manager;
     };
 }

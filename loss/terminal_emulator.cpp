@@ -1,4 +1,4 @@
-#include "tty_renderer.h"
+#include "terminal_emulator.h"
 
 #include <loss/kernel.h>
 #include <loss/fs/virtual_fileystem.h>
@@ -14,7 +14,7 @@ extern "C"
 
 namespace loss
 {
-    TTYRenderer::TTYRenderer() :
+    TerminalEmulator::TerminalEmulator() :
         _open(true),
         _kernel(nullptr),
         _file_handle(nullptr),
@@ -31,7 +31,7 @@ namespace loss
         refresh();
     }
 
-    TTYRenderer::~TTYRenderer()
+    TerminalEmulator::~TerminalEmulator()
     {
         if (_window != nullptr)
         {
@@ -41,34 +41,34 @@ namespace loss
         refresh();
     }
 
-    void TTYRenderer::kernel(Kernel *kernel)
+    void TerminalEmulator::kernel(Kernel *kernel)
     {
         _kernel = kernel;
     }
-    Kernel *TTYRenderer::kernel() const
+    Kernel *TerminalEmulator::kernel() const
     {
         return _kernel;
     }
 
-    void TTYRenderer::file_handle(FileHandle *file_handle)
+    void TerminalEmulator::file_handle(FileHandle *file_handle)
     {
         _file_handle = file_handle;
     }
-    FileHandle *TTYRenderer::file_handle() const
+    FileHandle *TerminalEmulator::file_handle() const
     {
         return _file_handle;
     }
 
-    void TTYRenderer::is_open(bool open)
+    void TerminalEmulator::is_open(bool open)
     {
         _open = open;
     }
-    bool TTYRenderer::is_open() const
+    bool TerminalEmulator::is_open() const
     {
         return _open;
     }
 
-    void TTYRenderer::render()
+    void TerminalEmulator::render()
     {
         //clear();
 

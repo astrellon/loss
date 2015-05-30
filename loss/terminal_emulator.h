@@ -8,11 +8,11 @@ namespace loss
     class Kernel;
     class FileHandle;
 
-    class TTYRenderer
+    class TerminalEmulator
     {
         public:
-            TTYRenderer();
-            ~TTYRenderer();
+            TerminalEmulator();
+            ~TerminalEmulator();
 
             void kernel(Kernel *kernel);
             Kernel *kernel() const;

@@ -22,8 +22,7 @@ extern "C"
 #include <loss/return_codes.h>
 #include <loss/fs/path.h>
 #include <loss/fs/ram_filesystem_drive.h>
-#include <loss/tty.h>
-#include <loss/tty_renderer.h>
+#include <loss/terminal_emulator.h>
 #include <loss/fs/stream_device.h>
 
 void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
@@ -93,7 +92,7 @@ int main()
     auto result = vfs.open(1u, "/tty0", loss::FileHandle::READ | loss::FileHandle::WRITE, handle);
     vfs.write_string(handle, 0, "hellor");
 
-    loss::TTYRenderer renderer;
+    loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
     renderer.file_handle(handle);
     
