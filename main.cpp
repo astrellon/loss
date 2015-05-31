@@ -83,6 +83,8 @@ int main()
     auto &vfs = kernel.virtual_file_system();
     vfs.create_file("/what.txt");
 
+    vfs.write_string("/what.txt", 0, "Hello there\nHow are you today?\nI'm good thank you.");
+
     loss::FileHandle *handle = nullptr;
     auto result = vfs.open(2u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
 
@@ -92,8 +94,10 @@ int main()
     
     std::thread write_thread([] (loss::Kernel &kernel)
     {
-        loss::FileHandle *handle = nullptr;
-        auto result = kernel.virtual_file_system().open(3u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
+        loss::FileHandle *tty_handle = nullptr;
+        auto &vfs = kernel.virtual_file_system();
+
+        auto result = vfs.open(3u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, tty_handle);
 
         if (result != loss::SUCCESS)
         {
@@ -101,15 +105,35 @@ int main()
             return;
         }
 
-        auto n = 0u;
-        while (true)
+        loss::FileHandle *handle = nullptr;
+        result = vfs.open(3u, "/what.txt", loss::FileHandle::READ, handle);
+        if (result != loss::SUCCESS)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            std::stringstream ss;
-            ss << "Writing: " << n << "\n";
-            kernel.virtual_file_system().write_string(handle, 0, ss.str());
-            n++;
+            std::cout << "Failed to open what!\n";
+            return;
         }
+
+        while (!vfs.at_eof(handle))
+        {
+            uint8_t buffer[128];
+            auto read_result = vfs.read_till_character(handle, '\n', 127, buffer);
+            if (read_result.status() != loss::SUCCESS)
+            {
+                std::cout << "Error reading to till newline: " << loss::ReturnCodes::desc(read_result.status()) << "\n";
+                return;
+            }
+
+            handle->change_read_position(1);
+            buffer[read_result.bytes()] = '\0';
+            std::string str((const char *)buffer);
+
+            std::stringstream output;
+            output << "Read line: >" << str << "<\n";
+
+            vfs.write_string(tty_handle, output.str());
+        }
+
+        vfs.write_string(tty_handle, "Done!");
     }, std::ref(kernel));
 
     renderer.render();

@@ -30,7 +30,7 @@ namespace loss
         }
 
         auto read_count = 0u;
-        for (auto i = offset; i < max; i++, read_count++)
+        for (auto i = 0; i < max; i++, read_count++)
         {
             buffer[i] = _data[read_count];
         }
@@ -48,7 +48,7 @@ namespace loss
         }
 
         std::lock_guard<std::mutex> lock_guard(_lock);
-        for (auto i = offset; i < offset + count; i++)
+        for (auto i = 0; i < count; i++)
         {
             //_data << data[i];
             _data.push_back(data[i]);

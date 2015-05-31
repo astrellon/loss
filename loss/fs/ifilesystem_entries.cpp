@@ -204,7 +204,9 @@ namespace loss
         _entry_id(entry_id),
         _process_id(process_id),
         _mode(mode),
-        _fs(fs)
+        _fs(fs),
+        _read_position(0),
+        _write_position(0)
     {
         if (entry_id == 0u || process_id == 0u)
         {
@@ -236,5 +238,32 @@ namespace loss
     {
         return static_cast<uint32_t>(_mode | FileHandle::READ) > 0;
     }
+            
+    int32_t FileHandle::read_position() const
+    {
+        return _read_position;
+    }
+    void FileHandle::read_position(int32_t pos)
+    {
+        _read_position = pos;
+    }
+    void FileHandle::change_read_position(int32_t change)
+    {
+        _read_position += change;
+    }
+            
+    int32_t FileHandle::write_position() const
+    {
+        return _write_position;
+    }
+    void FileHandle::write_position(int32_t pos)
+    {
+        _write_position = pos;
+    }
+    void FileHandle::change_write_position(int32_t change)
+    {
+        _write_position += change;
+    }
+
     // }}}
 }

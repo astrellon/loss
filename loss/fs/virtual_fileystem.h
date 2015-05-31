@@ -27,15 +27,17 @@ namespace loss
 
             // Change to a stream version at some point.
             IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
-            IOResult read(FileHandle *entry, uint32_t offset, uint32_t count, uint8_t *buffer);
+            IOResult read(FileHandle *entry, uint32_t count, uint8_t *buffer);
+            IOResult read_till_character(FileHandle *entry, char terminator, uint32_t max_count, uint8_t *buffer);
+
             ReturnCode read_folder(const std::string &name, FolderEntry &folder);
 
-            ReturnCode select(const std::string &name);
-
             IOResult write(const std::string &name, uint32_t offset, uint32_t count, const uint8_t *data);
-            IOResult write(FileHandle *entry, uint32_t offset, uint32_t count, const uint8_t *data);
+            IOResult write(FileHandle *entry, uint32_t count, const uint8_t *data);
             
             ReturnCode entry_size(const std::string &name, uint32_t &size);
+            ReturnCode entry_size(FileHandle *handle, uint32_t &size);
+            bool at_eof(FileHandle *handle);
 
             ReturnCode entry_metadata(const std::string &name, MetadataDef &metadata);
             ReturnCode update_entry_metadata(const std::string &name, const MetadataDef &metadata);
@@ -50,9 +52,9 @@ namespace loss
 
             // Helpers
             IOResult read_stream(const std::string &name, uint32_t offset, uint32_t count, std::ostream &ss);
-            IOResult read_stream(FileHandle *handle, uint32_t offset, uint32_t count, std::ostream &ss);
+            IOResult read_stream(FileHandle *handle, uint32_t count, std::ostream &ss);
             IOResult write_string(const std::string &name, uint32_t offset, const std::string &data);
-            IOResult write_string(FileHandle *handle, uint32_t offset, const std::string &data);
+            IOResult write_string(FileHandle *handle, const std::string &data);
 
             ReturnCode root_filesystem(IFileSystem *fs);
             IFileSystem *root_filesystem() const;

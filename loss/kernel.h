@@ -12,6 +12,9 @@
 
 namespace loss
 {
+    class RamFileSystem;
+    class StreamDevice;
+
     class Kernel
     {
         public:
@@ -38,11 +41,17 @@ namespace loss
             UserManager &user_manager();
             const UserManager &user_manager() const;
 
+            ReturnCode run_program(const std::string &path);
+
         private:
 
             uint32_t _id;
             VirtualFileSystem _vfs;
             ProcessManager _process_manager;
             UserManager _user_manager;
+
+            RamFileSystem *_init_fs;
+            StreamDevice *_tty_device;
+            void kernel_message(bool success, const std::string &message);
     };
 }

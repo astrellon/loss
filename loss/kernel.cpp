@@ -4,32 +4,29 @@
 #include <loss/fs/stream_device.h>
 #include <loss/fs/ram_filesystem.h>
 
+#include <sstream>
+
 namespace loss
 {
     Kernel::Kernel(uint32_t id) :
-        _id(id)
+        _id(id),
+        _init_fs(nullptr),
+        _tty_device(nullptr)
     {
 
     }
 
     ReturnCode Kernel::init()
     {
-        auto ramfs = new loss::RamFileSystem();
-        _vfs.root_filesystem(ramfs);
+        _init_fs = new loss::RamFileSystem();
+        _vfs.root_filesystem(_init_fs);
 
         _vfs.create_folder("/dev");
     
-        auto device = new loss::StreamDevice();
-        _vfs.create_char_device("/dev/tty0", device);
+        _tty_device = new StreamDevice();
+        _vfs.create_char_device("/dev/tty0", _tty_device);
 
-        loss::FileHandle *handle = nullptr;
-        auto result = _vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE, handle);
-        if (result != SUCCESS)
-        {
-            return result;
-        }
-
-        _vfs.write_string(handle, 0, "[ SUCCESS ] - Setup VFS and TTY0\n");
+        kernel_message(true, "Setup VFS");
 
         return SUCCESS;
     }
@@ -72,5 +69,24 @@ namespace loss
     const UserManager &Kernel::user_manager() const
     {
         return _user_manager;
+    }
+
+    ReturnCode Kernel::run_program(const std::string &path)
+    {
+        FileHandle *handle = nullptr;
+        auto result = _vfs.open(1u, "/init.d", FileHandle::READ, handle);
+        if (result != SUCCESS)
+        {
+            return result;
+        }
+
+        return SUCCESS;
+    }
+
+    void Kernel::kernel_message(bool success, const std::string &message)
+    {
+        std::stringstream ss;
+        ss << "[ " << (success ? "SUCCESS" : "FAIL") << " ] " << message << '\n';
+        _tty_device->write(0, ss.str().size(), (const uint8_t *)(ss.str().c_str()));
     }
 }

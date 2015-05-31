@@ -199,7 +199,7 @@ namespace loss
         }
         return result.fs()->read(find.id(), offset, count, buffer);
     }
-    IOResult VirtualFileSystem::read(FileHandle *handle, uint32_t offset, uint32_t count, uint8_t *buffer)
+    IOResult VirtualFileSystem::read(FileHandle *handle, uint32_t count, uint8_t *buffer)
     {
         if (handle == nullptr || buffer == nullptr)
         {
@@ -209,8 +209,61 @@ namespace loss
         {
             return IOResult(0, HANDLE_LACKING_READ);
         }
-        return handle->filesystem()->read(handle->entry_id(), offset, count, buffer);
+
+        auto result = handle->filesystem()->read(handle->entry_id(), handle->read_position(), count, buffer);
+        handle->change_read_position(result.bytes());
+        return result;
     }
+    IOResult VirtualFileSystem::read_till_character(FileHandle *handle, char terminator, uint32_t max_count, uint8_t *buffer)
+    {
+        if (handle == nullptr || buffer == nullptr)
+        {
+            return IOResult(0, NULL_PARAMETER);
+        }
+        if (!handle->has_read_mode())
+        {
+            return IOResult(0, HANDLE_LACKING_READ);
+        }
+
+        auto start_position = handle->read_position();
+        uint8_t temp[64];
+        auto counter = 0u;
+        auto done = false;
+        while (!done)
+        {
+            auto result = handle->filesystem()->read(handle->entry_id(), handle->read_position(), 64, temp);
+            if (result.status() != SUCCESS)
+            {
+                return result;
+            }
+
+            auto read_till = result.bytes();
+
+            for (auto i = 0u; i < result.bytes(); i++)
+            {
+                if (temp[i] == terminator)
+                {
+                    done = true;                      
+                    read_till = i;
+                    break;
+                }
+            }
+            handle->change_read_position(read_till);
+
+            if (result.bytes() < 64)
+            {
+                done = true;
+            }
+
+            for (auto i = 0u; i < read_till && counter < max_count; i++, counter++)
+            {
+                buffer[counter] = temp[i];
+            }
+        }
+
+        return IOResult(counter, SUCCESS);
+    }
+
     ReturnCode VirtualFileSystem::read_folder(const std::string &name, FolderEntry &folder)
     {
         Path path(name);
@@ -225,17 +278,18 @@ namespace loss
         return result.fs()->read_folder(result.id(), folder);
     }
 
-    IOResult VirtualFileSystem::read_stream(FileHandle *handle, uint32_t offset, uint32_t count, std::ostream &ss)
+    IOResult VirtualFileSystem::read_stream(FileHandle *handle, uint32_t count, std::ostream &ss)
     {
         // TODO Handle special case of -1 count
         uint8_t *temp = new uint8_t[count];
-        auto result = read(handle, offset, count, temp); 
+        auto result = read(handle, count, temp); 
         if (result.status() == SUCCESS && result.bytes() > 0)
         {
             ss.write(reinterpret_cast<const char *>(temp), result.bytes());
         }
         delete []temp;
 
+        handle->change_read_position(result.bytes());
         return result;
     }
     IOResult VirtualFileSystem::read_stream(const std::string &name, uint32_t offset, uint32_t count, std::ostream &ss)
@@ -270,7 +324,7 @@ namespace loss
         }
         return result.fs()->write(find.id(), offset, count, data);
     }
-    IOResult VirtualFileSystem::write(FileHandle *handle, uint32_t offset, uint32_t count, const uint8_t *data)
+    IOResult VirtualFileSystem::write(FileHandle *handle, uint32_t count, const uint8_t *data)
     {
         if (handle == nullptr || data == nullptr)
         {
@@ -280,15 +334,18 @@ namespace loss
         {
             return IOResult(0, HANDLE_LACKING_WRITE);
         }
-        return handle->filesystem()->write(handle->entry_id(), offset, count, data);
+
+        auto result = handle->filesystem()->write(handle->entry_id(), handle->write_position(), count, data);
+        handle->change_write_position(result.bytes());
+        return result;
     }
     IOResult VirtualFileSystem::write_string(const std::string &name, uint32_t offset, const std::string &data)
     {
         return write(name, offset, data.size(), reinterpret_cast<const uint8_t *>(data.c_str()));
     }
-    IOResult VirtualFileSystem::write_string(FileHandle *handle, uint32_t offset, const std::string &data)
+    IOResult VirtualFileSystem::write_string(FileHandle *handle, const std::string &data)
     {
-        return write(handle, offset, data.size(), reinterpret_cast<const uint8_t *>(data.c_str()));
+        return write(handle, data.size(), reinterpret_cast<const uint8_t *>(data.c_str()));
     }
 
     ReturnCode VirtualFileSystem::entry_size(const std::string &name, uint32_t &size)
@@ -308,6 +365,26 @@ namespace loss
             return find.status();
         }
         return result.fs()->entry_size(find.id(), size);
+    }
+    ReturnCode VirtualFileSystem::entry_size(FileHandle *handle, uint32_t &size)
+    {
+        if (handle == nullptr)
+        {
+            return NULL_PARAMETER;
+        }
+
+        return handle->filesystem()->entry_size(handle->entry_id(), size);
+    }
+
+    bool VirtualFileSystem::at_eof(FileHandle *handle)
+    {
+        uint32_t size = 0u;
+        auto size_result = entry_size(handle, size);
+        if (size_result != SUCCESS)
+        {
+            return false;
+        }
+        return handle->read_position() >= static_cast<int32_t>(size);
     }
 
     ReturnCode VirtualFileSystem::entry_metadata(const std::string &name, MetadataDef &metadata)

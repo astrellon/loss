@@ -123,9 +123,19 @@ namespace loss
             bool has_read_mode() const;
             IFileSystem *filesystem() const;
 
+            int32_t read_position() const;
+            void read_position(int32_t pos);
+            void change_read_position(int32_t change);
+
+            int32_t write_position() const;
+            void write_position(int32_t pos);
+            void change_write_position(int32_t change);
+
         private:
             uint32_t _entry_id;
             uint32_t _process_id;
+            int32_t _read_position;
+            int32_t _write_position;
             OpenMode _mode;
             IFileSystem *_fs;
 
