@@ -7,26 +7,30 @@
 namespace loss
 {
     class User;
+    class FileHandle;
+    class Kernel;
 
     class ProcessInfo
     {
         public:
-            ProcessInfo(const std::string &name, const User *user, uint32_t id);
+            ProcessInfo(const std::string &name, const User *user, uint32_t id, Kernel *kernel);
 
             void name(const std::string &name);
             const std::string &name() const;
             const User *user() const;
             uint32_t id() const;
+            Kernel *kernel() const;
             
-            void std_out(std::ostream *value);
-            std::ostream *std_out() const;
+            void std_out(FileHandle *std_out);
+            FileHandle *std_out() const;
 
         private:
             std::string _name;
             const User *_user;
             uint32_t _id;
+            Kernel *_kernel;
 
-            std::ostream *_std_out;
+            FileHandle *_std_out;
     };
 }
 

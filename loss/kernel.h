@@ -41,7 +41,7 @@ namespace loss
             UserManager &user_manager();
             const UserManager &user_manager() const;
 
-            ReturnCode run_program(const std::string &path);
+            ReturnCode run_program(const std::string &path, const std::string &std_out_path);
 
         private:
 

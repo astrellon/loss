@@ -1,8 +1,11 @@
 #include "process_manager.h"
 
+#include "kernel.h"
+
 namespace loss
 {
-    ProcessManager::ProcessManager() :
+    ProcessManager::ProcessManager(Kernel *kernel) :
+        _kernel(kernel),
         _id_count(0)
     {
 
@@ -16,7 +19,7 @@ namespace loss
         }
 
         auto id = ++_id_count;
-        auto process = new NativeProcess(name, user, id);
+        auto process = new NativeProcess(name, user, id, _kernel);
         _processes[id] = std::unique_ptr<IProcess>(process);
         result = process;
 

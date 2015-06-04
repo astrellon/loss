@@ -10,6 +10,7 @@ namespace loss
 {
     Kernel::Kernel(uint32_t id) :
         _id(id),
+        _process_manager(this),
         _init_fs(nullptr),
         _tty_device(nullptr)
     {
@@ -71,10 +72,17 @@ namespace loss
         return _user_manager;
     }
 
-    ReturnCode Kernel::run_program(const std::string &path)
+    ReturnCode Kernel::run_program(const std::string &path, const std::string &std_out_path)
     {
         FileHandle *handle = nullptr;
-        auto result = _vfs.open(1u, "/init.d", FileHandle::READ, handle);
+        auto result = _vfs.open(1u, path, FileHandle::READ, handle);
+        if (result != SUCCESS)
+        {
+            return result;
+        }
+
+        FileHandle *std_out_handle = nullptr;
+        result = _vfs.open(1u, std_out_path, FileHandle::READ, std_out_handle);
         if (result != SUCCESS)
         {
             return result;

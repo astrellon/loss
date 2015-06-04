@@ -4,8 +4,8 @@
 
 namespace loss
 {
-    IProcess::IProcess(const std::string &name, const User *user, uint32_t id) :
-        _info(name, user, id)
+    IProcess::IProcess(const std::string &name, const User *user, uint32_t id, Kernel *kernel) :
+        _info(name, user, id, kernel)
     {
 
     }
