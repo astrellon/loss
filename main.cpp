@@ -86,12 +86,24 @@ int main()
     vfs.write_string("/what.txt", 0, "Hello there\nHow are you today?\nI'm good thank you.");
 
     loss::FileHandle *handle = nullptr;
-    auto result = vfs.open(2u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
+    auto result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
 
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
     renderer.file_handle(handle);
+
+    loss::NativeProcess *proc = nullptr;
+    auto proc_result = kernel.process_manager().create_new_native_process("/dev/tty0", "test", nullptr, proc);
+    if (!proc_result)
+    {
+        std::cout << "Failed to start process: " << loss::ReturnCodes::desc(proc_result) << "\n";
+    }
+    else
+    {
+        proc->run(0, nullptr);
+    }
     
+    /*
     std::thread write_thread([] (loss::Kernel &kernel)
     {
         loss::FileHandle *tty_handle = nullptr;
@@ -135,6 +147,7 @@ int main()
 
         vfs.write_string(tty_handle, "Done!");
     }, std::ref(kernel));
+    */
 
     renderer.render();
 

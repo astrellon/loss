@@ -6,25 +6,35 @@ namespace loss
 {
     ProcessManager::ProcessManager(Kernel *kernel) :
         _kernel(kernel),
-        _id_count(0)
+        _id_count(1)
     {
 
     }
 
-    ReturnCode ProcessManager::create_new_native_process(const std::string &name, const User *user, NativeProcess *& result)
+    ReturnCode ProcessManager::create_new_native_process(const std::string &std_out_path, const std::string &name, const User *user, NativeProcess *& result)
     {
-        if (user == nullptr || name.empty())
+        if (name.empty())
         {
             return NULL_PARAMETER;
         }
 
         auto id = ++_id_count;
+        
+        FileHandle *std_out_handle = nullptr;
+        auto open_result = _kernel->virtual_file_system().open(id, std_out_path, FileHandle::READ, std_out_handle);
+        if (open_result != SUCCESS)
+        {
+            return open_result;
+        }
+
         auto process = new NativeProcess(name, user, id, _kernel);
         _processes[id] = std::unique_ptr<IProcess>(process);
         result = process;
+        process->info().std_out(std_out_handle);
 
         return SUCCESS;
     }
+
     ReturnCode ProcessManager::delete_process(uint32_t id)
     {
         const auto find = _processes.find(id);

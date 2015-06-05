@@ -20,14 +20,40 @@ namespace loss
     ReturnCode Kernel::init()
     {
         _init_fs = new loss::RamFileSystem();
-        _vfs.root_filesystem(_init_fs);
+        auto result = _vfs.root_filesystem(_init_fs);
+        if (result != SUCCESS)
+        {
+            return result;
+        }
 
-        _vfs.create_folder("/dev");
+        result = _vfs.create_folder("/dev");
+        if (result != SUCCESS)
+        {
+            return result;
+        }
     
         _tty_device = new StreamDevice();
-        _vfs.create_char_device("/dev/tty0", _tty_device);
+        result = _vfs.create_char_device("/dev/tty0", _tty_device);
+        if (result != SUCCESS)
+        {
+            return result;
+        }
 
         kernel_message(true, "Setup VFS");
+
+        User *root_user = nullptr;
+        result = _user_manager.create_new_user("root", root_user);
+        if (result != SUCCESS)
+        {
+            std::string error("Error creating root user: ");
+            error += ReturnCodes::desc(result);
+            kernel_message(false, error);
+            return result;
+        }
+        else
+        {
+            kernel_message(true, "Created root user");
+        }
 
         return SUCCESS;
     }
@@ -70,25 +96,6 @@ namespace loss
     const UserManager &Kernel::user_manager() const
     {
         return _user_manager;
-    }
-
-    ReturnCode Kernel::run_program(const std::string &path, const std::string &std_out_path)
-    {
-        FileHandle *handle = nullptr;
-        auto result = _vfs.open(1u, path, FileHandle::READ, handle);
-        if (result != SUCCESS)
-        {
-            return result;
-        }
-
-        FileHandle *std_out_handle = nullptr;
-        result = _vfs.open(1u, std_out_path, FileHandle::READ, std_out_handle);
-        if (result != SUCCESS)
-        {
-            return result;
-        }
-
-        return SUCCESS;
     }
 
     void Kernel::kernel_message(bool success, const std::string &message)
