@@ -1,10 +1,11 @@
 #pragma once
 
-#include "ifilesystem.h"
-#include "ifilesystem_entries.h"
 #include <map>
 #include <vector>
 #include <string>
+
+#include "ifilesystem.h"
+#include "ifilesystem_entries.h"
 
 namespace loss
 {

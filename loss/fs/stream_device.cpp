@@ -1,6 +1,6 @@
 #include "stream_device.h"
 
-#include <loss/return_codes.h>
+#include "../return_codes.h"
 
 namespace loss
 {

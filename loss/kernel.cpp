@@ -1,8 +1,8 @@
 #include "kernel.h"
 
-#include <loss/fs/ifilesystem.h>
-#include <loss/fs/stream_device.h>
-#include <loss/fs/ram_filesystem.h>
+#include "fs/ifilesystem.h"
+#include "fs/stream_device.h"
+#include "fs/ram_filesystem.h"
 
 #include <sstream>
 

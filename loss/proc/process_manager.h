@@ -1,12 +1,13 @@
 #pragma once
 
-#include "iprocess.h"
-#include "native_process.h"
 #include <map>
 #include <stdint.h>
 #include <memory>
 
-#include <loss/return_codes.h>
+#include "iprocess.h"
+#include "native_process.h"
+
+#include "../return_codes.h"
 
 namespace loss
 {

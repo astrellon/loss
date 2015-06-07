@@ -1,6 +1,6 @@
 #include "process_info.h"
 
-#include "fs/ifilesystem_entries.h"
+#include "../fs/ifilesystem_entries.h"
 
 namespace loss
 {

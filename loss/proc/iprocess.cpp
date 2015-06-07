@@ -1,6 +1,6 @@
 #include "iprocess.h"
 
-#include "user.h"
+#include "../user.h"
 
 namespace loss
 {

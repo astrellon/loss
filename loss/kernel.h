@@ -5,10 +5,10 @@
 #include <stdint.h>
 #include <memory>
 
-#include <loss/fs/virtual_fileystem.h>
-#include <loss/return_codes.h>
-#include <loss/user_manager.h>
-#include <loss/process_manager.h>
+#include "fs/virtual_fileystem.h"
+#include "return_codes.h"
+#include "user_manager.h"
+#include "proc/process_manager.h"
 
 namespace loss
 {

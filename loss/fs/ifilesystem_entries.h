@@ -5,8 +5,8 @@
 #include <iostream>
 #include <memory>
 
-#include <loss/return_codes.h>
-#include <loss/fs/common.h>
+#include "../return_codes.h"
+#include "../fs/common.h"
 
 namespace loss
 {

@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <iostream>
 
-#include <loss/return_codes.h>
-#include <loss/fs/common.h>
+#include "../return_codes.h"
+#include "../fs/common.h"
 
 namespace loss
 {

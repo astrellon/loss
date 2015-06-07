@@ -7,11 +7,11 @@
 #include <vector>
 #include <map>
 
-#include <loss/return_codes.h>
 #include "common.h"
 #include "ifilesystem_entries.h"
-
 #include "path.h"
+
+#include "../return_codes.h"
 
 namespace loss
 {

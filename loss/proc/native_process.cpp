@@ -1,8 +1,9 @@
 #include "native_process.h"
 
 #include <iostream>
-#include "fs/ifilesystem_entries.h"
-#include "kernel.h"
+
+#include "../fs/ifilesystem_entries.h"
+#include "../kernel.h"
 
 namespace loss
 {
