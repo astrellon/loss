@@ -15,28 +15,47 @@ namespace loss
 		// We always want the standard libs as they provide basic table manipulation.
 		luaL_openlibs(_lua);
 
-        lua_register(_lua, "print2", [] (lua_State *lua)
+        lua_register(_lua, "print", [] (lua_State *lua)
         {
             auto process = reinterpret_cast<LuaProcess *>(lua->process);
-            process->write_std_out("Printed from lua!\n");
 
+            auto n = lua_gettop(lua);  /* number of arguments */
+            lua_getglobal(lua, "tostring");
+
+            for (auto i = 1; i <= n; i++)
+            {
+                lua_pushvalue(lua, -1);  /* function to be called */
+                lua_pushvalue(lua, i);   /* value to print */
+                lua_call(lua, 1, 1);
+                
+                auto s = lua_tostring(lua, -1);  /* get result */
+
+                if (s == NULL)
+                {
+                    return luaL_error(lua,
+                        LUA_QL("tostring") " must return a string to " LUA_QL("print"));
+                }
+
+                if (i > 1) 
+                {
+                    process->write_std_out("\t");
+                }
+                process->write_std_out(s);
+                lua_pop(lua, 1);  /* pop result */
+            }
+
+            process->write_std_out("\n");
             return 0;
         });
     }
 
-	bool LuaProcess::load_string(const char *str)
+	bool LuaProcess::load_string(const std::string &code)
 	{
-		return !luaL_loadstring(_lua, str);
+		return !luaL_loadstring(_lua, code.c_str());
 	}
 
     int32_t LuaProcess::run(int argc, char **argv)
     {
-        if (!load_string("print2()"))
-        {
-            write_std_out("Failed to load string\n");
-            return 0;
-        }
-
         auto result = lua_pcall(_lua, 0, LUA_MULTRET, 0); 
         if (result != LUA_OK)
         {

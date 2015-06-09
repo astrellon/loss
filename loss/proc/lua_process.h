@@ -29,7 +29,7 @@ namespace loss
         public:
             LuaProcess(const std::string &name, const User *user, uint32_t id, Kernel *kernel);
 
-            bool load_string(const char *str);
+            bool load_string(const std::string &code);
 
             virtual int32_t run(int argc, char **argv);
             virtual int32_t shutdown();

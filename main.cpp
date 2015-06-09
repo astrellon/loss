@@ -74,18 +74,20 @@ int main()
 
     auto &vfs = kernel.virtual_file_system();
     vfs.create_file("/what.txt");
-
     vfs.write_string("/what.txt", 0, "Hello there\nHow are you today?\nI'm good thank you.");
 
     loss::FileHandle *handle = nullptr;
     auto result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
+
+    vfs.create_file("/test.lua");
+    vfs.write_string("/test.lua", 0, "print(\"O hai!\")");
 
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
     renderer.file_handle(handle);
 
     loss::LuaProcess *proc = nullptr;
-    auto proc_result = kernel.process_manager().create_new_lua_process("/dev/tty0", "test", nullptr, proc);
+    auto proc_result = kernel.process_manager().create_lua_process_from_file("/dev/tty0", "/test.lua", nullptr, proc);
     if (!proc_result)
     {
         std::cout << "Failed to start process: " << loss::ReturnCodes::desc(proc_result) << "\n";

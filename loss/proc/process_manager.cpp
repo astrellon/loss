@@ -2,6 +2,8 @@
 
 #include "../kernel.h"
 
+#include <sstream>
+
 namespace loss
 {
     ProcessManager::ProcessManager(Kernel *kernel) :
@@ -11,7 +13,7 @@ namespace loss
 
     }
 
-    ReturnCode ProcessManager::create_new_native_process(const std::string &std_out_path, const std::string &name, const User *user, NativeProcess *& result)
+    ReturnCode ProcessManager::create_native_process(const std::string &std_out_path, const std::string &name, const User *user, NativeProcess *& result)
     {
         if (name.empty())
         {
@@ -34,13 +36,9 @@ namespace loss
 
         return SUCCESS;
     }
-    ReturnCode ProcessManager::create_new_lua_process(const std::string &std_out_path, const std::string &name, const User *user, LuaProcess *& result)
+    
+    ReturnCode ProcessManager::create_lua_process(const std::string &std_out_path, const User *user, LuaProcess *& result)
     {
-        if (name.empty())
-        {
-            return NULL_PARAMETER;
-        }
-
         auto id = ++_id_count;
         
         FileHandle *std_out_handle = nullptr;
@@ -50,13 +48,55 @@ namespace loss
             return open_result;
         }
 
-        auto process = new LuaProcess(name, user, id, _kernel);
+        auto process = new LuaProcess("lua", user, id, _kernel);
         _processes[id] = std::unique_ptr<IProcess>(process);
         result = process;
         process->info().std_out(std_out_handle);
 
         return SUCCESS;
     }
+    ReturnCode ProcessManager::create_lua_process_from_file(const std::string &std_out_path, const std::string &file_path, const User *user, LuaProcess *& result)
+    {
+        auto proc_result = create_lua_process(std_out_path, user, result);
+        if (proc_result != SUCCESS)
+        {
+            return proc_result;
+        }
+
+        auto &vfs = _kernel->virtual_file_system();
+
+        FileHandle *file_handle = nullptr;
+        auto file_result = vfs.open(result->info().id(), file_path, FileHandle::READ, file_handle);
+        if (file_result != SUCCESS)
+        {
+            return file_result;
+        }
+
+        /*
+         * Read first line?
+        uint8_t buff[256];
+        auto read_result = _kernel->virtual_file_system().read_till_character(file_handle, '\n', 255, buff);
+        if (read_result.status() != SUCCESS)
+        {
+            return read_result.status();
+        }
+        buff[read_result.bytes()] = '\0';
+        */
+
+        std::stringstream file_contents; 
+        while (!vfs.at_eof(file_handle))
+        {
+            vfs.read_stream(file_handle, 1024, file_contents);
+        }
+
+        if (result->load_string(file_contents.str()))
+        {
+            return FILE_NOT_FOUND;
+        }
+
+        return SUCCESS;
+    }
+
 
     ReturnCode ProcessManager::delete_process(uint32_t id)
     {

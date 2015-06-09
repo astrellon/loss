@@ -19,9 +19,10 @@ namespace loss
         public:
             ProcessManager(Kernel *kernel);
 
-            ReturnCode create_new_native_process(const std::string &std_out_path, const std::string &name, const User *user, NativeProcess *& result);
+            ReturnCode create_native_process(const std::string &std_out_path, const std::string &name, const User *user, NativeProcess *& result);
 
-            ReturnCode create_new_lua_process(const std::string &std_out_path, const std::string &name, const User *user, LuaProcess *& result);
+            ReturnCode create_lua_process(const std::string &std_out_path, const User *user, LuaProcess *& result);
+            ReturnCode create_lua_process_from_file(const std::string &std_out_path, const std::string &file_path, const User *user, LuaProcess *& result);
 
             ReturnCode delete_process(uint32_t id);
             IProcess *find_process(uint32_t id) const;
