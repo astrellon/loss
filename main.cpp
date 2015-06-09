@@ -1,13 +1,5 @@
 #include <iostream>
 
-extern "C" 
-{ 
-#	include <lua/src/lua.h>
-#	include <lua/src/lauxlib.h>
-#	include <lua/src/lualib.h>
-#	include <lua/src/lstate.h>
-} 
-
 #include <string>
 #include <fstream>
 #include <thread>
@@ -92,8 +84,8 @@ int main()
     renderer.kernel(&kernel);
     renderer.file_handle(handle);
 
-    loss::NativeProcess *proc = nullptr;
-    auto proc_result = kernel.process_manager().create_new_native_process("/dev/tty0", "test", nullptr, proc);
+    loss::LuaProcess *proc = nullptr;
+    auto proc_result = kernel.process_manager().create_new_lua_process("/dev/tty0", "test", nullptr, proc);
     if (!proc_result)
     {
         std::cout << "Failed to start process: " << loss::ReturnCodes::desc(proc_result) << "\n";

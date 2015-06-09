@@ -15,9 +15,8 @@ namespace loss
 
     int32_t NativeProcess::run(int argc, char **argv)
     {
-        //*info().std_out() << "Hello thar\n";
-        //info().std_out()->write
-        info().kernel()->virtual_file_system().write_string(info().std_out(), "Hello thar\n");
+        write_std_out("Hello thar\n");
+
         return 0;
     }
     int32_t NativeProcess::shutdown()

@@ -20,6 +20,8 @@ namespace loss
 
             ProcessInfo &info();
 
+            void write_std_out(const std::string &message);
+
         private:
 
             ProcessInfo _info;

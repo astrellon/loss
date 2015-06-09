@@ -1,6 +1,7 @@
 #include "iprocess.h"
 
 #include "../user.h"
+#include "../kernel.h"
 
 namespace loss
 {
@@ -13,5 +14,10 @@ namespace loss
     ProcessInfo &IProcess::info()
     {
         return _info;
+    }
+            
+    void IProcess::write_std_out(const std::string &message)
+    {
+        info().kernel()->virtual_file_system().write_string(info().std_out(), message);
     }
 }

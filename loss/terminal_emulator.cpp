@@ -6,6 +6,9 @@
 
 #include <iostream>
 
+#undef cast
+#undef getstr
+
 extern "C"
 {
 #include <ncurses.h>
