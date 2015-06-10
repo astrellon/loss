@@ -25,5 +25,6 @@ namespace loss
             static int io_read(lua_State *lua);
             static int io_write(lua_State *lua);
 
+            static LuaProcess *proc(lua_State *lua);
     };
 }

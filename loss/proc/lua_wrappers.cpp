@@ -17,7 +17,7 @@ namespace loss
     {
         lua_register(lua, "print", [] (lua_State *lua)
         {
-            auto process = reinterpret_cast<LuaProcess *>(lua->process);
+            auto process = proc(lua);
 
             auto n = lua_gettop(lua);  /* number of arguments */
             lua_getglobal(lua, "tostring");
@@ -69,7 +69,7 @@ namespace loss
 
     int LuaWrappers::io_close(lua_State *lua)
     {
-        auto process = reinterpret_cast<LuaProcess *>(lua->process);
+        auto process = proc(lua);
         process->write_std_out("Close!");
         return 0;
     }
@@ -84,6 +84,11 @@ namespace loss
     int LuaWrappers::io_write(lua_State *lua)
     {
         return 0;
+    }
+
+    LuaProcess *LuaWrappers::proc(lua_State *lua)
+    {
+        return reinterpret_cast<LuaProcess *>(lua->process);
     }
     // }}}
 }
