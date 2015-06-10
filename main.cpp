@@ -80,7 +80,7 @@ int main()
     auto result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
 
     vfs.create_file("/test.lua");
-    vfs.write_string("/test.lua", 0, "print(\"O hai!\")");
+    vfs.write_string("/test.lua", 0, "io2.close()");
 
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
