@@ -109,6 +109,7 @@ namespace loss
             enum OpenMode
             {
                 UNKNOWN  = -0x01,
+                NONE     = 0x00,
                 READ     = 0x01,
                 WRITE    = 0x02,
                 APPEND   = 0x04
@@ -144,5 +145,10 @@ namespace loss
     inline FileHandle::OpenMode operator |(FileHandle::OpenMode lhs, FileHandle::OpenMode rhs)
     {
         return static_cast<FileHandle::OpenMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
+    }
+    inline FileHandle::OpenMode &operator |=(FileHandle::OpenMode &lhs, FileHandle::OpenMode rhs)
+    {
+        lhs = lhs | rhs;
+        return lhs;
     }
 }

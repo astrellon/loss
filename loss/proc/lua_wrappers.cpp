@@ -105,13 +105,41 @@ namespace loss
         const char *mode = luaL_optstring(lua, 2, "r");
         int i = 0;
         /* check whether 'mode' matches '[rwa]%+?b?' */
+        /*
         if (!(mode[i] != '\0' && strchr("rwa", mode[i++]) != NULL &&
-            (mode[i] != '+' || ++i) &&  /* skip if char is '+' */
-            (mode[i] != 'b' || ++i) &&  /* skip if char is 'b' */
+            (mode[i] != '+' || ++i) &&  
+            (mode[i] != 'b' || ++i) && 
             (mode[i] == '\0')))
         {
             return luaL_error(lua, "invalid mode " LUA_QS
                 " (should match " LUA_QL("[rwa]%%+?b?") ")", mode);
+        }
+        */
+        auto file_mode = FileHandle::NONE;
+        while (mode[i] != '\0')
+        {
+            auto m = mode[i++];
+            if (m == 'r')
+            {
+                file_mode |= FileHandle::READ;
+            }
+            else if (m == 'w')
+            {
+                file_mode |= FileHandle::WRITE;
+            }
+            else if (m == 'a')
+            {
+                file_mode |= FileHandle::APPEND;
+            }
+            else if (m == '+')
+            {
+                file_mode |= FileHandle::READ | FileHandle::WRITE;
+            }
+            else
+            {
+                return luaL_error(lua, "invalid mode " LUA_QS
+                    " (should match " LUA_QL("[rwa]%%+?b?") ")", mode);
+            }
         }
 
         auto process = proc(lua);
@@ -119,10 +147,10 @@ namespace loss
         auto &vfs = info.kernel()->virtual_file_system();
 
         FileHandle *handle = nullptr;
-        vfs.open(info.id(), filename, FileHandle::READ | FileHandle::WRITE, handle);
+        vfs.open(info.id(), filename, file_mode, handle);
         if (handle == nullptr)
         {
-            return 1;
+            return luaL_fileresult(lua, 0, filename);
         }
         
         auto result = new LuaFile();
