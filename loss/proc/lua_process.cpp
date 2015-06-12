@@ -2,7 +2,7 @@
 
 #include "../user.h"
 #include "../kernel.h"
-#include "lua_wrappers.h"
+#include "../lua/lua_wrappers.h"
 
 #include <sstream>
 

@@ -226,7 +226,7 @@ namespace loss
         }
 
         auto start_position = handle->read_position();
-        uint8_t temp[64];
+        uint8_t temp[256];
         auto counter = 0u;
         auto done = false;
         while (!done)
@@ -244,13 +244,13 @@ namespace loss
                 if (temp[i] == terminator)
                 {
                     done = true;                      
-                    read_till = i;
+                    read_till = i + 1;
                     break;
                 }
             }
             handle->change_read_position(read_till);
 
-            if (result.bytes() < 64)
+            if (result.bytes() < 256)
             {
                 done = true;
             }

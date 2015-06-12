@@ -1,23 +1,9 @@
 #pragma once
 
 #include "iprocess.h"
-
-extern "C" 
-{ 
-#	include <lua/src/lua.h>
-#	include <lua/src/lauxlib.h>
-#	include <lua/src/lualib.h>
-#	include <lua/src/lstate.h>
-} 
+#include "../lua/lua_common.h"
 
 #include <iostream>
-
-#define lua_tofloat(L,i)	static_cast<float>(lua_tonumber(L,i))
-#define lua_tobool(L,i)		(lua_toboolean(L,i) > 0)
-#define lua_isnum(L,i)		(lua_type(L,i) == LUA_TNUMBER)
-#define lua_isstr(L,i)		(lua_type(L,i) == LUA_TSTRING)
-#define lua_isbool(L,i)		(lua_type(L,i) == LUA_TBOOLEAN)
-#define lua_first(L)		lua_pushvalue(L,1); return 1;
 
 namespace loss
 {

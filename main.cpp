@@ -82,8 +82,17 @@ int main()
     vfs.create_file("/test.lua");
     vfs.write_string("/test.lua", 0, 
             "test_file = io2.open(\"/what.txt\", \"r\")\n"
+            //"test_file = io.open(\"./what.txt\", \"r\")\n"
             "print(\"Printing file: \", test_file)\n"
-            "test_file:read()\n");
+            "arg1,arg2,arg3 = test_file:read(\"*l\")\n"
+            "print(\"Read: \", arg1, arg2, arg3)\n"
+            "arg1,arg2,arg3 = test_file:read(\"*l\")\n"
+            "print(\"Read: \", arg1, arg2, arg3)\n"
+            "arg1,arg2,arg3 = test_file:read(\"*l\")\n"
+            "print(\"Read: \", arg1, arg2, arg3)\n"
+            "arg1,arg2,arg3 = test_file:read(\"*l\")\n"
+            "print(\"Read: \", arg1, arg2, arg3)\n"
+            );
 
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
