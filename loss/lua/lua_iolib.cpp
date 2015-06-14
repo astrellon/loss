@@ -293,13 +293,17 @@ namespace loss
 
     int LuaIOLib::read_number (lua_State *lua, FileHandle *file)
     {
-        lua_Number d;
-        /*
-        if (fscanf(file, LUA_NUMBER_SCAN, &d) == 1) {
-            lua_pushnumber(lua, d);
+        auto process = proc(lua);
+        auto &vfs = process->info().kernel()->virtual_file_system();
+        
+        double d;
+        if (vfs.read_number(file, d).status() == SUCCESS)
+        {
+            lua_pushnumber(lua, static_cast<lua_Number>(d));
             return 1;
         }
-        else*/ {
+        else 
+        {
             lua_pushnil(lua);  /* "result" to be removed */
             return 0;  /* read fails */
         }

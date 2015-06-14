@@ -263,6 +263,69 @@ namespace loss
 
         return IOResult(counter, SUCCESS);
     }
+    IOResult VirtualFileSystem::read_number(FileHandle *handle, double &result)
+    {
+        auto bytes_read = 0u;
+        auto num_counter = 0u;
+        
+        // Max size of number
+        uint8_t num_buff[32];
+        uint8_t read_buff[64];
+
+        auto has_period = false;
+        while (!at_eof(handle))
+        {
+            auto read_result = read(handle, 64, read_buff);
+            if (read_result.status() != SUCCESS)
+            {
+                return read_result;
+            }
+            auto counter = 0u;
+
+            while (isspace(read_buff[counter]))
+            {
+                counter++;
+            }
+
+            if (num_counter == 0u && read_buff[counter] == '-')
+            {
+                counter++;
+                num_buff[num_counter++] = '-';
+            }
+
+            for (; counter < read_result.bytes(); counter++)
+            {
+                if (read_buff[counter] == '.' && !has_period)
+                {
+                    counter++;
+                    has_period = true;
+                    num_buff[num_counter++] = '.';
+                    continue;
+                }
+
+                if (isdigit(read_buff[counter]))
+                {
+                    num_buff[num_counter++] = read_buff[counter++];
+                }
+                else
+                {
+                    break;
+                }
+            }
+            num_buff[num_counter] = '\0';
+            bytes_read += counter;
+        }
+
+        if (num_counter > 0)
+        {
+            num_buff[num_counter] = '\0';
+            result = atof((const char*)num_buff);
+
+            handle->change_read_position(bytes_read);
+            return IOResult(bytes_read, SUCCESS);
+        }
+        return IOResult(0, INVALID_NUMBER);
+    }
 
     ReturnCode VirtualFileSystem::read_folder(const std::string &name, FolderEntry &folder)
     {

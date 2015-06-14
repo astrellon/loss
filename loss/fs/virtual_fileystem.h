@@ -29,6 +29,7 @@ namespace loss
             IOResult read(const std::string &name, uint32_t offset, uint32_t count, uint8_t *buffer);
             IOResult read(FileHandle *entry, uint32_t count, uint8_t *buffer);
             IOResult read_till_character(FileHandle *entry, char terminator, uint32_t max_count, uint8_t *buffer);
+            IOResult read_number(FileHandle *entry, double &num);
 
             ReturnCode read_folder(const std::string &name, FolderEntry &folder);
 

@@ -10,6 +10,7 @@ namespace loss
         { INTERNAL_ERROR,  "internal_error" },
         { FILE_NOT_FOUND,  "file_not_found" },
         { ALREADY_IN_LIST, "already_in_list" },
+        { INVALID_NUMBER,  "invalid_number" },
 
         { ENTRY_ALREADY_EXITS,     "entry_already_exits" },
         { WRONG_ENTRY_TYPE,        "wrong_entry_type" },
@@ -38,6 +39,7 @@ namespace loss
         { INTERNAL_ERROR,  "there was an unexpected internal error." },
         { FILE_NOT_FOUND,  "file not found." },
         { ALREADY_IN_LIST, "a parameter has already been added to this list." },
+        { INVALID_NUMBER,  "unable to read number as it is not a valid number." },
 
         { ENTRY_ALREADY_EXITS,     "an entry with the given name already exists." },
         { WRONG_ENTRY_TYPE,        "an entry was found but it was not the correct type." },

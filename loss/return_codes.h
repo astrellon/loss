@@ -17,6 +17,7 @@ namespace loss
         INTERNAL_ERROR =            -0x0001,
         FILE_NOT_FOUND =            -0x0002,
         OUT_OF_BOUNDS =             -0x0003,
+        INVALID_NUMBER =            -0x0004,
 
         // FileSystem related
         ENTRY_ALREADY_EXITS =       -0x0010,

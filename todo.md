@@ -3,8 +3,8 @@ General list
 
 FileSystem
 ----------
-- HostComputerFileSystem?
 - Expand the metadata and user aspects.
+- FUSE for mounting.
 
 Users
 -----
