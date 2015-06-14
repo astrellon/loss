@@ -110,6 +110,14 @@ int main()
 "print(io.read(\"*l\"))\n"
             );
 
+    auto ramfs = dynamic_cast<loss::RamFileSystem *>(vfs.root_filesystem());
+    if (ramfs != nullptr)
+    {
+        std::ofstream output("testout.bin");
+        auto serialise = loss::RamFileSystemSerialise(output, ramfs);
+        serialise.save();
+    }
+
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
     renderer.file_handle(handle);

@@ -53,6 +53,14 @@ namespace loss
             {
                 continue;
             }
+
+            // We don't want to serialise character devices.
+            auto device = dynamic_cast<RamFileSystem::CharacterDevice *>(iter->second);
+            if (device != nullptr)
+            {
+                continue;
+            }
+
             write_string(iter->first);
             write_binary(iter->second->id());
         }
