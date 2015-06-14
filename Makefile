@@ -86,6 +86,12 @@ ifdef TESTING
 	SRCDIRS += tests tests/loss
 endif
 
+ifdef FUSE
+	MAIN_O = lossfs.o
+	PROGRAM = Lossfs
+	LDFLAGS += `pkg-config fuse --libs`
+endif
+
 ## Implicit Section: change the following only when necessary.
 ##==========================================================================
 
@@ -104,6 +110,11 @@ CXXFLAGS= -g -O0 -std=c++11
 ifdef RELEASE
 	CFLAGS =   -O3
 	CXXFLAGS = -O3 -std=c++11
+endif
+
+ifdef FUSE
+	CFLAGS += `pkg-config fuse --cflags`
+	CXXFLAGS += `pkg-config fuse --cflags`
 endif
 
 # The C program compiler.

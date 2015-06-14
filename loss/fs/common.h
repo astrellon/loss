@@ -19,7 +19,7 @@ namespace loss
     {
         public:
 
-            inline MetadataDef(EntryType type) :
+            inline MetadataDef(EntryType type = UNKNOWN_ENTRY) :
                 _owner_id(0u),
                 _permissions(0x00u),
                 _type(type)

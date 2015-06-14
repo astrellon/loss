@@ -73,17 +73,23 @@ int main()
     kernel.init();
 
     auto &vfs = kernel.virtual_file_system();
+    auto ramfs = dynamic_cast<loss::RamFileSystem *>(vfs.root_filesystem());
+    
+    {
+        std::ifstream input("testout.bin");
+        loss::RamFileSystemDeserialise deserialise(input, ramfs);
+        deserialise.load();
+    }
+    
+    loss::FileHandle *handle = nullptr;
+    /*
     vfs.create_file("/what.txt");
     vfs.write_string("/what.txt", 0, "Hello there\nHow are you today?\nI'm good thank you.");
     
     vfs.create_file("/test.txt");
     vfs.write_string("/test.txt", 0, "-.6 .654 -234 5345 123what");
 
-    loss::FileHandle *handle = nullptr;
-    auto result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
-
     vfs.create_file("/test.lua");
-    /*
     vfs.write_string("/test.lua", 0, 
             "test_file = io2.open(\"/what.txt\", \"r\")\n"
             //"test_file = io.open(\"./what.txt\", \"r\")\n"
@@ -98,6 +104,7 @@ int main()
             "print(\"Read: \", arg1, arg2, arg3)\n"
             );
             */
+    /*
     vfs.write_string("/test.lua", 0,
 "io.input(\"test.txt\", \"r\")\n"
 "print(io.read(\"*n\"))\n"
@@ -109,14 +116,18 @@ int main()
 "print(io.read(\"*l\"))\n"
 "print(io.read(\"*l\"))\n"
             );
+            */
 
-    auto ramfs = dynamic_cast<loss::RamFileSystem *>(vfs.root_filesystem());
+    /*
     if (ramfs != nullptr)
     {
         std::ofstream output("testout.bin");
         auto serialise = loss::RamFileSystemSerialise(output, ramfs);
         serialise.save();
     }
+    */
+
+    auto result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
 
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
@@ -181,7 +192,7 @@ int main()
 
     renderer.render();
 
-    vfs.close(handle);
+    //vfs.close(handle);
 
     /*
     vfs.write_string("/tty0", 0, "hellor");
