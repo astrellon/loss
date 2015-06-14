@@ -22,3 +22,12 @@ Unit testing is as simple as
 make TESTING=yes
 ./LossTests
 ```
+
+FUSE tool
+Todo: Extend tool to be able to create empty harddrives.
+```
+sudo apt-get install libfuse-dev
+
+make FUSE=yes
+./Lossfs <name of harddrive file> <mount folder>
+```
