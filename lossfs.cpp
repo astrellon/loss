@@ -76,9 +76,6 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     (void) offset;
     (void) fi;
 
-    if (strcmp(path, "/") != 0)
-        return -ENOENT;
-
     filler(buf, ".", NULL, 0);
     filler(buf, "..", NULL, 0);
 
@@ -92,18 +89,26 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
             filler(buf, iter.first.c_str(), NULL, 0);
         }
     }
-    //filler(buf, hello_path + 1, NULL, 0);
+    else
+    {
+        return -ENOENT;
+    }
 
     return 0;
 }
 
 static int hello_open(const char *path, struct fuse_file_info *fi)
 {
-    if (strcmp(path, hello_path) != 0)
-        return -ENOENT;
+    loss::MetadataDef metadata;
+    if (vfs->entry_metadata(path, metadata) != loss::SUCCESS)
+    {
+        return -ENOENT; 
+    }
 
     if ((fi->flags & 3) != O_RDONLY)
+    {
         return -EACCES;
+    }
 
     return 0;
 }
@@ -111,6 +116,14 @@ static int hello_open(const char *path, struct fuse_file_info *fi)
 static int hello_read(const char *path, char *buf, size_t size, off_t offset,
               struct fuse_file_info *fi)
 {
+    auto read_result = vfs->read(path, offset, size, (uint8_t*)buf);
+    if (read_result.status() != loss::SUCCESS)
+    {
+        return -ENOENT;
+    }
+
+    return read_result.bytes();
+    /*
     size_t len;
     (void) fi;
     if(strcmp(path, hello_path) != 0)
@@ -125,6 +138,7 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
         size = 0;
 
     return size;
+        */
 }
 
 static struct fuse_operations hello_oper = {
@@ -146,13 +160,14 @@ int main(int argc, char *argv[])
 	}
 
     vfs = new loss::VirtualFileSystem();
+    ramfs = new loss::RamFileSystem();
+    vfs->root_filesystem(ramfs);
     const char *file_to_open = argv[i];
     {
         std::ifstream input(file_to_open);
         loss::RamFileSystemDeserialise deserialise(input, ramfs);
         deserialise.load();
     }
-    vfs->root_filesystem(ramfs);
 
 	for(; i < argc; i++)
     {

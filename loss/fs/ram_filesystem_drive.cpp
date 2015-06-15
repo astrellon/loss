@@ -44,19 +44,23 @@ namespace loss
     {
         write_binary(folder->id());
         _output << 'f';
-        write_binary(folder->size());
+        
+        auto num_writable = 0u;
         for (auto iter = folder->begin(); iter != folder->end(); ++iter)
         {
-            // We don't want to serialise mount points.
-            auto mount = dynamic_cast<RamFileSystem::MountPoint *>(iter->second);
-            if (mount != nullptr)
+            auto type = iter->second->metadata().type();
+            if (type == MOUNT_POINT_ENTRY || type == CHARACTER_DEVICE_ENTRY)
             {
                 continue;
             }
+            num_writable++;
+        }
+        write_binary(num_writable);
 
-            // We don't want to serialise character devices.
-            auto device = dynamic_cast<RamFileSystem::CharacterDevice *>(iter->second);
-            if (device != nullptr)
+        for (auto iter = folder->begin(); iter != folder->end(); ++iter)
+        {
+            auto type = iter->second->metadata().type();
+            if (type == MOUNT_POINT_ENTRY || type == CHARACTER_DEVICE_ENTRY)
             {
                 continue;
             }
