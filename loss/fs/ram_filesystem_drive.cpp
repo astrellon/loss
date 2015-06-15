@@ -193,7 +193,9 @@ namespace loss
             auto entries = folder->entries();
             for (auto iter = entries.begin(); iter != entries.end(); ++iter)
             {
-                ram_folder->add_entry(iter->first, _fs->_entry_index[iter->second].get());
+                auto entry = _fs->_entry_index[iter->second].get();
+                entry->parent_folder_id(ram_folder->id());
+                ram_folder->add_entry(iter->first, entry);
             }
         }
     }

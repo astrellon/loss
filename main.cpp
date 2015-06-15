@@ -70,15 +70,22 @@ int main()
     */
 
     loss::Kernel kernel(1u);
-    kernel.init();
 
     auto &vfs = kernel.virtual_file_system();
-    auto ramfs = dynamic_cast<loss::RamFileSystem *>(vfs.root_filesystem());
-    
+    //auto ramfs = dynamic_cast<loss::RamFileSystem *>(vfs.root_filesystem());
+    auto rootfs = new loss::RamFileSystem();
+    vfs.root_filesystem(rootfs);
     {
         std::ifstream input("testout.bin");
-        loss::RamFileSystemDeserialise deserialise(input, ramfs);
+        loss::RamFileSystemDeserialise deserialise(input, rootfs);
         deserialise.load();
+    }
+    
+    auto result = kernel.init();
+    if (result != loss::SUCCESS)
+    {
+        std::cout << "Failed to start kernel: " << loss::ReturnCodes::desc(result) << "\n";
+        return -1;
     }
     
     loss::FileHandle *handle = nullptr;
@@ -86,8 +93,18 @@ int main()
     vfs.create_file("/what.txt");
     vfs.write_string("/what.txt", 0, "Hello there\nHow are you today?\nI'm good thank you.");
     
-    vfs.create_file("/test.txt");
-    vfs.write_string("/test.txt", 0, "-.6 .654 -234 5345 123what");
+    result = vfs.create_file("/test.txt");
+    if (result != loss::SUCCESS)
+    {
+        std::cout << "Failed to create test.txt: " << loss::ReturnCodes::desc(result) << "\n";
+        return -1;
+    }
+    auto io_result = vfs.write_string("/test.txt", 0, "-.6 .654 -234 5345 123what");
+    if (io_result.status() != loss::SUCCESS)
+    {
+        std::cout << "Failed to create test.txt: " << loss::ReturnCodes::desc(io_result.status()) << "\n";
+        return -1;
+    }
 
     vfs.create_file("/test.lua");
     vfs.write_string("/test.lua", 0, 
@@ -119,20 +136,26 @@ int main()
             */
 
     /*
-    if (ramfs != nullptr)
+    if (rootfs != nullptr)
     {
         std::ofstream output("testout.bin");
-        auto serialise = loss::RamFileSystemSerialise(output, ramfs);
+        auto serialise = loss::RamFileSystemSerialise(output, rootfs);
         serialise.save();
     }
     */
 
-    auto result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
+    result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
+
+    output_folder(vfs, "/");
+    output_folder(vfs, "/dev");
+
+    return -1;
 
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
     renderer.file_handle(handle);
 
+    /*
     loss::LuaProcess *proc = nullptr;
     auto proc_result = kernel.process_manager().create_lua_process_from_file("/dev/tty0", "/test.lua", nullptr, proc);
     if (!proc_result)
@@ -143,6 +166,7 @@ int main()
     {
         proc->run(0, nullptr);
     }
+    */
     
     /*
     std::thread write_thread([] (loss::Kernel &kernel)

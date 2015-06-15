@@ -11,7 +11,7 @@ namespace loss
     Kernel::Kernel(uint32_t id) :
         _id(id),
         _process_manager(this),
-        _init_fs(nullptr),
+        _dev_fs(nullptr),
         _tty_device(nullptr)
     {
 
@@ -19,14 +19,14 @@ namespace loss
 
     ReturnCode Kernel::init()
     {
-        _init_fs = new loss::RamFileSystem();
-        auto result = _vfs.root_filesystem(_init_fs);
-        if (result != SUCCESS)
+        if (_vfs.root_filesystem() == nullptr)
         {
-            return result;
+            // TODO
+            return INTERNAL_ERROR;
         }
 
-        result = _vfs.create_folder("/dev");
+        _dev_fs = new loss::RamFileSystem();
+        auto result = _vfs.mount("/dev", _dev_fs);
         if (result != SUCCESS)
         {
             return result;

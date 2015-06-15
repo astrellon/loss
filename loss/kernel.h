@@ -48,7 +48,7 @@ namespace loss
             ProcessManager _process_manager;
             UserManager _user_manager;
 
-            RamFileSystem *_init_fs;
+            RamFileSystem *_dev_fs;
             StreamDevice *_tty_device;
             void kernel_message(bool success, const std::string &message);
     };
