@@ -30,6 +30,7 @@ static loss::RamFileSystem *ramfs = nullptr;
 
 static int hello_getattr(const char *path, struct stat *stbuf)
 {
+    std::cout << "Getattr: " << path << "\n";
     int res = 0;
 
     memset(stbuf, 0, sizeof(struct stat));
@@ -60,7 +61,7 @@ static int hello_getattr(const char *path, struct stat *stbuf)
         }
         else if (metadata.type() == loss::FILE_ENTRY)
         {
-            stbuf->st_mode = S_IFREG | 0444;
+            stbuf->st_mode = S_IFREG | 0666;
             uint32_t size;
             vfs->entry_size(path, size);
             stbuf->st_size = size;
@@ -73,6 +74,7 @@ static int hello_getattr(const char *path, struct stat *stbuf)
 static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
              off_t offset, struct fuse_file_info *fi)
 {
+    std::cout << "Readdir: " << path << "\n";
     (void) offset;
     (void) fi;
 
@@ -99,15 +101,11 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
 static int hello_open(const char *path, struct fuse_file_info *fi)
 {
+    std::cout << "Open: " << path << "\n";
     loss::MetadataDef metadata;
     if (vfs->entry_metadata(path, metadata) != loss::SUCCESS)
     {
         return -ENOENT; 
-    }
-
-    if ((fi->flags & 3) != O_RDONLY)
-    {
-        return -EACCES;
     }
 
     return 0;
@@ -116,6 +114,7 @@ static int hello_open(const char *path, struct fuse_file_info *fi)
 static int hello_read(const char *path, char *buf, size_t size, off_t offset,
               struct fuse_file_info *fi)
 {
+    std::cout << "Read: " << path << ": " << size << ": " << offset << "\n";
     auto read_result = vfs->read(path, offset, size, (uint8_t*)buf);
     if (read_result.status() != loss::SUCCESS)
     {
@@ -141,11 +140,19 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
         */
 }
 
+static int hello_write(const char *path, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
+{
+    std::cout << "Write: " << path << ": " << size << ": " << off << "\n";
+    auto write_result = vfs->write(path, off, size, (const uint8_t *)buf);
+    return write_result.bytes();
+}
+
 static struct fuse_operations hello_oper = {
     .getattr    = hello_getattr,
     .readdir    = hello_readdir,
     .open       = hello_open,
     .read       = hello_read,
+    .write      = hello_write,
 };
 
 int main(int argc, char *argv[])
