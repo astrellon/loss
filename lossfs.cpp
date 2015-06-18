@@ -36,17 +36,39 @@ static int hello_getattr(const char *path, struct stat *stbuf)
     memset(stbuf, 0, sizeof(struct stat));
     // Not really used at the moment
     stbuf->st_nlink = 1;
-    /*
-    if (strcmp(path, "/") == 0) {
-        stbuf->st_mode = S_IFDIR | 0755;
-        stbuf->st_nlink = 2;
-    } else if (strcmp(path, hello_path) == 0) {
-        stbuf->st_mode = S_IFREG | 0444;
-        stbuf->st_nlink = 1;
-        stbuf->st_size = strlen(hello_str);
-    } else
+    
+    loss::MetadataDef metadata;
+    auto read_result = vfs->entry_metadata(path, metadata);
+    if (read_result != loss::SUCCESS)
+    {
         res = -ENOENT;
-        */
+    }
+    else
+    {
+        if (metadata.type() == loss::FOLDER_ENTRY)
+        {
+            stbuf->st_mode = S_IFDIR | 0755;
+        }
+        else if (metadata.type() == loss::FILE_ENTRY)
+        {
+            stbuf->st_mode = S_IFREG | 0666;
+            uint32_t size;
+            vfs->entry_size(path, size);
+            stbuf->st_size = size;
+        }
+    }
+
+    return res;
+}
+static int hello_fgetattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi)
+{
+    std::cout << "Fgetattr: " << path << "\n";
+    int res = 0;
+
+    memset(stbuf, 0, sizeof(struct stat));
+    // Not really used at the moment
+    stbuf->st_nlink = 1;
+    
     loss::MetadataDef metadata;
     auto read_result = vfs->entry_metadata(path, metadata);
     if (read_result != loss::SUCCESS)
@@ -88,7 +110,22 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     {
         for (auto &iter : folder)
         {
-            filler(buf, iter.first.c_str(), NULL, 0);
+            loss::MetadataDef metadata;
+            auto read_result = vfs->entry_metadata(path, metadata);
+
+            struct stat st;
+            if (metadata.type() == loss::FOLDER_ENTRY)
+            {
+                st.st_mode = S_IFDIR | 0755;
+            }
+            else if (metadata.type() == loss::FILE_ENTRY)
+            {
+                st.st_mode = S_IFREG | 0666;
+                uint32_t size;
+                vfs->entry_size(path, size);
+                st.st_size = size;
+            }
+            filler(buf, iter.first.c_str(), &st, 0);
         }
     }
     else
@@ -99,14 +136,26 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     return 0;
 }
 
+static int hello_create(const char *path, mode_t mode, struct fuse_file_info *fi)
+{
+    std::cout << "Create: " << path << ", " << mode << "\n";
+    auto result = vfs->create_file(path);
+    loss::FileHandle *handle = nullptr;
+    vfs->open(1, path, loss::FileHandle::READ | loss::FileHandle::WRITE, handle);
+    fi->fh = (intptr_t)handle;
+    return 0;
+}
+
 static int hello_open(const char *path, struct fuse_file_info *fi)
 {
     std::cout << "Open: " << path << "\n";
-    loss::MetadataDef metadata;
-    if (vfs->entry_metadata(path, metadata) != loss::SUCCESS)
+    loss::FileHandle *handle = nullptr;
+    auto open_result = vfs->open(1, path, loss::FileHandle::READ | loss::FileHandle::WRITE, handle);
+    if (open_result != loss::SUCCESS)
     {
-        return -ENOENT; 
+        return -ENOENT;
     }
+    fi->fh = (intptr_t)handle;
 
     return 0;
 }
@@ -115,7 +164,10 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
               struct fuse_file_info *fi)
 {
     std::cout << "Read: " << path << ": " << size << ": " << offset << "\n";
-    auto read_result = vfs->read(path, offset, size, (uint8_t*)buf);
+    loss::FileHandle *handle = (loss::FileHandle *)fi->fh;
+    handle->read_position(offset);
+    auto read_result = vfs->read(handle, size, (uint8_t*)buf);
+
     if (read_result.status() != loss::SUCCESS)
     {
         return -ENOENT;
@@ -147,12 +199,20 @@ static int hello_write(const char *path, const char *buf, size_t size, off_t off
     return write_result.bytes();
 }
 
+static void hello_destroy(void *user_data)
+{
+    std::cout << "Destroyed\n";
+}
+
 static struct fuse_operations hello_oper = {
     .getattr    = hello_getattr,
+    .fgetattr   = hello_fgetattr,
     .readdir    = hello_readdir,
     .open       = hello_open,
     .read       = hello_read,
+    .create     = hello_create,
     .write      = hello_write,
+    .destroy    = hello_destroy,
 };
 
 int main(int argc, char *argv[])
