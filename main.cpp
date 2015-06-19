@@ -75,13 +75,11 @@ int main()
     //auto ramfs = dynamic_cast<loss::RamFileSystem *>(vfs.root_filesystem());
     auto rootfs = new loss::RamFileSystem();
     vfs.root_filesystem(rootfs);
-    /*
     {
         std::ifstream input("testout.bin");
         loss::RamFileSystemDeserialise deserialise(input, rootfs);
         deserialise.load();
     }
-    */
     
     auto result = kernel.init();
     if (result != loss::SUCCESS)
@@ -91,6 +89,7 @@ int main()
     }
     
     loss::FileHandle *handle = nullptr;
+    /*
     vfs.create_file("/what.txt");
     vfs.write_string("/what.txt", 0, "Hello there\nHow are you today?\nI'm good thank you.");
     
@@ -121,6 +120,7 @@ int main()
             "arg1,arg2,arg3 = test_file:read(\"*l\")\n"
             "print(\"Read: \", arg1, arg2, arg3)\n"
             );
+            */
     /*
     vfs.write_string("/test.lua", 0,
 "io.input(\"test.txt\", \"r\")\n"
@@ -133,7 +133,6 @@ int main()
 "print(io.read(\"*l\"))\n"
 "print(io.read(\"*l\"))\n"
             );
-            */
 
     if (rootfs != nullptr)
     {
@@ -141,6 +140,7 @@ int main()
         auto serialise = loss::RamFileSystemSerialise(output, rootfs);
         serialise.save();
     }
+            */
 
     result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
 
@@ -360,6 +360,13 @@ int main()
 
     std::cout << " - DONE\n";
     */
+    
+    if (rootfs != nullptr)
+    {
+        std::ofstream output("testout.bin");
+        auto serialise = loss::RamFileSystemSerialise(output, rootfs);
+        serialise.save();
+    }
 
 #ifdef _WIN32
 	std::cin.get();

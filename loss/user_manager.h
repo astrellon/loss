@@ -17,6 +17,7 @@ namespace loss
             ReturnCode create_new_user(const std::string &name, User *& result, uint32_t id = 0u);
             ReturnCode delete_user(uint32_t id);
             User *find_user(uint32_t id) const;
+            User *find_user(const std::string &name) const;
             
             typedef std::map<uint32_t, std::unique_ptr<User> > UserMap;
             const UserMap &users() const;

@@ -51,6 +51,18 @@ namespace loss
 
         return find->second.get();
     }
+    User *UserManager::find_user(const std::string &name) const
+    {
+        for (const auto &iter : _users)
+        {
+            if (iter.second->name() == name)
+            {
+                return iter.second.get();
+            }
+        }
+
+        return nullptr;
+    }
 
     const UserManager::UserMap &UserManager::users() const
     {
