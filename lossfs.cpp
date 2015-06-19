@@ -22,11 +22,9 @@
 #include <loss/fs/ram_filesystem.h>
 #include <loss/fs/ram_filesystem_drive.h>
 
-static const char *hello_str = "Hello World!\n";
-static const char *hello_path = "/hello";
-
 static loss::VirtualFileSystem *vfs = nullptr;
 static loss::RamFileSystem *ramfs = nullptr;
+static const char *file_to_open = nullptr;
 
 static int hello_getattr(const char *path, struct stat *stbuf)
 {
@@ -63,34 +61,7 @@ static int hello_getattr(const char *path, struct stat *stbuf)
 static int hello_fgetattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi)
 {
     std::cout << "Fgetattr: " << path << "\n";
-    int res = 0;
-
-    memset(stbuf, 0, sizeof(struct stat));
-    // Not really used at the moment
-    stbuf->st_nlink = 1;
-    
-    loss::MetadataDef metadata;
-    auto read_result = vfs->entry_metadata(path, metadata);
-    if (read_result != loss::SUCCESS)
-    {
-        res = -ENOENT;
-    }
-    else
-    {
-        if (metadata.type() == loss::FOLDER_ENTRY)
-        {
-            stbuf->st_mode = S_IFDIR | 0755;
-        }
-        else if (metadata.type() == loss::FILE_ENTRY)
-        {
-            stbuf->st_mode = S_IFREG | 0666;
-            uint32_t size;
-            vfs->entry_size(path, size);
-            stbuf->st_size = size;
-        }
-    }
-
-    return res;
+    return hello_getattr(path, stbuf);
 }
 
 static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
@@ -174,22 +145,6 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
     }
 
     return read_result.bytes();
-    /*
-    size_t len;
-    (void) fi;
-    if(strcmp(path, hello_path) != 0)
-        return -ENOENT;
-
-    len = strlen(hello_str);
-    if (offset < len) {
-        if (offset + size > len)
-            size = len - offset;
-        memcpy(buf, hello_str + offset, size);
-    } else
-        size = 0;
-
-    return size;
-        */
 }
 
 static int hello_write(const char *path, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
@@ -201,7 +156,62 @@ static int hello_write(const char *path, const char *buf, size_t size, off_t off
 
 static void hello_destroy(void *user_data)
 {
+    if (file_to_open != nullptr)
+    {
+        std::ofstream output(file_to_open);
+        loss::RamFileSystemSerialise serialise(output, ramfs);
+        serialise.save();
+    }
     std::cout << "Destroyed\n";
+}
+
+static int hello_truncate(const char *path, off_t offset)
+{
+    std::cout << "Truncate: " << path << "\n";
+    return 0;
+}
+static int hello_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi)
+{
+    std::cout << "Truncate: " << path << ", " << offset << "\n";
+    return 0;
+}
+
+static int hello_flush(const char *path, struct fuse_file_info *fi)
+{
+    std::cout << "Flush: " << path << "\n";
+    return 0;
+}
+static int hello_fsync(const char *path, int datasync, struct fuse_file_info *fi)
+{
+    std::cout << "Fsync: " << path << ", " << datasync << "\n";
+    return 0;
+}
+
+static int hello_link(const char *path, const char *newpath)
+{
+    std::cout << "Link: " << path << ", " << newpath << "\n";
+    return 0;
+}
+static int hello_unlink(const char *path)
+{
+    std::cout << "Unlink: " << path << "\n";
+    auto remove_result = vfs->remove_entry(path);
+    if (remove_result != loss::SUCCESS)
+    {
+        return -ENOENT;
+    }
+    return 0;
+}
+static int hello_rename(const char *path, const char *newpath)
+{
+    std::cout << "Rename: " << path << ", " << newpath << "\n";
+    return 0;
+}
+static int hello_release(const char *path, struct fuse_file_info *fi)
+{
+    std::cout << "Release: " << path << "\n";
+    vfs->close((loss::FileHandle*)fi->fh);
+    return 0;
 }
 
 static struct fuse_operations hello_oper = {
@@ -213,6 +223,12 @@ static struct fuse_operations hello_oper = {
     .create     = hello_create,
     .write      = hello_write,
     .destroy    = hello_destroy,
+    .ftruncate  = hello_ftruncate,
+    .truncate   = hello_truncate,
+    .flush      = hello_flush,
+    .fsync      = hello_fsync,
+    .link       = hello_link,
+    .unlink     = hello_unlink,
 };
 
 int main(int argc, char *argv[])
@@ -229,7 +245,8 @@ int main(int argc, char *argv[])
     vfs = new loss::VirtualFileSystem();
     ramfs = new loss::RamFileSystem();
     vfs->root_filesystem(ramfs);
-    const char *file_to_open = argv[i];
+    file_to_open = argv[i];
+
     {
         std::ifstream input(file_to_open);
         loss::RamFileSystemDeserialise deserialise(input, ramfs);
