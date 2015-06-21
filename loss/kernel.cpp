@@ -60,7 +60,7 @@ namespace loss
     ReturnCode Kernel::boot()
     {
         IProcess *proc;
-        _process_manager.create_lua_process("/etc/init.d", _user_manager.find_user("root"), proc);
+        //_process_manager.create_lua_process("/etc/init.d", _user_manager.find_user("root"), proc);
         return SUCCESS;
     }
     ReturnCode Kernel::shutdown()

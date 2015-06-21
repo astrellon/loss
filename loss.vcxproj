@@ -41,6 +41,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>.;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -51,6 +54,9 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>copy $(ProjectDir)pdcurses\pdcurses.dll $(ProjectDir)Debug</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -64,7 +70,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>$(ProjectDir)pdcurses\pdcurses.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>copy $(ProjectDir)pdcurses\pdcurses.dll $(ProjectDir)Debug</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="loss\fs\ifilesystem.cpp" />
@@ -74,7 +88,20 @@
     <ClCompile Include="loss\fs\ram_filesystem_drive.cpp" />
     <ClCompile Include="loss\fs\stream_device.cpp" />
     <ClCompile Include="loss\fs\virtual_fileystem.cpp" />
+    <ClCompile Include="loss\kernel.cpp" />
+    <ClCompile Include="loss\kernel_manager.cpp" />
+    <ClCompile Include="loss\lua\lua_common.cpp" />
+    <ClCompile Include="loss\lua\lua_iolib.cpp" />
+    <ClCompile Include="loss\lua\lua_wrappers.cpp" />
+    <ClCompile Include="loss\proc\iprocess.cpp" />
+    <ClCompile Include="loss\proc\lua_process.cpp" />
+    <ClCompile Include="loss\proc\native_process.cpp" />
+    <ClCompile Include="loss\proc\process_info.cpp" />
+    <ClCompile Include="loss\proc\process_manager.cpp" />
     <ClCompile Include="loss\return_codes.cpp" />
+    <ClCompile Include="loss\terminal_emulator.cpp" />
+    <ClCompile Include="loss\user.cpp" />
+    <ClCompile Include="loss\user_manager.cpp" />
     <ClCompile Include="lua\src\lapi.c" />
     <ClCompile Include="lua\src\lauxlib.c" />
     <ClCompile Include="lua\src\lbaselib.c" />
@@ -118,10 +145,21 @@
     <ClInclude Include="loss\fs\ram_filesystem_drive.h" />
     <ClInclude Include="loss\fs\stream_device.h" />
     <ClInclude Include="loss\fs\virtual_fileystem.h" />
-    <ClInclude Include="loss\iprocess.h" />
     <ClInclude Include="loss\iuser.h" />
+    <ClInclude Include="loss\kernel.h" />
+    <ClInclude Include="loss\kernel_manager.h" />
+    <ClInclude Include="loss\lua\lua_common.h" />
+    <ClInclude Include="loss\lua\lua_iolib.h" />
+    <ClInclude Include="loss\lua\lua_wrappers.h" />
+    <ClInclude Include="loss\proc\iprocess.h" />
+    <ClInclude Include="loss\proc\lua_process.h" />
+    <ClInclude Include="loss\proc\native_process.h" />
+    <ClInclude Include="loss\proc\process_info.h" />
+    <ClInclude Include="loss\proc\process_manager.h" />
     <ClInclude Include="loss\return_codes.h" />
-    <ClInclude Include="loss\system.h" />
+    <ClInclude Include="loss\terminal_emulator.h" />
+    <ClInclude Include="loss\user.h" />
+    <ClInclude Include="loss\user_manager.h" />
     <ClInclude Include="lua\src\lapi.h" />
     <ClInclude Include="lua\src\lauxlib.h" />
     <ClInclude Include="lua\src\lcode.h" />
@@ -147,10 +185,20 @@
     <ClInclude Include="lua\src\lundump.h" />
     <ClInclude Include="lua\src\lvm.h" />
     <ClInclude Include="lua\src\lzio.h" />
+    <ClInclude Include="pdcurses\curses.h" />
+    <ClInclude Include="pdcurses\keyboard.h" />
+    <ClInclude Include="pdcurses\panel.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="lua\src\lua.c.old" />
     <None Include="lua\src\Makefile" />
+    <None Include="pdcurses\pdcurses.dll">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="pdcurses\pdcurses.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

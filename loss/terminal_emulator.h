@@ -1,7 +1,22 @@
 #pragma once
 
-struct _win_st;
-typedef struct _win_st WINDOW;
+//struct _win_st;
+//typedef struct _win_st WINDOW;
+
+#undef cast
+#undef getstr
+
+#ifdef _WIN32
+extern "C"
+{
+#   include <pdcurses/curses.h>
+}
+#else
+extern "C"
+{
+#   include <ncurses.h>
+}
+#endif
 
 namespace loss
 {
