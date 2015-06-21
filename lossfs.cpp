@@ -214,6 +214,15 @@ static int hello_release(const char *path, struct fuse_file_info *fi)
     return 0;
 }
 
+static int hello_mkdir(const char *path, mode_t mode)
+{
+    vfs->create_folder(path);
+    return 0;
+}
+static int hello_rmdir(const char *path)
+{
+}
+
 static struct fuse_operations hello_oper = {
     .getattr    = hello_getattr,
     .fgetattr   = hello_fgetattr,
@@ -229,6 +238,8 @@ static struct fuse_operations hello_oper = {
     .fsync      = hello_fsync,
     .link       = hello_link,
     .unlink     = hello_unlink,
+    .mkdir      = hello_mkdir,
+    .rmdir      = hello_rmdir,
 };
 
 int main(int argc, char *argv[])

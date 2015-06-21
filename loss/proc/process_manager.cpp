@@ -55,14 +55,8 @@ namespace loss
 
         return SUCCESS;
     }
-    ReturnCode ProcessManager::create_lua_process_from_file(const std::string &std_out_path, const std::string &file_path, const User *user, LuaProcess *& result)
+    ReturnCode ProcessManager::create_process_from_file(const std::string &file_path, const std::string &std_out_path, const User *user, IProcess *&result)
     {
-        auto proc_result = create_lua_process(std_out_path, user, result);
-        if (proc_result != SUCCESS)
-        {
-            return proc_result;
-        }
-
         auto &vfs = _kernel->virtual_file_system();
 
         FileHandle *file_handle = nullptr;
@@ -71,8 +65,15 @@ namespace loss
         {
             return file_result;
         }
+        
+        LuaProcess *proc = nullptr;
+        auto proc_result = create_lua_process(std_out_path, user, proc);
+        if (proc_result != SUCCESS)
+        {
+            return proc_result;
+        }
 
-        /*
+        /* TODO
          * Read first line?
         uint8_t buff[256];
         auto read_result = _kernel->virtual_file_system().read_till_character(file_handle, '\n', 255, buff);
@@ -86,17 +87,18 @@ namespace loss
         std::stringstream file_contents; 
         while (!vfs.at_eof(file_handle))
         {
-            vfs.read_stream(file_handle, 1024, file_contents);
+            vfs.read_stream(file_handle, 4096, file_contents);
         }
 
-        if (result->load_string(file_contents.str()))
+        if (proc->load_string(file_contents.str()))
         {
             return FILE_NOT_FOUND;
         }
 
+        result = proc;
+
         return SUCCESS;
     }
-
 
     ReturnCode ProcessManager::delete_process(uint32_t id)
     {
