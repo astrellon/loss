@@ -143,6 +143,7 @@ namespace loss
             virtual ReturnCode entry_metadata(uint32_t entry_id, MetadataDef &metadata);
             virtual ReturnCode update_entry_metadata(uint32_t entry_id, const MetadataDef &metadata);
 
+            virtual ReturnCode rename(uint32_t folder_id, const std::string &name, uint32_t new_parent_id, const std::string &new_name);
             virtual ReturnCode remove_entry(uint32_t entry_id);
 
         private:

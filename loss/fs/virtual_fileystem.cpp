@@ -557,6 +557,34 @@ namespace loss
         return result.fs()->mount(result.id(), path.filename(), fs).status();
     }
 
+    ReturnCode VirtualFileSystem::rename( const std::string &name, const std::string &new_name )
+    {
+        Path current_path(name);
+        current_path.dir_to_filename();
+
+        Path new_path(new_name);
+        new_path.dir_to_filename();
+        
+        auto current_result = follow_path(current_path, IFileSystem::ROOT_ID);
+        if (current_result.status() != SUCCESS)
+        {
+            return current_result.status();
+        } 
+        
+        auto new_result = follow_path(new_path, IFileSystem::ROOT_ID);
+        if (new_result.status() != SUCCESS)
+        {
+            return new_result.status();
+        }
+
+        if (current_result.fs() != new_result.fs())
+        {
+            return MUST_BE_SAME_FS;
+        }
+
+        return current_result.fs()->rename(current_result.id(), current_path.filename(), new_result.id(), new_path.filename());
+    }
+
     ReturnCode VirtualFileSystem::remove_entry(const std::string &name)
     {
         Path path(name);

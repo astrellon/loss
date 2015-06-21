@@ -60,7 +60,6 @@ namespace loss
     ReturnCode Kernel::boot()
     {
         IProcess *proc;
-<<<<<<< HEAD
         auto proc_result = _process_manager.create_process_from_file("/dev/tty0", "/etc/init.d", _user_manager.find_user("root"), proc);
         if (proc_result != SUCCESS)
         {
@@ -68,9 +67,6 @@ namespace loss
         }
 
         proc->run(0, nullptr);
-=======
-        //_process_manager.create_lua_process("/etc/init.d", _user_manager.find_user("root"), proc);
->>>>>>> f3a8906d47777ed796ec6dbffe641681ba3c9ace
         return SUCCESS;
     }
     ReturnCode Kernel::shutdown()

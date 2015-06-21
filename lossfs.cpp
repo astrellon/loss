@@ -96,6 +96,7 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                 vfs->entry_size(path, size);
                 st.st_size = size;
             }
+            std::cout << "- " << iter.first << "\n";
             filler(buf, iter.first.c_str(), &st, 0);
         }
     }
@@ -205,6 +206,24 @@ static int hello_unlink(const char *path)
 static int hello_rename(const char *path, const char *newpath)
 {
     std::cout << "Rename: " << path << ", " << newpath << "\n";
+    auto rename_result = vfs->rename(path, newpath);
+    if (rename_result == loss::ENTRY_NOT_FOUND)
+    {
+        return -ENOENT;
+    }
+    else if (rename_result == loss::WRONG_ENTRY_TYPE)
+    {
+        return -ENOTDIR;
+    }
+    else if (rename_result == loss::ENTRY_ALREADY_EXITS)
+    {
+        return -EEXIST;
+    }
+    else if (rename_result != loss::SUCCESS)
+    {
+        return -EACCES;
+    }
+
     return 0;
 }
 static int hello_release(const char *path, struct fuse_file_info *fi)
@@ -216,11 +235,54 @@ static int hello_release(const char *path, struct fuse_file_info *fi)
 
 static int hello_mkdir(const char *path, mode_t mode)
 {
-    vfs->create_folder(path);
+    auto create_result = vfs->create_folder(path);
+    if (create_result == loss::ENTRY_NOT_FOUND)
+    {
+        return -ENOENT;
+    }
+    else if (create_result == loss::WRONG_ENTRY_TYPE)
+    {
+        return -ENOTDIR;
+    }
+    else if (create_result == loss::ENTRY_ALREADY_EXITS)
+    {
+        return -EEXIST;
+    }
+    else if (create_result != loss::SUCCESS)
+    {
+        return -EACCES;
+    }
+
     return 0;
 }
 static int hello_rmdir(const char *path)
 {
+    loss::MetadataDef metadata;
+    auto meta_result = vfs->entry_metadata(path, metadata);
+    if (meta_result == loss::ENTRY_NOT_FOUND)
+    {
+        return -ENOENT;
+    }
+    if (metadata.type() != loss::FOLDER_ENTRY)
+    {
+        return -ENOTDIR;
+    }
+
+    auto remove_result = vfs->remove_entry(path);
+    if (remove_result == loss::FOLDER_NOT_EMPTY)
+    {
+        return -ENOTEMPTY;
+    }
+    else if (remove_result == loss::ENTRY_NOT_FOUND)
+    {
+        return -ENOENT;
+    }
+    else if (remove_result != loss::SUCCESS)
+    {
+        return -EACCES;
+    }
+
+    return 0;
 }
 
 static struct fuse_operations hello_oper = {
@@ -240,6 +302,7 @@ static struct fuse_operations hello_oper = {
     .unlink     = hello_unlink,
     .mkdir      = hello_mkdir,
     .rmdir      = hello_rmdir,
+    .rename     = hello_rename,
 };
 
 int main(int argc, char *argv[])

@@ -22,6 +22,7 @@ namespace loss
         { HANDLE_LACKING_WRITE,    "handle_lacking_write" },
         { HANDLE_LACKING_READ,     "handle_lacking_read" },
         { VFS_HAS_NO_ROOT,         "vfs_has_no_root" },
+        { MUST_BE_SAME_FS,         "must_be_same_fs" },
 
         { CANNOT_FIND_PROCESS, "cannot_find_process" },
 
@@ -51,6 +52,7 @@ namespace loss
         { HANDLE_LACKING_WRITE,    "attempting to write with a file handle that does not have write permissions." },
         { HANDLE_LACKING_READ,     "attempting to read with a file handle that does not have read permissions." },
         { VFS_HAS_NO_ROOT,         "vfs has no root filesystem set." },
+        { MUST_BE_SAME_FS,         "the operation is only supported across the same file system." },
         
         { CANNOT_FIND_PROCESS, "cannot find the process with the given process_id." },
 

@@ -424,6 +424,60 @@ namespace loss
         return SUCCESS;
     }
 
+    ReturnCode RamFileSystem::rename(uint32_t folder_id, const std::string &name, uint32_t new_parent_id, const std::string &new_name)
+    {
+        if (name.size() == 0u || new_parent_id == NULL_ID || new_name.size() == 0u)
+        {
+            return NULL_PARAMETER;
+        }
+
+        // We did it!
+        if (folder_id == new_parent_id && name == new_name)
+        {
+            return SUCCESS;
+        }
+
+        auto find = _entry_index.find(folder_id);
+        if (find == _entry_index.end())
+        {
+            return ENTRY_NOT_FOUND;
+        }
+        auto current_parent = find->second.get();
+        if (current_parent->metadata().type() != FOLDER_ENTRY)
+        {
+            return WRONG_ENTRY_TYPE;
+        }
+
+        find = _entry_index.find(new_parent_id);
+        if (find == _entry_index.end())
+        {
+            return ENTRY_NOT_FOUND;
+        }
+        auto new_parent = find->second.get();
+        if (new_parent->metadata().type() != FOLDER_ENTRY)
+        {
+            return WRONG_ENTRY_TYPE;
+        }
+
+        auto current_parent_folder = dynamic_cast<Folder *>(current_parent);
+        auto new_parent_folder = dynamic_cast<Folder *>(new_parent);
+
+        Entry *to_move = nullptr;
+        auto move_find = current_parent_folder->find_entry(name, &to_move);
+        if (move_find != SUCCESS)
+        {
+            return move_find;
+        }
+
+        auto move_result = new_parent_folder->add_entry(new_name, to_move);
+        if (move_result != SUCCESS)
+        {
+            return move_result;
+        }
+        current_parent_folder->remove_entry(name);
+
+        return SUCCESS;
+    }
     ReturnCode RamFileSystem::remove_entry(uint32_t entry_id)
     {
         if (entry_id == NULL_ID)

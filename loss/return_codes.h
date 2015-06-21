@@ -30,6 +30,7 @@ namespace loss
         HANDLE_LACKING_WRITE =      -0x0017,
         HANDLE_LACKING_READ =       -0x0018,
         VFS_HAS_NO_ROOT =           -0x0019,
+        MUST_BE_SAME_FS =           -0x001A,
 
         // Process related
         CANNOT_FIND_PROCESS =       -0x0020,

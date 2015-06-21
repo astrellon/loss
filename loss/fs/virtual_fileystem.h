@@ -49,6 +49,7 @@ namespace loss
             ReturnCode create_char_device(const std::string &name, ICharacterDevice *device);
             ReturnCode mount(const std::string &name, IFileSystem *fs);
             
+            ReturnCode rename(const std::string &name, const std::string &new_name);
             ReturnCode remove_entry(const std::string &name);
 
             // Helpers

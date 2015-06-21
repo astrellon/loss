@@ -144,8 +144,22 @@ int main()
 
     result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
 
+    auto rename_result = vfs.rename("/test2.txt", "/test.txt");
+    if (rename_result != loss::SUCCESS)
+    {
+        std::cout << "Failed to rename: " << loss::ReturnCodes::desc(rename_result) << "\n";
+    }
+
     output_folder(vfs, "/");
     output_folder(vfs, "/dev");
+    
+    if (rootfs != nullptr)
+    {
+        std::ofstream output("testout.bin");
+        auto serialise = loss::RamFileSystemSerialise(output, rootfs);
+        serialise.save();
+    }
+
 
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
@@ -359,13 +373,6 @@ int main()
     std::cout << " - DONE\n";
     */
     
-    if (rootfs != nullptr)
-    {
-        std::ofstream output("testout.bin");
-        auto serialise = loss::RamFileSystemSerialise(output, rootfs);
-        serialise.save();
-    }
-
 #ifdef _WIN32
 	std::cin.get();
 #endif
