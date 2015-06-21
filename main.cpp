@@ -147,8 +147,6 @@ int main()
     output_folder(vfs, "/");
     output_folder(vfs, "/dev");
 
-    return -1;
-
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
     renderer.file_handle(handle);

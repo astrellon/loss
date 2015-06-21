@@ -17,6 +17,15 @@
     <Filter Include="loss\fs">
       <UniqueIdentifier>{8dfa82a5-40a8-47ef-9ad3-921b9eb7f652}</UniqueIdentifier>
     </Filter>
+    <Filter Include="loss\proc">
+      <UniqueIdentifier>{ddf10d05-b318-44d4-bd0d-73ce30897290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="loss\lua">
+      <UniqueIdentifier>{e4784ee3-a39e-4b6b-b231-7ab731080ae9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="curses">
+      <UniqueIdentifier>{db371c27-20b1-43cc-995a-d0808c2a56c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lua\src\lapi.c">
@@ -140,6 +149,45 @@
     <ClCompile Include="loss\fs\stream_device.cpp">
       <Filter>loss\fs</Filter>
     </ClCompile>
+    <ClCompile Include="loss\proc\iprocess.cpp">
+      <Filter>loss\proc</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\proc\lua_process.cpp">
+      <Filter>loss\proc</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\proc\native_process.cpp">
+      <Filter>loss\proc</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\proc\process_info.cpp">
+      <Filter>loss\proc</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\proc\process_manager.cpp">
+      <Filter>loss\proc</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\lua\lua_common.cpp">
+      <Filter>loss\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\lua\lua_iolib.cpp">
+      <Filter>loss\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\lua\lua_wrappers.cpp">
+      <Filter>loss\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\kernel.cpp">
+      <Filter>loss</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\kernel_manager.cpp">
+      <Filter>loss</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\terminal_emulator.cpp">
+      <Filter>loss</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\user.cpp">
+      <Filter>loss</Filter>
+    </ClCompile>
+    <ClCompile Include="loss\user_manager.cpp">
+      <Filter>loss</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lua\src\lapi.h">
@@ -217,16 +265,10 @@
     <ClInclude Include="lua\src\lzio.h">
       <Filter>lua\src</Filter>
     </ClInclude>
-    <ClInclude Include="loss\iprocess.h">
-      <Filter>loss</Filter>
-    </ClInclude>
     <ClInclude Include="loss\iuser.h">
       <Filter>loss</Filter>
     </ClInclude>
     <ClInclude Include="loss\return_codes.h">
-      <Filter>loss</Filter>
-    </ClInclude>
-    <ClInclude Include="loss\system.h">
       <Filter>loss</Filter>
     </ClInclude>
     <ClInclude Include="loss\fs\common.h">
@@ -253,6 +295,54 @@
     <ClInclude Include="loss\fs\stream_device.h">
       <Filter>loss\fs</Filter>
     </ClInclude>
+    <ClInclude Include="loss\proc\iprocess.h">
+      <Filter>loss\proc</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\proc\lua_process.h">
+      <Filter>loss\proc</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\proc\native_process.h">
+      <Filter>loss\proc</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\proc\process_info.h">
+      <Filter>loss\proc</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\proc\process_manager.h">
+      <Filter>loss\proc</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\lua\lua_common.h">
+      <Filter>loss\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\lua\lua_iolib.h">
+      <Filter>loss\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\lua\lua_wrappers.h">
+      <Filter>loss\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\kernel.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\kernel_manager.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\terminal_emulator.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\user.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="loss\user_manager.h">
+      <Filter>loss</Filter>
+    </ClInclude>
+    <ClInclude Include="pdcurses\curses.h">
+      <Filter>curses</Filter>
+    </ClInclude>
+    <ClInclude Include="pdcurses\keyboard.h">
+      <Filter>curses</Filter>
+    </ClInclude>
+    <ClInclude Include="pdcurses\panel.h">
+      <Filter>curses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lua\src\lua.c.old">
@@ -261,5 +351,13 @@
     <None Include="lua\src\Makefile">
       <Filter>lua\src</Filter>
     </None>
+    <None Include="pdcurses\pdcurses.dll">
+      <Filter>curses</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="pdcurses\pdcurses.lib">
+      <Filter>curses</Filter>
+    </Library>
   </ItemGroup>
 </Project>
