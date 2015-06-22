@@ -1,7 +1,9 @@
 loss
 ====
 
-LOSS (Lua Operating SyStem)
+LOSS (Lua Operating SystemS)
+
+Aim: To be able to run many virtual kernels built to run Lua.
 
 Building
 --------
