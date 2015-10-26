@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 project(loss)
+
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
 
 set(EXECUTABLE_NAME "LossProg")
 set(EXECUTABLE_NAME_FUSE "LossFuse")
@@ -32,7 +35,7 @@ include_directories(${loss_include_dirs})
 add_executable(${EXECUTABLE_NAME} "main.cpp" ${loss_sources} ${lua_sources})
 
 find_package(Threads REQUIRED)
-target_link_libraries(${EXECUTABLE_NAME} Threads::Threads)
+target_link_libraries(${EXECUTABLE_NAME} ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(${EXECUTABLE_NAME} ncurses)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
