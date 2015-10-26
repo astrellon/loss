@@ -62,6 +62,9 @@ int main()
     renderer.kernel(&kernel);
     renderer.file_handle(handle);
 
+    //loss::LuaProcess proc;
+    //kernel.process_manager().create_process_from_file("/test.lua")
+
     renderer.render();
 
 #ifdef _WIN32
