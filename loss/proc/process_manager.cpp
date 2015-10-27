@@ -10,7 +10,6 @@ namespace loss
         _kernel(kernel),
         _id_count(1)
     {
-
     }
 
     ReturnCode ProcessManager::create_native_process(const std::string &std_out_path, const std::string &name, const User *user, NativeProcess *& result)
@@ -23,10 +22,13 @@ namespace loss
         auto id = ++_id_count;
         
         FileHandle *std_out_handle = nullptr;
-        auto open_result = _kernel->virtual_file_system().open(id, std_out_path, FileHandle::READ, std_out_handle);
-        if (open_result != SUCCESS)
+        if (std_out_path.size() > 0u)
         {
-            return open_result;
+            auto open_result = _kernel->virtual_file_system().open(id, std_out_path, FileHandle::READ, std_out_handle);
+            if (open_result != SUCCESS)
+            {
+                return open_result;
+            }
         }
 
         auto process = new NativeProcess(name, user, id, _kernel);
@@ -60,7 +62,7 @@ namespace loss
         auto &vfs = _kernel->virtual_file_system();
 
         FileHandle *file_handle = nullptr;
-        auto file_result = vfs.open(result->info().id(), file_path, FileHandle::READ, file_handle);
+        auto file_result = vfs.open(_kernel->kernel_proc()->info().id(), file_path, FileHandle::READ, file_handle);
         if (file_result != SUCCESS)
         {
             return file_result;
@@ -90,7 +92,7 @@ namespace loss
             vfs.read_stream(file_handle, 4096, file_contents);
         }
 
-        if (proc->load_string(file_contents.str()))
+        if (!proc->load_string(file_contents.str()))
         {
             return FILE_NOT_FOUND;
         }

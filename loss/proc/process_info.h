@@ -4,6 +4,8 @@
 #include <string>
 #include <stdint.h>
 
+#include "../fs/virtual_fileystem.h"
+
 namespace loss
 {
     class User;
@@ -18,17 +20,31 @@ namespace loss
             void name(const std::string &name);
             const std::string &name() const;
             const User *user() const;
-            uint32_t id() const;
-            Kernel *kernel() const;
+            inline uint32_t id() const
+            {
+                return _id;
+            }
+            inline Kernel *kernel() const
+            {
+                return _kernel;
+            }
+            inline VirtualFileSystem &vfs() const
+            {
+                return _vfs;
+            }
             
             void std_out(FileHandle *std_out);
-            FileHandle *std_out() const;
+            inline FileHandle *std_out() const
+            {
+                return _std_out;
+            }
 
         private:
             std::string _name;
             const User *_user;
             uint32_t _id;
             Kernel *_kernel;
+            VirtualFileSystem &_vfs;
 
             FileHandle *_std_out;
     };

@@ -41,12 +41,17 @@ namespace loss
             UserManager &user_manager();
             const UserManager &user_manager() const;
 
+            User *root_user() const;
+            IProcess *kernel_proc() const;
+
         private:
 
             uint32_t _id;
             VirtualFileSystem _vfs;
             ProcessManager _process_manager;
             UserManager _user_manager;
+            User *_root_user;
+            IProcess *_kernel_proc;
 
             RamFileSystem *_dev_fs;
             StreamDevice *_tty_device;

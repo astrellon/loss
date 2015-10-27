@@ -12,7 +12,8 @@ namespace loss
         _id(id),
         _process_manager(this),
         _dev_fs(nullptr),
-        _tty_device(nullptr)
+        _tty_device(nullptr),
+        _root_user(nullptr)
     {
 
     }
@@ -41,8 +42,7 @@ namespace loss
 
         kernel_message(true, "Setup VFS");
 
-        User *root_user = nullptr;
-        result = _user_manager.create_new_user("root", root_user);
+        result = _user_manager.create_new_user("root", _root_user);
         if (result != SUCCESS)
         {
             std::string error("Error creating root user: ");
@@ -53,6 +53,21 @@ namespace loss
         else
         {
             kernel_message(true, "Created root user");
+        }
+
+        NativeProcess *proc;
+        result = _process_manager.create_native_process("/dev/tty0", "kernel", _root_user, proc);
+        if (result != SUCCESS)
+        {
+            std::string error("Error creating kernel process: ");
+            error += ReturnCodes::desc(result);
+            kernel_message(false, error);
+            return result;
+        }
+        else
+        {
+            kernel_message(true, "Created kernel process");
+            _kernel_proc = proc;
         }
 
         return SUCCESS;
@@ -104,6 +119,15 @@ namespace loss
     const UserManager &Kernel::user_manager() const
     {
         return _user_manager;
+    }
+
+    User *Kernel::root_user() const
+    {
+        return _root_user;
+    }
+    IProcess *Kernel::kernel_proc() const
+    {
+        return _kernel_proc;
     }
 
     void Kernel::kernel_message(bool success, const std::string &message)

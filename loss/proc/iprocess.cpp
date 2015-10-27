@@ -2,6 +2,7 @@
 
 #include "../user.h"
 #include "../kernel.h"
+#include "../fs/virtual_fileystem.h"
 
 namespace loss
 {
@@ -18,6 +19,9 @@ namespace loss
             
     void IProcess::write_std_out(const std::string &message)
     {
-        info().kernel()->virtual_file_system().write_string(info().std_out(), message);
+        if (info().std_out() != nullptr)
+        {
+            info().vfs().write_string(info().std_out(), message);
+        }
     }
 }

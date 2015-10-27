@@ -36,5 +36,6 @@ namespace loss
             ProcessMap _processes;
             uint32_t _id_count;
 
+            IProcess *_kernel_proc;
     };
 }

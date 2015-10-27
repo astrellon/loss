@@ -58,12 +58,17 @@ int main()
 
     result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
 
+    loss::IProcess *proc = nullptr;
+    auto proc_result = kernel.process_manager().create_process_from_file("/test.lua", "/dev/tty0", kernel.root_user(), proc);
+    if (proc_result == loss::SUCCESS)
+    {
+        proc->run(0, nullptr);
+    }
+
     loss::TerminalEmulator renderer;
     renderer.kernel(&kernel);
     renderer.file_handle(handle);
 
-    //loss::LuaProcess proc;
-    //kernel.process_manager().create_process_from_file("/test.lua")
 
     renderer.render();
 

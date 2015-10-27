@@ -4,6 +4,8 @@
 
 namespace loss
 {
+    class Kernel;
+
     class NativeProcess : public IProcess
     {
         public:

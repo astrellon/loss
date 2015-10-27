@@ -2,13 +2,16 @@
 
 #include "../fs/ifilesystem_entries.h"
 
+#include "../kernel.h"
+
 namespace loss
 {
     ProcessInfo::ProcessInfo(const std::string &name, const User *user, uint32_t id, Kernel *kernel) :
         _name(name),
         _user(user),
         _id(id),
-        _kernel(kernel)
+        _kernel(kernel),
+        _vfs(kernel->virtual_file_system())
     {
 
     }
@@ -27,22 +30,8 @@ namespace loss
         return _user;
     }
 
-    uint32_t ProcessInfo::id() const
-    {
-        return _id;
-    }
-
-    Kernel *ProcessInfo::kernel() const
-    {
-        return _kernel;
-    }
-
     void ProcessInfo::std_out(FileHandle *value)
     {
         _std_out = value;
-    }
-    FileHandle *ProcessInfo::std_out() const
-    {
-        return _std_out;
     }
 }
