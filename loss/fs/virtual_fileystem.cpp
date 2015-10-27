@@ -259,6 +259,7 @@ namespace loss
             {
                 buffer[counter] = temp[i];
             }
+            buffer[counter] = '\0';
         }
 
         return IOResult(counter, SUCCESS);
