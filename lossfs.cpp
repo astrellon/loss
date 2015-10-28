@@ -25,10 +25,34 @@
 static loss::VirtualFileSystem *vfs = nullptr;
 static loss::RamFileSystem *ramfs = nullptr;
 static const char *file_to_open = nullptr;
+std::ofstream log_file;
+
+static void save_hdd()
+{
+    if (file_to_open != nullptr)
+    {
+        std::ofstream output(file_to_open);
+        if (output.is_open())
+        {
+            log_file << "Writing back to: " << file_to_open << "\n";
+        }
+        else
+        {
+            log_file << "Unable to save back to: " << file_to_open << "\n";
+        }
+        loss::RamFileSystemSerialise serialise(output, ramfs);
+        serialise.save();
+    }
+    else
+    {
+        log_file << "Input file is null!\n";
+    }
+}
+
 
 static int hello_getattr(const char *path, struct stat *stbuf)
 {
-    std::cout << "Getattr: " << path << "\n";
+    log_file << "Getattr: " << path << "\n";
     int res = 0;
 
     memset(stbuf, 0, sizeof(struct stat));
@@ -60,14 +84,14 @@ static int hello_getattr(const char *path, struct stat *stbuf)
 }
 static int hello_fgetattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi)
 {
-    std::cout << "Fgetattr: " << path << "\n";
+    log_file << "Fgetattr: " << path << "\n";
     return hello_getattr(path, stbuf);
 }
 
 static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
              off_t offset, struct fuse_file_info *fi)
 {
-    std::cout << "Readdir: " << path << "\n";
+    log_file << "Readdir: " << path << "\n";
     (void) offset;
     (void) fi;
 
@@ -96,7 +120,7 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                 vfs->entry_size(path, size);
                 st.st_size = size;
             }
-            std::cout << "- " << iter.first << "\n";
+            log_file << "- " << iter.first << "\n";
             filler(buf, iter.first.c_str(), &st, 0);
         }
     }
@@ -110,17 +134,18 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
 static int hello_create(const char *path, mode_t mode, struct fuse_file_info *fi)
 {
-    std::cout << "Create: " << path << ", " << mode << "\n";
+    log_file << "Create: " << path << ", " << mode << "\n";
     auto result = vfs->create_file(path);
     loss::FileHandle *handle = nullptr;
     vfs->open(1, path, loss::FileHandle::READ | loss::FileHandle::WRITE, handle);
     fi->fh = (intptr_t)handle;
+    
     return 0;
 }
 
 static int hello_open(const char *path, struct fuse_file_info *fi)
 {
-    std::cout << "Open: " << path << "\n";
+    log_file << "Open: " << path << "\n";
     loss::FileHandle *handle = nullptr;
     auto open_result = vfs->open(1, path, loss::FileHandle::READ | loss::FileHandle::WRITE, handle);
     if (open_result != loss::SUCCESS)
@@ -135,7 +160,7 @@ static int hello_open(const char *path, struct fuse_file_info *fi)
 static int hello_read(const char *path, char *buf, size_t size, off_t offset,
               struct fuse_file_info *fi)
 {
-    std::cout << "Read: " << path << ": " << size << ": " << offset << "\n";
+    log_file << "Read: " << path << ": " << size << ": " << offset << "\n";
     loss::FileHandle *handle = (loss::FileHandle *)fi->fh;
     handle->read_position(offset);
     auto read_result = vfs->read(handle, size, (uint8_t*)buf);
@@ -150,52 +175,48 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
 
 static int hello_write(const char *path, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
 {
-    std::cout << "Write: " << path << ": " << size << ": " << off << "\n";
+    log_file << "Write: " << path << ": " << size << ": " << off << "\n";
     auto write_result = vfs->write(path, off, size, (const uint8_t *)buf);
+
     return write_result.bytes();
 }
 
 static void hello_destroy(void *user_data)
 {
-    if (file_to_open != nullptr)
-    {
-        std::ofstream output(file_to_open);
-        loss::RamFileSystemSerialise serialise(output, ramfs);
-        serialise.save();
-    }
-    std::cout << "Destroyed\n";
+    save_hdd();
+    log_file << "Destroyed\n";
 }
 
 static int hello_truncate(const char *path, off_t offset)
 {
-    std::cout << "Truncate: " << path << "\n";
+    log_file << "Truncate: " << path << "\n";
     return 0;
 }
 static int hello_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi)
 {
-    std::cout << "Truncate: " << path << ", " << offset << "\n";
+    log_file << "Truncate: " << path << ", " << offset << "\n";
     return 0;
 }
 
 static int hello_flush(const char *path, struct fuse_file_info *fi)
 {
-    std::cout << "Flush: " << path << "\n";
+    log_file << "Flush: " << path << "\n";
     return 0;
 }
 static int hello_fsync(const char *path, int datasync, struct fuse_file_info *fi)
 {
-    std::cout << "Fsync: " << path << ", " << datasync << "\n";
+    log_file << "Fsync: " << path << ", " << datasync << "\n";
     return 0;
 }
 
 static int hello_link(const char *path, const char *newpath)
 {
-    std::cout << "Link: " << path << ", " << newpath << "\n";
+    log_file << "Link: " << path << ", " << newpath << "\n";
     return 0;
 }
 static int hello_unlink(const char *path)
 {
-    std::cout << "Unlink: " << path << "\n";
+    log_file << "Unlink: " << path << "\n";
     auto remove_result = vfs->remove_entry(path);
     if (remove_result != loss::SUCCESS)
     {
@@ -205,7 +226,7 @@ static int hello_unlink(const char *path)
 }
 static int hello_rename(const char *path, const char *newpath)
 {
-    std::cout << "Rename: " << path << ", " << newpath << "\n";
+    log_file << "Rename: " << path << ", " << newpath << "\n";
     auto rename_result = vfs->rename(path, newpath);
     if (rename_result == loss::ENTRY_NOT_FOUND)
     {
@@ -228,7 +249,7 @@ static int hello_rename(const char *path, const char *newpath)
 }
 static int hello_release(const char *path, struct fuse_file_info *fi)
 {
-    std::cout << "Release: " << path << "\n";
+    log_file << "Release: " << path << "\n";
     vfs->close((loss::FileHandle*)fi->fh);
     return 0;
 }
@@ -321,10 +342,14 @@ int main(int argc, char *argv[])
     vfs->root_filesystem(ramfs);
     file_to_open = argv[i];
 
+    log_file.open("./fuse.log");
+    log_file << "Attempting to open: " << file_to_open << " as hdd\n";
+
     {
         std::ifstream input(file_to_open);
         loss::RamFileSystemDeserialise deserialise(input, ramfs);
         deserialise.load();
+        input.close();
     }
 
 	for(; i < argc; i++)
@@ -332,7 +357,11 @@ int main(int argc, char *argv[])
 		argv[i] = argv[i+1];
 	}
 	argc--;
+
+    log_file << "Starting FUSE main\n";
     auto result = fuse_main(argc, argv, &hello_oper, NULL);
+    
+    log_file << "Shutting down FUSE main\n";
 
     delete vfs;
 
