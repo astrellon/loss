@@ -50,16 +50,20 @@ int main()
     auto result = kernel.init();
     if (result != loss::SUCCESS)
     {
-        std::cout << "Failed to start kernel: " << loss::ReturnCodes::desc(result) << "\n";
+        std::cout << "Failed to init kernel: " << loss::ReturnCodes::desc(result) << "\n";
         return -1;
     }
     
-    loss::FileHandle *handle = nullptr;
-
-    result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
-    kernel.boot();
+    result = kernel.boot();
+    if (result != loss::SUCCESS)
+    {
+        std::cout << "Failed to boot kernel: " << loss::ReturnCodes::desc(result) << "\n";
+        return -1;
+    }
 
     loss::TerminalEmulator renderer;
+    loss::FileHandle *handle = nullptr;
+    result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
     renderer.kernel(&kernel);
     renderer.file_handle(handle);
 
@@ -68,6 +72,8 @@ int main()
 #ifdef _WIN32
 	std::cin.get();
 #endif
+
+    kernel.shutdown();
     
     // Shutdown
     if (rootfs != nullptr)

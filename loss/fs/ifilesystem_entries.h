@@ -102,10 +102,10 @@ namespace loss
 
     };
 
-    class FileHandle
+    class StreamHandle
     {
         public:
-            
+
             enum OpenMode
             {
                 UNKNOWN  = -0x01,
@@ -115,14 +115,12 @@ namespace loss
                 APPEND   = 0x04
             };
 
-            FileHandle(uint32_t entry_id, uint32_t process_id, OpenMode mode, IFileSystem *fs);
+            StreamHandle( uint32_t process_id, OpenMode mode);
 
-            uint32_t entry_id() const;
             uint32_t process_id() const;
             OpenMode mode() const;
             bool has_write_mode() const;
             bool has_read_mode() const;
-            IFileSystem *filesystem() const;
 
             int32_t read_position() const;
             void read_position(int32_t pos);
@@ -133,22 +131,35 @@ namespace loss
             void change_write_position(int32_t change);
 
         private:
-            uint32_t _entry_id;
             uint32_t _process_id;
             int32_t _read_position;
             int32_t _write_position;
             OpenMode _mode;
-            IFileSystem *_fs;
-
     };
-            
-    inline FileHandle::OpenMode operator |(FileHandle::OpenMode lhs, FileHandle::OpenMode rhs)
+
+    inline StreamHandle::OpenMode operator |(StreamHandle::OpenMode lhs, StreamHandle::OpenMode rhs)
     {
-        return static_cast<FileHandle::OpenMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
+        return static_cast<StreamHandle::OpenMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
     }
-    inline FileHandle::OpenMode &operator |=(FileHandle::OpenMode &lhs, FileHandle::OpenMode rhs)
+    inline StreamHandle::OpenMode &operator |=(StreamHandle::OpenMode &lhs, StreamHandle::OpenMode rhs)
     {
         lhs = lhs | rhs;
         return lhs;
     }
+
+    class FileHandle : public StreamHandle
+    {
+        public:
+            
+            FileHandle(uint32_t entry_id, uint32_t process_id, OpenMode mode, IFileSystem *fs);
+
+            uint32_t entry_id() const;
+            IFileSystem *filesystem() const;
+
+        private:
+            uint32_t _entry_id;
+            IFileSystem *_fs;
+
+    };
+            
 }

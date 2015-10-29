@@ -198,19 +198,73 @@ namespace loss
         return _device;
     }
     // }}}
+   
+    // StreamHandle {{{
+    StreamHandle::StreamHandle(uint32_t process_id, StreamHandle::OpenMode mode) :
+        _process_id(process_id),
+        _read_position(0),
+        _write_position(0),
+        _mode(mode)
+    {
+        if (process_id == 0u)
+        {
+            throw std::runtime_error("process is null");
+        }
+    }
+    
+    uint32_t StreamHandle::process_id() const
+    {
+        return _process_id;
+    }
+    StreamHandle::OpenMode StreamHandle::mode() const
+    {
+        return _mode;
+    }
+    bool StreamHandle::has_write_mode() const
+    {
+        return static_cast<uint32_t>(_mode | StreamHandle::WRITE) > 0;
+    }
+    bool StreamHandle::has_read_mode() const
+    {
+        return static_cast<uint32_t>(_mode | StreamHandle::READ) > 0;
+    }
+            
+    int32_t StreamHandle::read_position() const
+    {
+        return _read_position;
+    }
+    void StreamHandle::read_position(int32_t pos)
+    {
+        _read_position = pos;
+    }
+    void StreamHandle::change_read_position(int32_t change)
+    {
+        _read_position += change;
+    }
+            
+    int32_t StreamHandle::write_position() const
+    {
+        return _write_position;
+    }
+    void StreamHandle::write_position(int32_t pos)
+    {
+        _write_position = pos;
+    }
+    void StreamHandle::change_write_position(int32_t change)
+    {
+        _write_position += change;
+    }
+    // }}}
 
     // FileHandle {{{
     FileHandle::FileHandle(uint32_t entry_id, uint32_t process_id, FileHandle::OpenMode mode, IFileSystem *fs) :
+        StreamHandle(process_id, mode),
         _entry_id(entry_id),
-        _process_id(process_id),
-        _mode(mode),
-        _fs(fs),
-        _read_position(0),
-        _write_position(0)
+        _fs(fs)
     {
-        if (entry_id == 0u || process_id == 0u)
+        if (entry_id == 0u)
         {
-            throw std::runtime_error("file entry or process is null");
+            throw std::runtime_error("file entry is null");
         }
     }
 
@@ -218,52 +272,9 @@ namespace loss
     {
         return _entry_id;
     }
-    uint32_t FileHandle::process_id() const
-    {
-        return _process_id;
-    }
-    FileHandle::OpenMode FileHandle::mode() const
-    {
-        return _mode;
-    }
     IFileSystem *FileHandle::filesystem() const
     {
         return _fs;
     }
-    bool FileHandle::has_write_mode() const
-    {
-        return static_cast<uint32_t>(_mode | FileHandle::WRITE) > 0;
-    }
-    bool FileHandle::has_read_mode() const
-    {
-        return static_cast<uint32_t>(_mode | FileHandle::READ) > 0;
-    }
-            
-    int32_t FileHandle::read_position() const
-    {
-        return _read_position;
-    }
-    void FileHandle::read_position(int32_t pos)
-    {
-        _read_position = pos;
-    }
-    void FileHandle::change_read_position(int32_t change)
-    {
-        _read_position += change;
-    }
-            
-    int32_t FileHandle::write_position() const
-    {
-        return _write_position;
-    }
-    void FileHandle::write_position(int32_t pos)
-    {
-        _write_position = pos;
-    }
-    void FileHandle::change_write_position(int32_t change)
-    {
-        _write_position += change;
-    }
-
     // }}}
 }
