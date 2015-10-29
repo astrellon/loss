@@ -23,7 +23,7 @@ namespace loss
 
             ReturnCode create_lua_process(const std::string &std_out_path, const User *user, LuaProcess *&result);
 
-            ReturnCode create_process_from_file(const std::string &file_path, const std::string &std_out_path, const User *user, IProcess *& result);
+            ReturnCode create_process_from_file(const std::string &std_out_path, const std::string &file_path, const User *user, IProcess *& result);
 
             ReturnCode delete_process(uint32_t id);
             IProcess *find_process(uint32_t id) const;

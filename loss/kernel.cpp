@@ -75,7 +75,7 @@ namespace loss
     ReturnCode Kernel::boot()
     {
         IProcess *proc;
-        auto proc_result = _process_manager.create_process_from_file("/dev/tty0", "/etc/init.d", _user_manager.find_user("root"), proc);
+        auto proc_result = _process_manager.create_process_from_file("/etc/init.d", "/dev/tty0", _user_manager.find_user("root"), proc);
         if (proc_result != SUCCESS)
         {
             return proc_result;

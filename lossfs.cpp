@@ -98,6 +98,8 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     filler(buf, ".", NULL, 0);
     filler(buf, "..", NULL, 0);
 
+    auto context = fuse_get_context();
+
     loss::FolderEntry folder;
     auto read_result = vfs->read_folder(path, folder);
 
@@ -120,6 +122,9 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                 vfs->entry_size(path, size);
                 st.st_size = size;
             }
+            st.st_uid = context->uid;
+            st.st_gid = context->gid;
+
             log_file << "- " << iter.first << "\n";
             filler(buf, iter.first.c_str(), &st, 0);
         }
