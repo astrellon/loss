@@ -3,6 +3,8 @@
 #include <loss/return_codes.h>
 #include <stdint.h>
 
+#include "../io_common.h"
+
 namespace loss
 {
     enum EntryType
@@ -104,30 +106,6 @@ namespace loss
             uint32_t _owner_id;
             uint32_t _permissions;
             EntryType _type;
-    };
-
-    class IOResult
-    {
-        private:
-            uint32_t _bytes;
-            ReturnCode _status;
-
-        public:
-            inline IOResult(uint32_t bytes, ReturnCode status) :
-                _bytes(bytes),
-                _status(status)
-            {
-
-            }
-
-            inline uint32_t bytes() const
-            {
-                return _bytes;
-            }
-            inline ReturnCode status() const
-            {
-                return _status;
-            }
     };
 
     class CreateEntryResult
