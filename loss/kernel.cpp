@@ -13,7 +13,8 @@ namespace loss
         _process_manager(this),
         _dev_fs(nullptr),
         _tty_device(nullptr),
-        _root_user(nullptr)
+        _root_user(nullptr),
+        _keyboard(nullptr)
     {
 
     }
@@ -39,6 +40,14 @@ namespace loss
         {
             return result;
         }
+
+        _keyboard = new StreamDevice();
+        result = _vfs.create_char_device("/dev/kb0", _keyboard);
+        if (result != SUCCESS)
+        {
+            return result;
+        }
+        _keyboard->write_string("Hello from keyboard\n");
 
         kernel_message(true, "Setup VFS");
 
@@ -82,6 +91,7 @@ namespace loss
         }
 
         proc->run(0, nullptr);
+
         return SUCCESS;
     }
     ReturnCode Kernel::shutdown()

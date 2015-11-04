@@ -43,6 +43,7 @@ namespace loss
 
             User *root_user() const;
             IProcess *kernel_proc() const;
+            StreamDevice *keyboard() const;
 
         private:
 
@@ -55,6 +56,7 @@ namespace loss
 
             RamFileSystem *_dev_fs;
             StreamDevice *_tty_device;
+            StreamDevice *_keyboard;
             void kernel_message(bool success, const std::string &message);
     };
 }
