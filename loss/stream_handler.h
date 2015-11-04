@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <iostream>
 
 #include "return_codes.h"
 #include "io_common.h"
@@ -38,12 +39,16 @@ namespace loss
             virtual void close() = 0;
 
             virtual IOResult read(uint32_t count, uint8_t *buffer) = 0;
-            IOResult read_till_character(char terminator, uint32_t max_count, uint8_t *buffer);
-            IOResult read_number(double &num);
+            virtual IOResult read_till_character(char terminator, uint32_t max_count, uint8_t *buffer);
+            virtual IOResult read_number(double &num);
 
             virtual IOResult write(uint32_t count, const uint8_t *data) = 0;
-            virtual ReturnCode size(uint32_t &size) = 0;
-            virtual bool at_eof() = 0;
+            virtual ReturnCode stream_size(uint32_t &size) = 0;
+            virtual bool at_end_of_stream() = 0;
+
+            // Helpers
+            IOResult read_stream(uint32_t count, std::ostream &ss);
+            IOResult write_string(const std::string &data);
 
         private:
             uint32_t _process_id;

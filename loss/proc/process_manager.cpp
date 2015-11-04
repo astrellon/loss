@@ -87,9 +87,9 @@ namespace loss
         */
 
         std::stringstream file_contents; 
-        while (!vfs.at_eof(file_handle))
+        while (!file_handle->at_end_of_stream())
         {
-            vfs.read_stream(file_handle, 4096, file_contents);
+            file_handle->read_stream(4096, file_contents);
         }
 
         if (!proc->load_string(file_contents.str()))

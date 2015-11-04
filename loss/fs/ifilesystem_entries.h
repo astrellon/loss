@@ -102,20 +102,4 @@ namespace loss
             ICharacterDevice *_device;
 
     };
-
-    class FileHandle : public StreamHandle
-    {
-        public:
-            
-            FileHandle(uint32_t entry_id, uint32_t process_id, OpenMode mode, IFileSystem *fs);
-
-            uint32_t entry_id() const;
-            IFileSystem *filesystem() const;
-
-        private:
-            uint32_t _entry_id;
-            IFileSystem *_fs;
-
-    };
-            
 }

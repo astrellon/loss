@@ -8,7 +8,8 @@ namespace loss
     const uint32_t IFileSystem::NULL_ID = 0u;
 
     IFileSystem::IFileSystem() :
-        _filesystem_id(0u)
+        _filesystem_id(0u),
+        _vfs(nullptr)
     {
 
     }
@@ -26,6 +27,13 @@ namespace loss
         return _filesystem_id;
     }
 
-
+    VirtualFileSystem *IFileSystem::vfs() const
+    {
+        return _vfs;
+    }
+    void IFileSystem::vfs(VirtualFileSystem *vfs)
+    {
+        _vfs = vfs;
+    }
 
 }

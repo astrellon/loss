@@ -185,7 +185,7 @@ namespace loss
             for (n = first; nargs-- && success; n++) {
                 if (lua_type(lua, n) == LUA_TNUMBER) {
                     size_t l = (size_t)lua_tointeger(lua, n);
-                    success = (l == 0) ? vfs.at_eof(file) : read_chars(lua, file, l);
+                    success = (l == 0) ? file->at_end_of_stream() : read_chars(lua, file, l);
                 }
                 else {
                     const char *p = lua_tostring(lua, n);
@@ -232,7 +232,7 @@ namespace loss
         {
             size_t l;
             char *p = luaL_prepbuffer(&b);
-            auto read_result = vfs.read_till_character(file, '\n', LUAL_BUFFERSIZE, (uint8_t*)p);
+            auto read_result = file->read_till_character('\n', LUAL_BUFFERSIZE, (uint8_t*)p);
             if (read_result.bytes() == 0)
             {
                 luaL_pushresult(&b);  /* close buffer */
@@ -263,7 +263,7 @@ namespace loss
         luaL_Buffer b;
         luaL_buffinit(lua, &b);
         p = luaL_prepbuffsize(&b, n);  /* prepare buffer to read whole block */
-        auto read_result = vfs.read(file, n, (uint8_t*)p);
+        auto read_result = file->read(n, (uint8_t*)p);
         //nr = fread(p, sizeof(char), n, file);  /* try to read 'n' chars */
         luaL_addsize(&b, read_result.bytes());
         luaL_pushresult(&b);  /* close buffer */
@@ -282,7 +282,7 @@ namespace loss
         for (;;) {
             char *p = luaL_prepbuffsize(&b, rlen);
             //size_t nr = fread(p, sizeof(char), rlen, file);
-            auto read_result = vfs.read(file, rlen, (uint8_t*)p);        
+            auto read_result = file->read(rlen, (uint8_t*)p);        
             luaL_addsize(&b, read_result.bytes());
             if (read_result.bytes() < rlen) break;  /* eof? */
             else if (rlen <= (MAX_SIZE_T / 4))  /* avoid buffers too large */
@@ -297,7 +297,7 @@ namespace loss
         auto &vfs = process->info().kernel()->virtual_file_system();
         
         double d;
-        if (vfs.read_number(file, d).status() == SUCCESS)
+        if (file->read_number(d).status() == SUCCESS)
         {
             lua_pushnumber(lua, static_cast<lua_Number>(d));
             return 1;

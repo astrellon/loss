@@ -74,7 +74,7 @@ namespace loss
         uint8_t buff[128];
         do
         {
-            auto result = _kernel->virtual_file_system().read(_file_handle, 128, buff);
+            auto result = _file_handle->read(128, buff);
             if (result.status() != SUCCESS)
             {
                 std::cout << "Error reading from tty\n";

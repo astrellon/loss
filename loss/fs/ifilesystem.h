@@ -12,6 +12,7 @@ namespace loss
     class FolderEntry;
     class FileEntry;
     class ICharacterDevice;
+    class VirtualFileSystem;
 
     class IFileSystem
     {
@@ -42,11 +43,15 @@ namespace loss
             void filesystem_id(uint32_t id);
             uint32_t filesystem_id() const;
 
+            VirtualFileSystem *vfs() const;
+            void vfs(VirtualFileSystem *vfs);
+
             static const uint32_t ROOT_ID;
             static const uint32_t NULL_ID;
 
         private:
             uint32_t _filesystem_id;
+            VirtualFileSystem *_vfs;
     };
 }
 

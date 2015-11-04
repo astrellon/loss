@@ -198,26 +198,4 @@ namespace loss
         return _device;
     }
     // }}}
-
-    // FileHandle {{{
-    FileHandle::FileHandle(uint32_t entry_id, uint32_t process_id, FileHandle::OpenMode mode, IFileSystem *fs) :
-        StreamHandle(process_id, mode),
-        _entry_id(entry_id),
-        _fs(fs)
-    {
-        if (entry_id == 0u)
-        {
-            throw std::runtime_error("file entry is null");
-        }
-    }
-
-    uint32_t FileHandle::entry_id() const
-    {
-        return _entry_id;
-    }
-    IFileSystem *FileHandle::filesystem() const
-    {
-        return _fs;
-    }
-    // }}}
 }

@@ -75,7 +75,11 @@ static int hello_getattr(const char *path, struct stat *stbuf)
         {
             stbuf->st_mode = S_IFREG | 0666;
             uint32_t size;
-            vfs->entry_size(path, size);
+
+            loss::FileHandle *handle = nullptr;
+            vfs->open(1, path, loss::FileHandle::READ, handle);
+            handle->stream_size(size);
+            vfs->close(handle);
             stbuf->st_size = size;
         }
     }
@@ -119,7 +123,11 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
             {
                 st.st_mode = S_IFREG | 0666;
                 uint32_t size;
-                vfs->entry_size(path, size);
+
+                loss::FileHandle *handle = nullptr;
+                vfs->open(1, path, loss::FileHandle::READ, handle);
+                handle->stream_size(size);
+                vfs->close(handle);
                 st.st_size = size;
             }
             st.st_uid = context->uid;
@@ -168,8 +176,8 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
     log_file << "Read: " << path << ": " << size << ": " << offset << "\n";
     loss::FileHandle *handle = (loss::FileHandle *)fi->fh;
     handle->read_position(offset);
-    auto read_result = vfs->read(handle, size, (uint8_t*)buf);
-
+    auto read_result = handle->read(size, (uint8_t *)buf);
+    
     if (read_result.status() != loss::SUCCESS)
     {
         return -ENOENT;
@@ -181,7 +189,10 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
 static int hello_write(const char *path, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
 {
     log_file << "Write: " << path << ": " << size << ": " << off << "\n";
-    auto write_result = vfs->write(path, off, size, (const uint8_t *)buf);
+    
+    loss::FileHandle *handle = (loss::FileHandle *)fi->fh;
+    handle->write_position(off);
+    auto write_result = handle->write(size, (const uint8_t *)buf);
 
     return write_result.bytes();
 }

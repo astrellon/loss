@@ -21,7 +21,7 @@ namespace loss
     {
         if (info().std_out() != nullptr)
         {
-            info().vfs().write_string(info().std_out(), message);
+            info().std_out()->write_string(message);
         }
     }
 }
