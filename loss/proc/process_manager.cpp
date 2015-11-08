@@ -124,6 +124,10 @@ namespace loss
         }
 
         return find->second.get();
-           
+    }
+
+    const ProcessManager::ProcessMap &ProcessManager::processes() const
+    {
+        return _processes;
     }
 }

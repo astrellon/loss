@@ -14,6 +14,7 @@ namespace loss
 {
     class RamFileSystem;
     class StreamDevice;
+    class ProcFileSystem;
 
     class Kernel
     {
@@ -53,6 +54,7 @@ namespace loss
             UserManager _user_manager;
             User *_root_user;
             IProcess *_kernel_proc;
+            ProcFileSystem *_proc_fs;
 
             RamFileSystem *_dev_fs;
             StreamDevice *_tty_device;

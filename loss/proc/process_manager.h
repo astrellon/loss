@@ -30,6 +30,7 @@ namespace loss
 
             typedef std::map<uint32_t, std::unique_ptr<IProcess> > ProcessMap;
             const ProcessMap &processes() const;
+
         private:
 
             Kernel *_kernel;

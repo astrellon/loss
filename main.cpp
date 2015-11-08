@@ -61,6 +61,8 @@ int main()
         return -1;
     }
 
+    output_folder(kernel.virtual_file_system(), "/proc");
+
     loss::TerminalEmulator renderer;
     loss::FileHandle *handle = nullptr;
     result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);

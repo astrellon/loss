@@ -3,6 +3,7 @@
 #include "fs/ifilesystem.h"
 #include "fs/stream_device.h"
 #include "fs/ram_filesystem.h"
+#include "fs/proc_filesystem.h"
 
 #include <sstream>
 
@@ -14,6 +15,8 @@ namespace loss
         _dev_fs(nullptr),
         _tty_device(nullptr),
         _root_user(nullptr),
+        _kernel_proc(nullptr),
+        _proc_fs(nullptr),
         _keyboard(nullptr)
     {
 
@@ -59,10 +62,7 @@ namespace loss
             kernel_message(false, error);
             return result;
         }
-        else
-        {
-            kernel_message(true, "Created root user");
-        }
+        kernel_message(true, "Created root user");
 
         NativeProcess *proc;
         result = _process_manager.create_native_process("/dev/tty0", "kernel", _root_user, proc);
@@ -73,11 +73,19 @@ namespace loss
             kernel_message(false, error);
             return result;
         }
-        else
+        kernel_message(true, "Created kernel process");
+        _kernel_proc = proc;
+
+        _proc_fs = new ProcFileSystem(this);
+        result = _vfs.mount("/proc", _proc_fs);
+        if (result != SUCCESS)
         {
-            kernel_message(true, "Created kernel process");
-            _kernel_proc = proc;
+            std::string error("Error creating proc filesystem: ");
+            error += ReturnCodes::desc(result);
+            kernel_message(false, error);
+            return result; 
         }
+        kernel_message(true, "Created proc filesystem");
 
         return SUCCESS;
     }
