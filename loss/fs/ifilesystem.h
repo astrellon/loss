@@ -23,7 +23,7 @@ namespace loss
             virtual IOResult read(uint32_t file_id, uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
             virtual IOResult write(uint32_t file_id, uint32_t offset, uint32_t count, const uint8_t *data) = 0;
 
-            virtual ReturnCode read_folder(uint32_t folder_id, FolderEntry &to_populate) = 0;
+            virtual ReturnCode read_folder(uint32_t process_id, uint32_t folder_id, FolderEntry &to_populate) = 0;
             virtual ReturnCode read_symlink(uint32_t symlink_id, std::string &link) = 0;
             virtual FindEntryResult find_entry(uint32_t parent_id, const std::string &name) = 0;
             

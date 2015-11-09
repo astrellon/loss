@@ -177,7 +177,7 @@ namespace loss
         return CANNOT_FIND_FILE_HANDLE;
     }
 
-    ReturnCode VirtualFileSystem::read_folder(const std::string &name, FolderEntry &folder)
+    ReturnCode VirtualFileSystem::read_folder(uint32_t process_id, const std::string &name, FolderEntry &folder)
     {
         Path path(name);
         path.filename_to_dir();
@@ -188,7 +188,7 @@ namespace loss
             return result.status();
         }
 
-        return result.fs()->read_folder(result.id(), folder);
+        return result.fs()->read_folder(process_id, result.id(), folder);
     }
 
     ReturnCode VirtualFileSystem::entry_metadata(const std::string &name, MetadataDef &metadata)

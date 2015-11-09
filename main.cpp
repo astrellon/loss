@@ -21,7 +21,7 @@ void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
 {
     std::cout << "Output: " << name << "\n";
     auto folder = new loss::FolderEntry();
-    auto folder_result = vfs.read_folder(name, *folder);
+    auto folder_result = vfs.read_folder(1u, name, *folder);
     if (folder_result == loss::SUCCESS)
     {
         for (auto &iter : *folder)

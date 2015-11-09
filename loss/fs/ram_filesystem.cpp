@@ -131,7 +131,7 @@ namespace loss
         return CreateEntryResult(entry->id(), folder->add_entry(name, entry));
 
     }
-    ReturnCode RamFileSystem::read_folder(uint32_t folder_id, FolderEntry &to_populate)
+    ReturnCode RamFileSystem::read_folder(uint32_t proess_id, uint32_t folder_id, FolderEntry &to_populate)
     {
         auto find = _entry_index.find(folder_id);
         if (find == _entry_index.end())

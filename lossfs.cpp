@@ -105,7 +105,7 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     auto context = fuse_get_context();
 
     loss::FolderEntry folder;
-    auto read_result = vfs->read_folder(path, folder);
+    auto read_result = vfs->read_folder(0u, path, folder);
 
     if (read_result == loss::SUCCESS)
     {

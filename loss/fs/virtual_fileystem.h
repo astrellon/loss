@@ -26,7 +26,7 @@ namespace loss
             ReturnCode open(uint32_t process_id, const std::string &name, FileHandle::OpenMode open_mode, FileHandle *&handle);
             ReturnCode close(FileHandle *entry);
 
-            ReturnCode read_folder(const std::string &name, FolderEntry &folder);
+            ReturnCode read_folder(uint32_t process_id, const std::string &name, FolderEntry &folder);
 
             ReturnCode entry_metadata(const std::string &name, MetadataDef &metadata);
             ReturnCode update_entry_metadata(const std::string &name, const MetadataDef &metadata);

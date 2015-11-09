@@ -129,7 +129,7 @@ namespace loss
             virtual IOResult read(uint32_t file_id, uint32_t offset, uint32_t count, uint8_t *buffer);
             virtual IOResult write(uint32_t file_id, uint32_t offset, uint32_t count, const uint8_t *data);
 
-            virtual ReturnCode read_folder(uint32_t folder_id, FolderEntry &to_populate);
+            virtual ReturnCode read_folder(uint32_t process_id, uint32_t folder_id, FolderEntry &to_populate);
             virtual ReturnCode read_symlink(uint32_t symlink_id, std::string &link);
             virtual FindEntryResult find_entry(uint32_t parent_id, const std::string &name);
             
@@ -146,14 +146,15 @@ namespace loss
             virtual ReturnCode rename(uint32_t folder_id, const std::string &name, uint32_t new_parent_id, const std::string &new_name);
             virtual ReturnCode remove_entry(uint32_t entry_id);
 
+        protected:
+            uint32_t next_id();
+
         private:
             Folder *_root;
             uint32_t _id_counter;
             
             typedef std::map<uint32_t, std::unique_ptr<Entry> > EntryMap;
             EntryMap _entry_index;
-
-            uint32_t next_id();
 
             Folder *new_folder(uint32_t parent_id);
             File *new_file(uint32_t parent_id);
