@@ -53,23 +53,38 @@ int main()
         std::cout << "Failed to init kernel: " << loss::ReturnCodes::desc(result) << "\n";
         return -1;
     }
-    
-    result = kernel.boot();
-    if (result != loss::SUCCESS)
+        
+    std::thread term_thread([] (loss::Kernel *kernel)
     {
-        std::cout << "Failed to boot kernel: " << loss::ReturnCodes::desc(result) << "\n";
-        return -1;
-    }
+        loss::TerminalEmulator renderer;
+        loss::FileHandle *handle = nullptr;
+        auto &vfs = kernel->virtual_file_system();
+
+        auto result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
+        renderer.kernel(kernel);
+        renderer.file_handle(handle);
+
+        renderer.render();
+    }, &kernel);
+    
+    std::thread kernel_thread([] (loss::Kernel *kernel)
+    {
+        auto result = kernel->boot();
+        if (result != loss::SUCCESS)
+        {
+            std::cout << "Failed to boot kernel: " << loss::ReturnCodes::desc(result) << "\n";
+            return -1;
+        }
+        return 0;
+    }, &kernel);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    kernel.keyboard()->write_string("Hello from keyboard\n");
+
+    term_thread.join();
+    kernel_thread.join();
 
     output_folder(kernel.virtual_file_system(), "/proc");
-
-    loss::TerminalEmulator renderer;
-    loss::FileHandle *handle = nullptr;
-    result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
-    renderer.kernel(&kernel);
-    renderer.file_handle(handle);
-
-    renderer.render();
 
 #ifdef _WIN32
 	std::cin.get();

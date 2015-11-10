@@ -50,7 +50,6 @@ namespace loss
         {
             return result;
         }
-        _keyboard->write_string("Hello from keyboard\n");
 
         kernel_message(true, "Setup VFS");
 
@@ -146,6 +145,10 @@ namespace loss
     IProcess *Kernel::kernel_proc() const
     {
         return _kernel_proc;
+    }
+    StreamDevice *Kernel::keyboard() const
+    {
+        return _keyboard;
     }
 
     void Kernel::kernel_message(bool success, const std::string &message)
