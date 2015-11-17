@@ -24,7 +24,7 @@ namespace loss
 		return !luaL_loadstring(_lua, code.c_str());
 	}
 
-    int32_t LuaProcess::run(int argc, char **argv)
+    int32_t LuaProcess::run_impl()
     {
         auto result = lua_pcall(_lua, 0, LUA_MULTRET, 0); 
         if (result != LUA_OK)
@@ -100,3 +100,4 @@ namespace loss
 		return lua_typename(_lua, n);
 	}
 }
+

@@ -17,8 +17,10 @@ namespace loss
 
             bool load_string(const std::string &code);
 
-            virtual int32_t run(int argc, char **argv);
             virtual int32_t shutdown();
+
+        protected:
+            virtual int32_t run_impl();
 
         private:
             lua_State *_lua;
@@ -28,3 +30,4 @@ namespace loss
             const char *get_type(int n);
     };
 }
+

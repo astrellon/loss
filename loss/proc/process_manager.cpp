@@ -1,6 +1,11 @@
 #include "process_manager.h"
 
+#undef val_
+#include <boost/coroutine/all.hpp>
+
 #include "../kernel.h"
+
+#include "kernel_process.h"
 
 #include <sstream>
 
@@ -8,10 +13,29 @@ namespace loss
 {
     ProcessManager::ProcessManager(Kernel *kernel) :
         _kernel(kernel),
-        _id_count(1)
+        _id_count(1),
+        _running(false)
     {
     }
 
+    ReturnCode ProcessManager::create_kernel_proc(const std::string &std_out_path, KernelProcess *&result)
+    {
+        auto id = ++_id_count;
+        
+        FileHandle *std_out_handle = nullptr;
+        auto open_result = _kernel->virtual_file_system().open(id, std_out_path, FileHandle::READ, std_out_handle);
+        if (open_result != SUCCESS)
+        {
+            return open_result;
+        }
+
+        auto process = new KernelProcess(id, _kernel);
+        add_process(process);
+        result = process;
+        result->info().std_out(std_out_handle);
+
+        return SUCCESS;
+    }
     ReturnCode ProcessManager::create_native_process(const std::string &std_out_path, const std::string &name, const User *user, NativeProcess *& result)
     {
         if (name.empty())
@@ -32,7 +56,7 @@ namespace loss
         }
 
         auto process = new NativeProcess(name, user, id, _kernel);
-        _processes[id] = std::unique_ptr<IProcess>(process);
+        add_process(process);
         result = process;
         process->info().std_out(std_out_handle);
 
@@ -51,12 +75,13 @@ namespace loss
         }
 
         auto process = new LuaProcess("lua", user, id, _kernel);
-        _processes[id] = std::unique_ptr<IProcess>(process);
+        add_process(process);
         result = process;
         process->info().std_out(std_out_handle);
 
         return SUCCESS;
     }
+
     ReturnCode ProcessManager::create_process_from_file(const std::string &file_path, const std::string &std_out_path, const User *user, IProcess *&result)
     {
         auto &vfs = _kernel->virtual_file_system();
@@ -126,8 +151,51 @@ namespace loss
         return find->second.get();
     }
 
+    void ProcessManager::run()
+    {
+        _running = true;
+
+        while (_running)
+        {
+            auto proc = _process_queue.front();
+            _process_queue.pop();
+
+            proc->finish_time = IProcess::ClockType::now() + std::chrono::microseconds(100); 
+
+            if (!proc->is_running())
+            {
+                proc->run();
+            }
+            else
+            {
+                proc->resume();
+            }
+
+            if (proc->is_active())
+            {
+                _process_queue.push(proc);
+            }
+
+            if (_process_queue.size() == 0u)
+            {
+                _running = false;
+            }
+
+        }
+    }
+
     const ProcessManager::ProcessMap &ProcessManager::processes() const
     {
         return _processes;
+    }
+    const ProcessManager::ProcessQueue &ProcessManager::process_queue() const
+    {
+        return _process_queue;
+    }
+
+    void ProcessManager::add_process(IProcess *proc)
+    {
+        _processes[proc->info().id()] = std::unique_ptr<IProcess>(proc);
+        _process_queue.push(proc);
     }
 }

@@ -1,6 +1,7 @@
 #include "proc_filesystem.h"
 
 #include "../kernel.h"
+#include "../proc/kernel_process.h"
 #include "file_handler.h"
 
 #include <sstream>

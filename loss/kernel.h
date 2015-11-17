@@ -15,6 +15,7 @@ namespace loss
     class RamFileSystem;
     class StreamDevice;
     class ProcFileSystem;
+    class KernelProcess;
 
     class Kernel
     {
@@ -25,6 +26,7 @@ namespace loss
             ReturnCode init();
             ReturnCode boot();
             ReturnCode shutdown();
+            ReturnCode run();
 
             uint32_t id() const;
 
@@ -43,7 +45,7 @@ namespace loss
             const UserManager &user_manager() const;
 
             User *root_user() const;
-            IProcess *kernel_proc() const;
+            KernelProcess *kernel_proc() const;
             StreamDevice *keyboard() const;
 
         private:
@@ -53,7 +55,7 @@ namespace loss
             ProcessManager _process_manager;
             UserManager _user_manager;
             User *_root_user;
-            IProcess *_kernel_proc;
+            KernelProcess *_kernel_proc;
             ProcFileSystem *_proc_fs;
 
             RamFileSystem *_dev_fs;

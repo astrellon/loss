@@ -46,6 +46,7 @@ namespace loss
             Kernel *_kernel;
             VirtualFileSystem &_vfs;
 
+
             FileHandle *_std_out;
     };
 }

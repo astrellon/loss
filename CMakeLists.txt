@@ -9,8 +9,6 @@ set(EXECUTABLE_NAME "LossProg")
 set(EXECUTABLE_NAME_FUSE "LossFuse")
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -g -O0 -I./")
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-#add_compile_options(-std=c++11 -g -O0 -I./)
 
 file(GLOB_RECURSE loss_headers "loss/*.h")
 file(GLOB_RECURSE loss_sources "loss/*.cpp")
@@ -32,7 +30,12 @@ list(REMOVE_DUPLICATES loss_include_dirs)
 
 include_directories(${loss_include_dirs})
 
+find_package(Boost 1.58 REQUIRED system context coroutine)
+include_directories(${Boost_INCLUDE_DIR})
+
 add_executable(${EXECUTABLE_NAME} "main.cpp" ${loss_sources} ${lua_sources})
+
+target_link_libraries(${EXECUTABLE_NAME} ${Boost_LIBRARIES})
 
 find_package(Threads REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} ${CMAKE_THREAD_LIBS_INIT})
@@ -45,6 +48,7 @@ include_directories(${FUSE_INCLUDE_DIR})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_FILE_OFFSET_BITS=64")
 add_executable(${EXECUTABLE_NAME_FUSE} "lossfs.cpp" ${loss_sources} ${lua_sources})
 target_link_libraries(${EXECUTABLE_NAME_FUSE} ${FUSE_LIBRARIES})
+target_link_libraries(${EXECUTABLE_NAME_FUSE} ${Boost_LIBRARIES})
 
 # TODO Fix so this isn't needed.
 target_link_libraries(${EXECUTABLE_NAME_FUSE} ncurses)

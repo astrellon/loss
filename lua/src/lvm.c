@@ -26,7 +26,7 @@
 #include "ltm.h"
 #include "lvm.h"
 
-
+#include "../loss/proc/lua_process_bridge.h"
 
 /* limit for table tag-method chains (to avoid loops) */
 #define MAXTAGLOOP	100
@@ -544,6 +544,8 @@ void luaV_execute (lua_State *L) {
   base = ci->u.l.base;
   /* main loop of interpreter */
   for (;;) {
+    check_lua_process_yielding(L);
+
     Instruction i = *(ci->u.l.savedpc++);
     StkId ra;
     if ((L->hookmask & (LUA_MASKLINE | LUA_MASKCOUNT)) &&

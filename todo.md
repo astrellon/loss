@@ -32,3 +32,10 @@ Thoughts:
 - TTY
   Kernel level TTYs?
   - 
+
+Scheduler
+---------
+
+First version, round robin.
+Need a way of having anything that would block normally (stream reading) puts the process to sleep until that
+handle has data.

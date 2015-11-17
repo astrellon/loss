@@ -34,7 +34,7 @@ void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
     std::cout << "\n";
 }
 
-int main()
+int main(int argc, char **argv)
 {
     loss::Kernel kernel(1u);
 

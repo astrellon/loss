@@ -13,14 +13,10 @@ namespace loss
 
     }
 
-    int32_t NativeProcess::run(int argc, char **argv)
+    int32_t NativeProcess::run_impl()
     {
         write_std_out("Hello thar\n");
 
-        return 0;
-    }
-    int32_t NativeProcess::shutdown()
-    {
         return 0;
     }
 }

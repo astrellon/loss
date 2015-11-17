@@ -63,8 +63,8 @@ namespace loss
         }
         kernel_message(true, "Created root user");
 
-        NativeProcess *proc;
-        result = _process_manager.create_native_process("/dev/tty0", "kernel", _root_user, proc);
+        KernelProcess *proc;
+        result = _process_manager.create_kernel_proc("/dev/tty0", proc);
         if (result != SUCCESS)
         {
             std::string error("Error creating kernel process: ");
@@ -97,12 +97,18 @@ namespace loss
             return proc_result;
         }
 
-        proc->run(0, nullptr);
+        run();
 
         return SUCCESS;
     }
     ReturnCode Kernel::shutdown()
     {
+        return SUCCESS;
+    }
+    ReturnCode Kernel::run()
+    {
+        _process_manager.run();
+
         return SUCCESS;
     }
 
@@ -142,7 +148,7 @@ namespace loss
     {
         return _root_user;
     }
-    IProcess *Kernel::kernel_proc() const
+    KernelProcess *Kernel::kernel_proc() const
     {
         return _kernel_proc;
     }
