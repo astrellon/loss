@@ -60,7 +60,8 @@ namespace loss
         auto now = ClockType::now();
         if (now > finish_time)
         {
-            yield();
+            //write_std_out("---Yielded---\n");
+            //yield();
         }
     }
 }

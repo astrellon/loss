@@ -97,6 +97,12 @@ namespace loss
             return proc_result;
         }
 
+        proc_result = _process_manager.create_process_from_file("/etc/long_proc.lua", "/dev/tty0", _root_user, proc);
+        if (proc_result != SUCCESS)
+        {
+            return proc_result;
+        }
+
         run();
 
         return SUCCESS;

@@ -22,6 +22,8 @@ namespace loss
 
         noecho();
 
+        scrollok(_window, true);
+
         refresh();
     }
 
@@ -87,8 +89,15 @@ namespace loss
                 auto c = static_cast<char>(buff[i]);
                 if (c == '\n')
                 {
-                    y++;
+                    if (y > 50)
+                    {
+                        y = 10;
+                    }
+                    else{
+                        y++;
+                    }
                     x = 0;
+
                 }
                 else if (c == '\r')
                 {
