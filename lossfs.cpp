@@ -57,7 +57,11 @@ static int hello_getattr(const char *path, struct stat *stbuf)
 
     memset(stbuf, 0, sizeof(struct stat));
     // Not really used at the moment
-    stbuf->st_nlink = 1;
+    //
+
+    auto context = fuse_get_context();
+    stbuf->st_uid = context->uid;
+    stbuf->st_gid = context->gid;
     
     loss::MetadataDef metadata;
     auto read_result = vfs->entry_metadata(path, metadata);
@@ -70,10 +74,12 @@ static int hello_getattr(const char *path, struct stat *stbuf)
         if (metadata.type() == loss::FOLDER_ENTRY)
         {
             stbuf->st_mode = S_IFDIR | 0755;
+            stbuf->st_nlink = 2;
         }
         else if (metadata.type() == loss::FILE_ENTRY)
         {
             stbuf->st_mode = S_IFREG | 0666;
+            stbuf->st_nlink = 1;
             uint32_t size;
 
             loss::FileHandle *handle = nullptr;
@@ -189,6 +195,8 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
 static int hello_write(const char *path, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
 {
     log_file << "Write: " << path << ": " << size << ": " << off << "\n";
+
+    log_file << " - Writing:\n" << buf << "\n\n";
     
     loss::FileHandle *handle = (loss::FileHandle *)fi->fh;
     handle->write_position(off);
