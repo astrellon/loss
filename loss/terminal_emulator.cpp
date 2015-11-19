@@ -93,7 +93,8 @@ namespace loss
                     {
                         y = 10;
                     }
-                    else{
+                    else
+                    {
                         y++;
                     }
                     x = 0;

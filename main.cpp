@@ -53,7 +53,7 @@ int main(int argc, char **argv)
         std::cout << "Failed to init kernel: " << loss::ReturnCodes::desc(result) << "\n";
         return -1;
     }
-        
+    
     std::thread term_thread([] (loss::Kernel *kernel)
     {
         loss::TerminalEmulator renderer;

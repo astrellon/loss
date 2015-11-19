@@ -22,6 +22,7 @@ namespace loss
     void IProcess::run()
     {
         _active = true;
+        _running = true;
 
         _thread = new ThreadType
         {
@@ -29,7 +30,9 @@ namespace loss
             {
                 _yield = &yield;
                 run_impl();
+
                 _active = false;
+                _running = false;
             }
         };
     }
@@ -60,8 +63,8 @@ namespace loss
         auto now = ClockType::now();
         if (now > finish_time)
         {
-            //write_std_out("---Yielded---\n");
-            //yield();
+            write_std_out("---Yielded---\n");
+            yield();
         }
     }
 }
