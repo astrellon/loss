@@ -536,6 +536,7 @@ void luaV_execute (lua_State *L) {
   CallInfo *ci = L->ci;
   LClosure *cl;
   TValue *k;
+  int yield_count = 0;
   StkId base;
  newframe:  /* reentry point when frame changes (call/return) */
   lua_assert(ci == L->ci);
@@ -544,7 +545,12 @@ void luaV_execute (lua_State *L) {
   base = ci->u.l.base;
   /* main loop of interpreter */
   for (;;) {
-    check_lua_process_yielding(L);
+      ++yield_count;
+      if (yield_count > 8)
+      {
+        check_lua_process_yielding(L);
+        yield_count = 0;
+      }
 
     Instruction i = *(ci->u.l.savedpc++);
     StkId ra;

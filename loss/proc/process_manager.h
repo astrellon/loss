@@ -40,6 +40,8 @@ namespace loss
             typedef std::queue<IProcess *> ProcessQueue;
             const ProcessQueue &process_queue() const;
 
+            typedef std::map<uint32_t, std::vector<IProcess *> > ProcessMap;
+
         private:
 
             Kernel *_kernel;
@@ -47,6 +49,7 @@ namespace loss
             bool _running;
             ProcessMap _processes;
             ProcessQueue _process_queue;
+            ProcessMap _process_map;
 
             void add_process(IProcess *proc);
     };

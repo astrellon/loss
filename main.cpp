@@ -75,11 +75,12 @@ int main(int argc, char **argv)
             std::cout << "Failed to boot kernel: " << loss::ReturnCodes::desc(result) << "\n";
             return -1;
         }
+
         return 0;
     }, &kernel);
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    kernel.keyboard()->write_string("Hello from keyboard\n");
+    //std::this_thread::sleep_for(std::chrono::seconds(1));
+    //kernel.keyboard()->write_string("Hello from keyboard\n");
 
     term_thread.join();
     kernel_thread.join();

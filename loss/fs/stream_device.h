@@ -18,8 +18,8 @@ namespace loss
 
         private:
             std::vector<uint8_t> _data;
-            mutable std::mutex _lock;
-            std::condition_variable _cv;
+            //mutable std::mutex _lock;
+            //std::condition_variable _cv;
 
     };
 }
