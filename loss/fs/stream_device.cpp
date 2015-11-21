@@ -6,7 +6,7 @@ namespace loss
 {
     uint32_t StreamDevice::size() const
     {
-        std::lock_guard<std::mutex> lock_guard(_lock);
+        //std::lock_guard<std::mutex> lock_guard(_lock);
         return _data.size();
     }
 
@@ -49,13 +49,13 @@ namespace loss
             return IOResult(0, NULL_PARAMETER);
         }
 
-        std::lock_guard<std::mutex> lock_guard(_lock);
+        //std::lock_guard<std::mutex> lock_guard(_lock);
         for (auto i = 0; i < count; i++)
         {
             _data.push_back(data[i]);
         }
 
-        _cv.notify_one();
+        //_cv.notify_one();
         return IOResult(count, SUCCESS);
     }
     /*

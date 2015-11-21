@@ -5,6 +5,7 @@
 #include <memory>
 #include <queue>
 #include <chrono>
+#include <vector>
 
 #include "iprocess.h"
 #include "native_process.h"
@@ -40,7 +41,10 @@ namespace loss
             typedef std::queue<IProcess *> ProcessQueue;
             const ProcessQueue &process_queue() const;
 
-            typedef std::map<uint32_t, std::vector<IProcess *> > ProcessMap;
+            typedef std::map<uint32_t, std::vector<IProcess *> > ProcessBlockedMap;
+            void add_blocked_process(uint32_t block_id, IProcess *proc);
+            void notify_one_blocked_process(uint32_t block_id);
+            void notify_all_blocked_processes(uint32_t block_id);
 
         private:
 
@@ -49,7 +53,7 @@ namespace loss
             bool _running;
             ProcessMap _processes;
             ProcessQueue _process_queue;
-            ProcessMap _process_map;
+            ProcessBlockedMap _process_map;
 
             void add_process(IProcess *proc);
     };
