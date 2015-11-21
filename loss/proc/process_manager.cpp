@@ -198,4 +198,44 @@ namespace loss
         _processes[proc->info().id()] = std::unique_ptr<IProcess>(proc);
         _process_queue.push(proc);
     }
+            
+    void ProcessManager::add_blocked_process(uint32_t block_id, IProcess *proc)
+    {
+        _process_blocked_map[block_id].push(proc);
+    }
+    void ProcessManager::notify_one_blocked_process(uint32_t block_id)
+    {
+        auto find = _process_blocked_map.find(block_id);
+        if (find == _process_blocked_map.end())
+        {
+            return;
+        }
+
+        _process_queue.push(find->second.front());
+        find->second.pop();
+
+        if (find->second.empty())
+        {
+            _process_blocked_map.erase(find);
+        }
+    }
+    void ProcessManager::notify_all_blocked_processes(uint32_t block_id)
+    {
+        auto find = _process_blocked_map.find(block_id);
+        if (find == _process_blocked_map.end())
+        {
+            return;
+        }
+
+        while (!find->second.empty())
+        {
+            _process_queue.push(find->second.front());
+            find->second.pop();
+        }
+        
+        if (find->second.empty())
+        {
+            _process_blocked_map.erase(find);
+        }
+    }
 }

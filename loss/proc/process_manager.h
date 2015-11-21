@@ -41,19 +41,18 @@ namespace loss
             typedef std::queue<IProcess *> ProcessQueue;
             const ProcessQueue &process_queue() const;
 
-            typedef std::map<uint32_t, std::vector<IProcess *> > ProcessBlockedMap;
+            typedef std::map<uint32_t, std::queue<IProcess *> > ProcessBlockedMap;
             void add_blocked_process(uint32_t block_id, IProcess *proc);
             void notify_one_blocked_process(uint32_t block_id);
             void notify_all_blocked_processes(uint32_t block_id);
 
         private:
-
             Kernel *_kernel;
             uint32_t _id_count;
             bool _running;
             ProcessMap _processes;
             ProcessQueue _process_queue;
-            ProcessBlockedMap _process_map;
+            ProcessBlockedMap _process_blocked_map;
 
             void add_process(IProcess *proc);
     };
