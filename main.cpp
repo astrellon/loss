@@ -9,6 +9,7 @@
 #include <condition_variable>
 
 #include <loss/kernel.h>
+#include <loss/kernel_manager.h>
 #include <loss/fs/virtual_fileystem.h>
 #include <loss/fs/ram_filesystem.h>
 #include <loss/return_codes.h>
@@ -36,9 +37,10 @@ void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
 
 int main(int argc, char **argv)
 {
-    loss::Kernel kernel(1u);
+    //loss::Kernel kernel(1u);
+    auto kernel = loss::KernelManager::create_new_kernel();
 
-    auto &vfs = kernel.virtual_file_system();
+    auto &vfs = kernel->virtual_file_system();
     auto rootfs = new loss::RamFileSystem();
     vfs.root_filesystem(rootfs);
     {
@@ -47,7 +49,7 @@ int main(int argc, char **argv)
         deserialise.load();
     }
     
-    auto result = kernel.init();
+    auto result = kernel->init();
     if (result != loss::SUCCESS)
     {
         std::cout << "Failed to init kernel: " << loss::ReturnCodes::desc(result) << "\n";
@@ -65,10 +67,12 @@ int main(int argc, char **argv)
         renderer.file_handle(handle);
 
         renderer.render();
-    }, &kernel);
+    }, kernel);
     
     std::thread kernel_thread([] (loss::Kernel *kernel)
     {
+        loss::KernelManager::register_kernel(kernel, std::this_thread::get_id());
+
         auto result = kernel->boot();
         if (result != loss::SUCCESS)
         {
@@ -77,7 +81,7 @@ int main(int argc, char **argv)
         }
 
         return 0;
-    }, &kernel);
+    }, kernel);
 
     //std::this_thread::sleep_for(std::chrono::seconds(1));
     //kernel.keyboard()->write_string("Hello from keyboard\n");
@@ -85,13 +89,11 @@ int main(int argc, char **argv)
     term_thread.join();
     kernel_thread.join();
 
-    output_folder(kernel.virtual_file_system(), "/proc");
+    output_folder(vfs, "/proc");
 
 #ifdef _WIN32
 	std::cin.get();
 #endif
-
-    kernel.shutdown();
     
     // Shutdown
     if (rootfs != nullptr)

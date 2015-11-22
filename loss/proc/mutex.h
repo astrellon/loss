@@ -22,14 +22,18 @@ namespace loss
                 _locked = value;
             }
 
+            void try_get_lock();
+            void unlock();
+
         private:
+            uint32_t _id;
+            bool _locked;
+            
             static uint32_t s_id_counter;
             inline static uint32_t next_id()
             {
                 return ++s_id_counter;
             }
 
-            uint32_t _id;
-            bool _locked;
     };
 }

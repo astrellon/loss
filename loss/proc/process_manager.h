@@ -46,6 +46,11 @@ namespace loss
             void notify_one_blocked_process(uint32_t block_id);
             void notify_all_blocked_processes(uint32_t block_id);
 
+            inline IProcess *current_process() const
+            {
+                return _current_process;
+            }
+
         private:
             Kernel *_kernel;
             uint32_t _id_count;
@@ -53,6 +58,7 @@ namespace loss
             ProcessMap _processes;
             ProcessQueue _process_queue;
             ProcessBlockedMap _process_blocked_map;
+            IProcess *_current_process;
 
             void add_process(IProcess *proc);
     };

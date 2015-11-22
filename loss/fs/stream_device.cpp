@@ -6,7 +6,6 @@ namespace loss
 {
     uint32_t StreamDevice::size() const
     {
-        //std::lock_guard<std::mutex> lock_guard(_lock);
         return _data.size();
     }
 
@@ -16,14 +15,8 @@ namespace loss
         {
             return IOResult(0, NULL_PARAMETER);
         }
-
-        /*
-        std::unique_lock<std::mutex> lock_guard(_lock);
-        _cv.wait(lock_guard, [this]()
-        {
-            return _data.size() > 0u;
-        });
-        */
+        
+        _mutex.try_get_lock();
 
         auto max = count;
         if (max > _data.size())
@@ -32,7 +25,7 @@ namespace loss
         }
 
         auto read_count = 0u;
-        for (auto i = 0; i < max; i++, read_count++)
+        for (auto i = 0u; i < max; i++, read_count++)
         {
             buffer[i] = _data[read_count];
         }
@@ -49,13 +42,13 @@ namespace loss
             return IOResult(0, NULL_PARAMETER);
         }
 
-        //std::lock_guard<std::mutex> lock_guard(_lock);
-        for (auto i = 0; i < count; i++)
+        _mutex.try_get_lock();
+        for (auto i = 0u; i < count; i++)
         {
             _data.push_back(data[i]);
         }
+        _mutex.unlock();
 
-        //_cv.notify_one();
         return IOResult(count, SUCCESS);
     }
     /*

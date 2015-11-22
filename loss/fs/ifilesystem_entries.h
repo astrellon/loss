@@ -12,6 +12,7 @@
 namespace loss
 {
     class IFileSystem;
+    class IProcess;
 
     class IEntry
     {

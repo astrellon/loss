@@ -14,7 +14,8 @@ namespace loss
     ProcessManager::ProcessManager(Kernel *kernel) :
         _kernel(kernel),
         _id_count(1),
-        _running(false)
+        _running(false),
+        _current_process(nullptr)
     {
     }
 
@@ -158,6 +159,8 @@ namespace loss
         while (_running)
         {
             auto proc = _process_queue.front();
+            _current_process = proc;
+
             _process_queue.pop();
 
             proc->finish_time = IProcess::ClockType::now() + std::chrono::microseconds(100); 

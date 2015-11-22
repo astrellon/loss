@@ -4,11 +4,13 @@
 
 #include <stdint.h>
 #include <vector>
-#include <mutex>
-#include <condition_variable>
+
+#include "../proc/mutex.h"
 
 namespace loss
 {
+    class IProcess;
+
     class StreamDevice : public ICharacterDevice
     {
         public:
@@ -18,8 +20,7 @@ namespace loss
 
         private:
             std::vector<uint8_t> _data;
-            //mutable std::mutex _lock;
-            //std::condition_variable _cv;
+            Mutex _mutex;
 
     };
 }

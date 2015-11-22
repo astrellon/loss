@@ -44,7 +44,6 @@ namespace loss
 
             void check_for_yield();
 
-        protected:
             void yield();
 
             virtual int32_t run_impl() = 0;
