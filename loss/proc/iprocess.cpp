@@ -1,4 +1,4 @@
-#include "iprocess.h"
+    #include "iprocess.h"
 
 #include "../user.h"
 #include "../kernel.h"
@@ -12,11 +12,6 @@ namespace loss
         _running(false)
     {
 
-    }
-
-    ProcessInfo &IProcess::info()
-    {
-        return _info;
     }
 
     void IProcess::run()
@@ -63,7 +58,7 @@ namespace loss
         auto now = ClockType::now();
         if (now > finish_time)
         {
-            write_std_out("---Yielded---\n");
+            //write_std_out("---Yielded---\n");
             yield();
         }
     }

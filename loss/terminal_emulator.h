@@ -18,19 +18,18 @@ extern "C"
 }
 #endif
 
+#include "proc/iprocess.h"
+
 namespace loss
 {
     class Kernel;
     class FileHandle;
 
-    class TerminalEmulator
+    class TerminalEmulator : public IProcess
     {
         public:
-            TerminalEmulator();
+            TerminalEmulator(const User *user, uint32_t id, Kernel *kernel);
             ~TerminalEmulator();
-
-            void kernel(Kernel *kernel);
-            Kernel *kernel() const;
 
             void file_handle(FileHandle *file_handle);
             FileHandle *file_handle() const;
@@ -40,9 +39,10 @@ namespace loss
 
             void render();
 
+            virtual int32_t run_impl();
+
         private:
             bool _open;
-            Kernel *_kernel;
             FileHandle *_file_handle;
 
             WINDOW *_window;

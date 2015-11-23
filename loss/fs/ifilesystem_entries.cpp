@@ -155,6 +155,12 @@ namespace loss
     // }}}
     
     // ICharacterDevice {{{
+    ICharacterDevice::ICharacterDevice(Kernel *kernel) :
+        _kernel(kernel)
+    {
+
+    }
+
     IOResult ICharacterDevice::read_string(std::stringstream &buffer)
     {
         auto read_total = 0u;

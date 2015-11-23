@@ -10,10 +10,13 @@
 namespace loss
 {
     class IProcess;
+    class Kernel;
 
     class StreamDevice : public ICharacterDevice
     {
         public:
+            StreamDevice(Kernel *kernel);
+
             virtual uint32_t size() const;
             virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer);
             virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data);

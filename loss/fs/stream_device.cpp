@@ -4,6 +4,13 @@
 
 namespace loss
 {
+    StreamDevice::StreamDevice(Kernel *kernel) :
+        ICharacterDevice(kernel),
+        _mutex(kernel)
+    {
+
+    }
+
     uint32_t StreamDevice::size() const
     {
         return _data.size();
@@ -31,6 +38,8 @@ namespace loss
         }
 
         _data.erase(_data.begin(), _data.begin() + read_count);
+
+        _mutex.unlock();
 
         return IOResult(read_count, SUCCESS);
     }

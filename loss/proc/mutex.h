@@ -4,10 +4,12 @@
 
 namespace loss
 {
+    class Kernel;
+
     class Mutex
     {
         public:
-            Mutex();
+            Mutex(Kernel *kernel);
 
             inline uint32_t id() const
             {
@@ -26,6 +28,7 @@ namespace loss
             void unlock();
 
         private:
+            Kernel *_kernel;
             uint32_t _id;
             bool _locked;
             

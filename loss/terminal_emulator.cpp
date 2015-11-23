@@ -8,42 +8,16 @@
 
 namespace loss
 {
-    TerminalEmulator::TerminalEmulator() :
+    TerminalEmulator::TerminalEmulator(const User *user, uint32_t id, Kernel *kernel) :
+        IProcess("term", user, id, kernel),
         _open(true),
-        _kernel(nullptr),
         _file_handle(nullptr),
         _window(nullptr)
     {
-        _window = initscr();
-        if (_window == nullptr)
-        {
-            std::cout << "Failed to initialise curses window\n";
-        }
-
-        noecho();
-
-        scrollok(_window, true);
-
-        refresh();
     }
 
     TerminalEmulator::~TerminalEmulator()
     {
-        if (_window != nullptr)
-        {
-            delwin(_window);
-        }
-        endwin();
-        refresh();
-    }
-
-    void TerminalEmulator::kernel(Kernel *kernel)
-    {
-        _kernel = kernel;
-    }
-    Kernel *TerminalEmulator::kernel() const
-    {
-        return _kernel;
     }
 
     void TerminalEmulator::file_handle(FileHandle *file_handle)
@@ -66,16 +40,24 @@ namespace loss
 
     void TerminalEmulator::render()
     {
-        if (_kernel == nullptr || _file_handle == nullptr)
+        if (_file_handle == nullptr)
         {
             return;
         }
+        auto yield_counter = 0u;
 
         auto x = 0u;
         auto y = 0u;
         uint8_t buff[128];
         do
         {
+            ++yield_counter;
+            if (yield_counter > 8)
+            {
+                check_for_yield();
+                yield_counter = 0u;
+            }
+
             auto result = _file_handle->read(128, buff);
             if (result.status() != SUCCESS)
             {
@@ -122,5 +104,35 @@ namespace loss
         while (_open);
 
         refresh();
+    }
+
+    int32_t TerminalEmulator::run_impl()
+    {
+        _window = initscr();
+        if (_window == nullptr)
+        {
+            std::cout << "Failed to initialise curses window\n";
+        }
+
+        noecho();
+
+        scrollok(_window, true);
+
+        refresh();
+
+        auto &vfs = info().vfs();
+        vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, _file_handle);
+
+        render();
+        
+        if (_window != nullptr)
+        {
+            delwin(_window);
+            _window = nullptr;
+            endwin();
+            refresh();
+        }
+
+        return 0;
     }
 }

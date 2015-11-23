@@ -26,7 +26,10 @@ namespace loss
             void run();
             virtual int32_t shutdown();
 
-            ProcessInfo &info();
+            inline ProcessInfo &info()
+            {
+                return _info;
+            }
 
             void write_std_out(const std::string &message);
             

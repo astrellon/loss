@@ -56,6 +56,7 @@ int main(int argc, char **argv)
         return -1;
     }
     
+    /*
     std::thread term_thread([] (loss::Kernel *kernel)
     {
         loss::TerminalEmulator renderer;
@@ -68,11 +69,10 @@ int main(int argc, char **argv)
 
         renderer.render();
     }, kernel);
+    */
     
     std::thread kernel_thread([] (loss::Kernel *kernel)
     {
-        loss::KernelManager::register_kernel(kernel, std::this_thread::get_id());
-
         auto result = kernel->boot();
         if (result != loss::SUCCESS)
         {
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
     //std::this_thread::sleep_for(std::chrono::seconds(1));
     //kernel.keyboard()->write_string("Hello from keyboard\n");
 
-    term_thread.join();
+    //term_thread.join();
     kernel_thread.join();
 
     output_folder(vfs, "/proc");

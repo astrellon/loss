@@ -5,7 +5,6 @@
 namespace loss
 {
     KernelManager::KernelMap KernelManager::s_kernels;
-    KernelManager::KernelThreadMap KernelManager::s_kernels_by_thread;
     uint32_t KernelManager::s_id_counter = 0u;
 
     Kernel *KernelManager::create_new_kernel()
@@ -15,7 +14,7 @@ namespace loss
         s_kernels[id] = std::unique_ptr<Kernel>(result);
         return result;
     }
-    ReturnCode KernelManager::register_kernel(Kernel *kernel, std::thread::id for_thread)
+    ReturnCode KernelManager::register_kernel(Kernel *kernel)
     {
         if (kernel == nullptr)
         {
@@ -33,7 +32,6 @@ namespace loss
         }
 
         s_kernels[kernel->id()] = std::unique_ptr<Kernel>(kernel);
-        s_kernels_by_thread[for_thread] = kernel;
         return SUCCESS;
     }
     
@@ -47,27 +45,9 @@ namespace loss
 
         return find->second.get();
     }
-    Kernel *KernelManager::find_kernel(std::thread::id for_thread)
-    {
-        const auto find = s_kernels_by_thread.find(for_thread);
-        if (find == s_kernels_by_thread.end())
-        {
-            return nullptr;
-        }
-
-        return find->second;
-    }
-    Kernel *KernelManager::get_current_kernel()
-    {
-        return find_kernel(std::this_thread::get_id());
-    }
 
     const KernelManager::KernelMap &KernelManager::kernels()
     {
         return s_kernels;
-    }
-    const KernelManager::KernelThreadMap &KernelManager::kernels_by_thread()
-    {
-        return s_kernels_by_thread;
     }
 }

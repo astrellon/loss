@@ -24,7 +24,7 @@ namespace loss
             ProcessManager(Kernel *kernel);
 
             ReturnCode create_kernel_proc(const std::string &std_out_path, KernelProcess *&result);
-            ReturnCode create_native_process(const std::string &std_out_path, const std::string &name, const User *user, NativeProcess *&result);
+            ReturnCode create_native_process(const std::string &std_out_path, const std::string &name, const User *user, IProcess *&result);
 
             ReturnCode create_lua_process(const std::string &std_out_path, const User *user, LuaProcess *&result);
 
@@ -61,5 +61,7 @@ namespace loss
             IProcess *_current_process;
 
             void add_process(IProcess *proc);
+
+            IProcess *create_native_process(const std::string &name, const User *user, uint32_t id);
     };
 }

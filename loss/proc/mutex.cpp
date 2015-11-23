@@ -1,5 +1,6 @@
 #include "mutex.h"
 
+#include "../kernel.h"
 #include "../kernel_manager.h"
 #include "iprocess.h"
 
@@ -7,9 +8,10 @@ namespace loss
 {
     uint32_t Mutex::s_id_counter = 0u;
 
-    Mutex::Mutex() :
+    Mutex::Mutex(Kernel *kernel) :
         _id(next_id()),
-        _locked(false)
+        _locked(false),
+        _kernel(kernel)
     {
 
     }
@@ -18,9 +20,8 @@ namespace loss
     {
         while (_locked)
         {
-            auto *kernel = KernelManager::get_current_kernel();
-            auto *proc = kernel->process_manager().current_process();
-            kernel->process_manager().add_blocked_process(_id, proc);
+            auto *proc = _kernel->process_manager().current_process();
+            _kernel->process_manager().add_blocked_process(_id, proc);
             proc->yield();
         }
         _locked = true;
@@ -29,8 +30,7 @@ namespace loss
     {
         if (_locked)
         {
-            auto *kernel = KernelManager::get_current_kernel();
-            kernel->process_manager().notify_one_blocked_process(_id);
+            _kernel->process_manager().notify_one_blocked_process(_id);
             _locked = false;
         }
     }

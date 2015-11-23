@@ -37,14 +37,14 @@ namespace loss
             return result;
         }
     
-        _tty_device = new StreamDevice();
+        _tty_device = new StreamDevice(this);
         result = _vfs.create_char_device("/dev/tty0", _tty_device);
         if (result != SUCCESS)
         {
             return result;
         }
 
-        _keyboard = new StreamDevice();
+        _keyboard = new StreamDevice(this);
         result = _vfs.create_char_device("/dev/kb0", _keyboard);
         if (result != SUCCESS)
         {
@@ -98,6 +98,12 @@ namespace loss
         }
 
         proc_result = _process_manager.create_process_from_file("/etc/long_proc.lua", "/dev/tty0", _root_user, proc);
+        if (proc_result != SUCCESS)
+        {
+            return proc_result;
+        }
+
+        proc_result = _process_manager.create_native_process("/dev/tty0", "term", _root_user, proc);
         if (proc_result != SUCCESS)
         {
             return proc_result;

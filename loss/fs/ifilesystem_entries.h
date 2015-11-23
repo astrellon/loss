@@ -13,6 +13,7 @@ namespace loss
 {
     class IFileSystem;
     class IProcess;
+    class Kernel;
 
     class IEntry
     {
@@ -83,12 +84,22 @@ namespace loss
     class ICharacterDevice
     {
         public:
+            ICharacterDevice(Kernel *kernel);
+
             virtual uint32_t size() const = 0;
             virtual IOResult read(uint32_t offset, uint32_t count, uint8_t *buffer) = 0;
             virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data) = 0;
 
             virtual IOResult read_string(std::stringstream &buffer);
             virtual IOResult write_string(const std::string &data);
+
+            inline Kernel *kernel() const
+            {
+                return _kernel;
+            }
+
+        private:
+            Kernel *_kernel;
     };
 
     class CharacterDeviceEntry : public IEntry
