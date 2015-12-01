@@ -1,20 +1,16 @@
 #pragma once
 
-#include <stdint.h>
+#include "isync.h"
 
 namespace loss
 {
     class Kernel;
 
-    class Mutex
+    class Mutex : public ISync
     {
         public:
             Mutex(Kernel *kernel);
 
-            inline uint32_t id() const
-            {
-                return _id;
-            }
             inline bool is_locked() const
             {
                 return _locked;
@@ -26,17 +22,11 @@ namespace loss
 
             void try_get_lock();
             void unlock();
+            void wait();
 
         private:
-            Kernel *_kernel;
             uint32_t _id;
             bool _locked;
-            
-            static uint32_t s_id_counter;
-            inline static uint32_t next_id()
-            {
-                return ++s_id_counter;
-            }
 
     };
 }

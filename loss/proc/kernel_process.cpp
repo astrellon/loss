@@ -14,6 +14,10 @@ namespace loss
 
     int32_t KernelProcess::run_impl()
     {
+        while (true)
+        {
+            yield();
+        }
         return 0;
     }
 }

@@ -6,12 +6,9 @@
 
 namespace loss
 {
-    uint32_t Mutex::s_id_counter = 0u;
-
     Mutex::Mutex(Kernel *kernel) :
-        _id(next_id()),
-        _locked(false),
-        _kernel(kernel)
+        ISync(kernel),
+        _locked(false)
     {
 
     }
@@ -20,9 +17,7 @@ namespace loss
     {
         while (_locked)
         {
-            auto *proc = _kernel->process_manager().current_process();
-            _kernel->process_manager().add_blocked_process(_id, proc);
-            proc->yield();
+            wait();
         }
         _locked = true;
     }
@@ -30,8 +25,14 @@ namespace loss
     {
         if (_locked)
         {
-            _kernel->process_manager().notify_one_blocked_process(_id);
+            kernel()->process_manager().notify_one_blocked_process(_id);
             _locked = false;
         }
+    }
+    void Mutex::wait()
+    {
+        auto *proc = kernel()->process_manager().current_process();
+        kernel()->process_manager().add_blocked_process(_id, proc);
+        proc->yield();
     }
 }

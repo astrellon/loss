@@ -5,6 +5,8 @@
 #include "fs/ram_filesystem.h"
 #include "fs/proc_filesystem.h"
 
+#include "kernel_stream.h"
+
 #include <sstream>
 
 namespace loss
@@ -37,14 +39,15 @@ namespace loss
             return result;
         }
     
-        _tty_device = new StreamDevice(this);
+        _tty_device = new KernelStream(this);
         result = _vfs.create_char_device("/dev/tty0", _tty_device);
         if (result != SUCCESS)
         {
             return result;
         }
 
-        _keyboard = new StreamDevice(this);
+        //_keyboard = new KeyboardDriver(this, "/dev/kb0");
+        _keyboard = new KernelStream(this);
         result = _vfs.create_char_device("/dev/kb0", _keyboard);
         if (result != SUCCESS)
         {
@@ -103,11 +106,13 @@ namespace loss
             return proc_result;
         }
 
+        /*
         proc_result = _process_manager.create_native_process("/dev/tty0", "term", _root_user, proc);
         if (proc_result != SUCCESS)
         {
             return proc_result;
         }
+        */
 
         run();
 
@@ -164,7 +169,11 @@ namespace loss
     {
         return _kernel_proc;
     }
-    StreamDevice *Kernel::keyboard() const
+    KernelStream *Kernel::tty_device() const
+    {
+        return _tty_device;
+    }
+    KernelStream *Kernel::keyboard() const
     {
         return _keyboard;
     }
@@ -173,6 +182,7 @@ namespace loss
     {
         std::stringstream ss;
         ss << "[ " << (success ? "SUCCESS" : "FAIL") << " ] " << message << '\n';
-        _tty_device->write(0, ss.str().size(), (const uint8_t *)(ss.str().c_str()));
+        //_tty_device->write(0, ss.str().size(), (const uint8_t *)(ss.str().c_str()));
+        std::cout << ss.str();
     }
 }

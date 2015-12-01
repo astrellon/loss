@@ -3,13 +3,12 @@
 #undef val_
 #include <boost/coroutine/all.hpp>
 
-#include "../kernel.h"
-
 #include "kernel_process.h"
+#include "../kernel.h"
+#include "../terminal_emulator.h"
 
 #include <sstream>
-
-#include "../terminal_emulator.h"
+#include <thread>
 
 namespace loss
 {
@@ -194,28 +193,41 @@ namespace loss
         {
             auto proc = _process_queue.front();
             _current_process = proc;
+                    
+            std::stringstream msg;
+            msg << "Running process; " << proc->info().name() << "\n";
+            //std::cout << msg.str();
+            //_kernel->tty_device()->write_string(msg.str());
 
             _process_queue.pop();
 
             proc->finish_time = IProcess::ClockType::now() + std::chrono::microseconds(100); 
 
-            if (!proc->is_running())
+            if (proc->status() == IProcess::NotRunning)
             {
                 proc->run();
             }
-            else
+            else if (proc->status() == IProcess::Idle)
             {
                 proc->resume();
             }
 
-            if (proc->is_active())
+            if (proc->status() == IProcess::Running || proc->status() == IProcess::Idle)
             {
                 _process_queue.push(proc);
             }
 
             if (_process_queue.size() == 0u)
             {
-                _running = false;
+                if (_process_blocked_map.empty())
+                {
+                    _running = false;
+                }
+                else
+                {
+                    _kernel->tty_device()->write_string("-- Waiting for blocked process");
+                    std::this_thread::sleep_for(std::chrono::microseconds(100));
+                }
             }
 
         }
@@ -238,6 +250,7 @@ namespace loss
             
     void ProcessManager::add_blocked_process(uint32_t block_id, IProcess *proc)
     {
+        proc->status(IProcess::Blocked);
         _process_blocked_map[block_id].push(proc);
     }
     void ProcessManager::notify_one_blocked_process(uint32_t block_id)
@@ -248,7 +261,10 @@ namespace loss
             return;
         }
 
-        _process_queue.push(find->second.front());
+        auto proc = find->second.front();
+        std::cout << "Waking up: " << proc->info().name() << "\n";
+        proc->status(IProcess::Idle);
+        _process_queue.push(proc);
         find->second.pop();
 
         if (find->second.empty())
@@ -266,7 +282,9 @@ namespace loss
 
         while (!find->second.empty())
         {
-            _process_queue.push(find->second.front());
+            auto proc = find->second.front();
+            proc->status(IProcess::Idle);
+            _process_queue.push(proc);
             find->second.pop();
         }
         

@@ -1,4 +1,4 @@
-    #include "iprocess.h"
+#include "iprocess.h"
 
 #include "../user.h"
 #include "../kernel.h"
@@ -8,28 +8,26 @@ namespace loss
 {
     IProcess::IProcess(const std::string &name, const User *user, uint32_t id, Kernel *kernel) :
         _info(name, user, id, kernel),
-        _active(true),
-        _running(false)
+        _status(NotRunning)
     {
 
     }
 
     void IProcess::run()
     {
-        _active = true;
-        _running = true;
-
-        _thread = new ThreadType
+        _status = Idle;
+        _thread = std::unique_ptr<ThreadType>(new ThreadType
         {
             [&](YieldType &yield)
             {
+                _status = Running;
+
                 _yield = &yield;
                 run_impl();
 
-                _active = false;
-                _running = false;
+                _status = Complete;
             }
-        };
+        });
     }
     int32_t IProcess::shutdown()
     {
@@ -44,12 +42,18 @@ namespace loss
     {
         (*_yield)();
     }
+
+    void IProcess::status(Status status)
+    {
+        _status = status;
+    }
             
     void IProcess::write_std_out(const std::string &message)
     {
         if (info().std_out() != nullptr)
         {
-            info().std_out()->write_string(message);
+            //info().std_out()->write_string(message);
+            std::cout << message;
         }
     }
 

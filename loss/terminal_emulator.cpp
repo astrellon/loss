@@ -18,6 +18,7 @@ namespace loss
 
     TerminalEmulator::~TerminalEmulator()
     {
+
     }
 
     void TerminalEmulator::file_handle(FileHandle *file_handle)

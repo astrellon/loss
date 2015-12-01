@@ -3,6 +3,7 @@
 #include <string>
 #include <stdint.h>
 #include <chrono>
+#include <memory>
 
 #include "process_info.h"
 
@@ -22,6 +23,15 @@ namespace loss
             typedef boost::coroutines::asymmetric_coroutine<void>::pull_type ThreadType;
             typedef boost::coroutines::asymmetric_coroutine<void>::push_type YieldType;
 
+            enum Status
+            {
+                NotRunning,
+                Idle,
+                Running,
+                Blocked,
+                Complete
+            };
+
             void resume();
             void run();
             virtual int32_t shutdown();
@@ -36,14 +46,11 @@ namespace loss
             typedef std::chrono::steady_clock ClockType;
             std::chrono::time_point<ClockType> finish_time;
 
-            inline bool is_active() const
+            inline Status status() const
             {
-                return _active;
+                return _status;
             }
-            inline bool is_running() const
-            {
-                return _running;
-            }
+            void status(Status status);
 
             void check_for_yield();
 
@@ -54,9 +61,8 @@ namespace loss
         private:
 
             ProcessInfo _info;
-            ThreadType *_thread;
+            std::unique_ptr<ThreadType> _thread;
             YieldType *_yield;
-            bool _active;
-            bool _running;
+            Status _status;
     };
 }

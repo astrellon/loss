@@ -9,6 +9,7 @@
 #include "return_codes.h"
 #include "user_manager.h"
 #include "proc/process_manager.h"
+#include "driver/keyboard.h"
 
 namespace loss
 {
@@ -16,6 +17,8 @@ namespace loss
     class StreamDevice;
     class ProcFileSystem;
     class KernelProcess;
+    class KernelStream;
+    class KeyboardDriver;
 
     class Kernel
     {
@@ -46,7 +49,8 @@ namespace loss
 
             User *root_user() const;
             KernelProcess *kernel_proc() const;
-            StreamDevice *keyboard() const;
+            KernelStream *tty_device() const;
+            KernelStream *keyboard() const;
 
         private:
 
@@ -59,8 +63,9 @@ namespace loss
             ProcFileSystem *_proc_fs;
 
             RamFileSystem *_dev_fs;
-            StreamDevice *_tty_device;
-            StreamDevice *_keyboard;
+            KernelStream *_tty_device;
+            //KeyboardDriver *_keyboard;
+            KernelStream *_keyboard;
             void kernel_message(bool success, const std::string &message);
     };
 }
