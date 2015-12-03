@@ -25,14 +25,14 @@ namespace loss
     {
         if (_locked)
         {
-            kernel()->process_manager().notify_one_blocked_process(_id);
+            kernel()->process_manager().notify_one_blocked_process(id());
             _locked = false;
         }
     }
     void Mutex::wait()
     {
         auto *proc = kernel()->process_manager().current_process();
-        kernel()->process_manager().add_blocked_process(_id, proc);
+        kernel()->process_manager().add_blocked_process(id(), proc);
         proc->yield();
     }
 }

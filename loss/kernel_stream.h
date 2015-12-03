@@ -7,6 +7,7 @@
 #include "io_common.h"
 #include "return_codes.h"
 #include "proc/mutex.h"
+#include "proc/conditional_variable.h"
 #include "fs/ifilesystem_entries.h"
 
 #include <mutex>
@@ -40,6 +41,7 @@ namespace loss
 
             // Loss Kernel level
             Mutex _yield_lock;
+            ConditionalVariable _yield_cv;
     };
 
 }

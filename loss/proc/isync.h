@@ -24,7 +24,7 @@ namespace loss
             {
                 return _kernel;
             }
-            
+
         private:
 
             Kernel *_kernel;
@@ -35,5 +35,5 @@ namespace loss
             {
                 return ++s_id_counter;
             }
-    }
+    };
 }

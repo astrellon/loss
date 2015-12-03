@@ -194,11 +194,6 @@ namespace loss
             auto proc = _process_queue.front();
             _current_process = proc;
                     
-            std::stringstream msg;
-            msg << "Running process; " << proc->info().name() << "\n";
-            //std::cout << msg.str();
-            //_kernel->tty_device()->write_string(msg.str());
-
             _process_queue.pop();
 
             proc->finish_time = IProcess::ClockType::now() + std::chrono::microseconds(100); 
@@ -250,11 +245,15 @@ namespace loss
             
     void ProcessManager::add_blocked_process(uint32_t block_id, IProcess *proc)
     {
+        std::lock_guard<std::mutex> lock_guard(_mutex);
+
         proc->status(IProcess::Blocked);
         _process_blocked_map[block_id].push(proc);
     }
     void ProcessManager::notify_one_blocked_process(uint32_t block_id)
     {
+        std::lock_guard<std::mutex> lock_guard(_mutex);
+
         auto find = _process_blocked_map.find(block_id);
         if (find == _process_blocked_map.end())
         {
@@ -262,7 +261,6 @@ namespace loss
         }
 
         auto proc = find->second.front();
-        std::cout << "Waking up: " << proc->info().name() << "\n";
         proc->status(IProcess::Idle);
         _process_queue.push(proc);
         find->second.pop();
@@ -274,6 +272,8 @@ namespace loss
     }
     void ProcessManager::notify_all_blocked_processes(uint32_t block_id)
     {
+        std::lock_guard<std::mutex> lock_guard(_mutex);
+
         auto find = _process_blocked_map.find(block_id);
         if (find == _process_blocked_map.end())
         {

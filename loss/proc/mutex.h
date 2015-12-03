@@ -25,7 +25,6 @@ namespace loss
             void wait();
 
         private:
-            uint32_t _id;
             bool _locked;
 
     };

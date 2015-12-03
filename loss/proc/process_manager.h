@@ -6,6 +6,7 @@
 #include <queue>
 #include <chrono>
 #include <vector>
+#include <mutex>
 
 #include "iprocess.h"
 #include "native_process.h"
@@ -59,6 +60,7 @@ namespace loss
             ProcessQueue _process_queue;
             ProcessBlockedMap _process_blocked_map;
             IProcess *_current_process;
+            std::mutex _mutex;
 
             void add_process(IProcess *proc);
 

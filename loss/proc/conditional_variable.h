@@ -12,11 +12,11 @@ namespace loss
     class ConditionalVariable : public ISync
     {
         public:
-            ConditionalVariable(Kernel *kernel);
-
             typedef std::function<bool()> WaitCondition;
-            void wait(Mutex &mutex, WaitCondition wait_cond);
 
+            ConditionalVariable(Kernel *kernel, Mutex &lock, WaitCondition wait_cond);
+
+            void wait();
             void notify_one();
             void notify_all();
 

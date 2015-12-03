@@ -4,7 +4,11 @@ namespace loss
 {
     KernelStream::KernelStream(Kernel *kernel) :
         ICharacterDevice(kernel),
-        _yield_lock(kernel)
+        _yield_lock(kernel),
+        _yield_cv(kernel, _yield_lock, [this]()
+        {
+            return _data.size() > 0u;
+        })
     {
 
     }
@@ -54,7 +58,7 @@ namespace loss
         }
 
         _cv.notify_one();
-        _yield_lock.unlock();
+        _yield_cv.notify_one();
         return IOResult(count, SUCCESS);
     }
     IOResult KernelStream::write_threaded_string(uint32_t offset, const std::string &data)
@@ -71,15 +75,7 @@ namespace loss
             return IOResult(0, NULL_PARAMETER);
         }
 
-        _yield_lock.try_get_lock();
-        while (size() == 0u)
-        {
-            _yield_lock.unlock();
-            _yield_lock.wait();
-            _yield_lock.try_get_lock();
-        }
-        // Add Loss conditional variable
-
+        _yield_cv.wait();
         auto read_count = 0u;
         {
             std::unique_lock<std::mutex> lock_guard(_thread_lock);
@@ -116,6 +112,7 @@ namespace loss
             }
         }
 
+        _yield_cv.notify_one();
         _yield_lock.unlock();
 
         return IOResult(count, SUCCESS);

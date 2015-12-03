@@ -1,16 +1,40 @@
 #include "conditional_variable.h"
 
+#include "../kernel.h"
+
+#include <iostream>
+
 namespace loss
 {
-    ConditionalVariable::ConditionalVariable(Kernel *kernel) :
-        ISync(kernel)
+    ConditionalVariable::ConditionalVariable(Kernel *kernel, Mutex &lock, WaitCondition wait_cond) :
+        ISync(kernel),
+        _mutex(lock),
+        _wait_cond(wait_cond)
     {
 
     }
-
-    void ConditionalVariable::wait(Mutex &mutex, WaitCondition wait_cond)
+    
+    void ConditionalVariable::wait()
     {
-        _mutex = mutex;
-        _wait_cond = wait_cond;
+        _mutex.try_get_lock();
+        while (!_wait_cond())
+        {
+            _mutex.unlock();
+
+            auto proc = kernel()->process_manager().current_process();
+            kernel()->process_manager().add_blocked_process(id(), proc);
+            proc->yield();
+
+            _mutex.try_get_lock();
+        }
+    }
+
+    void ConditionalVariable::notify_one()
+    {
+        kernel()->process_manager().notify_one_blocked_process(id());
+    }
+    void ConditionalVariable::notify_all()
+    {
+        kernel()->process_manager().notify_all_blocked_processes(id());
     }
 }
