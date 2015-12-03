@@ -191,10 +191,12 @@ namespace loss
 
         while (_running)
         {
+            _mutex.lock();
             auto proc = _process_queue.front();
             _current_process = proc;
                     
             _process_queue.pop();
+            _mutex.unlock();
 
             proc->finish_time = IProcess::ClockType::now() + std::chrono::microseconds(100); 
 
@@ -207,10 +209,16 @@ namespace loss
                 proc->resume();
             }
 
+            _mutex.lock();
             if (proc->status() == IProcess::Running || proc->status() == IProcess::Idle)
             {
                 _process_queue.push(proc);
             }
+            else if (proc->status() != IProcess::Blocked)
+            {
+                std::cout << "Ending process: " << proc->info().name() << ": " << proc->status() << "\n";
+            }
+            _mutex.unlock();
 
             if (_process_queue.size() == 0u)
             {
@@ -248,7 +256,7 @@ namespace loss
         std::lock_guard<std::mutex> lock_guard(_mutex);
 
         proc->status(IProcess::Blocked);
-        _process_blocked_map[block_id].push(proc);
+        _process_blocked_map[block_id].push_back(proc);
     }
     void ProcessManager::notify_one_blocked_process(uint32_t block_id)
     {
@@ -263,7 +271,10 @@ namespace loss
         auto proc = find->second.front();
         proc->status(IProcess::Idle);
         _process_queue.push(proc);
-        find->second.pop();
+
+        std::cout << "Notify one process: " << _process_queue.size() << "\n";
+
+        find->second.pop_front();
 
         if (find->second.empty())
         {
@@ -285,7 +296,7 @@ namespace loss
             auto proc = find->second.front();
             proc->status(IProcess::Idle);
             _process_queue.push(proc);
-            find->second.pop();
+            find->second.pop_front();
         }
         
         if (find->second.empty())
