@@ -17,6 +17,7 @@
 #include <loss/fs/ram_filesystem_drive.h>
 #include <loss/terminal_emulator.h>
 #include <loss/fs/stream_device.h>
+#include <loss/kernel_stream.h>
 
 void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
 {

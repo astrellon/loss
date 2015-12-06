@@ -5,6 +5,7 @@
 
 #include "kernel_process.h"
 #include "../kernel.h"
+#include "../kernel_stream.h"
 #include "../terminal_emulator.h"
 
 #include <sstream>

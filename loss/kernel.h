@@ -9,7 +9,6 @@
 #include "return_codes.h"
 #include "user_manager.h"
 #include "proc/process_manager.h"
-#include "driver/keyboard.h"
 
 namespace loss
 {
