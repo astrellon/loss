@@ -53,6 +53,8 @@ namespace loss
                 return _current_process;
             }
 
+            bool is_running() const;
+
         private:
             Kernel *_kernel;
             uint32_t _id_count;

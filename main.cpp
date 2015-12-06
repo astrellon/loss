@@ -83,11 +83,21 @@ int main(int argc, char **argv)
         return 0;
     }, kernel);
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    kernel->keyboard()->write_threaded_string(0, "Hello from keyboard\n");
+    std::thread keyboard_thread([] (loss::Kernel *kernel)
+    {
+        while (kernel->is_running())
+        {
+            std::string input;
+            std::cin >> input;
+            input += "\n";
+            kernel->keyboard()->write_threaded_string(0, input);
+        }
+        std::cout << "Keyboard thread done\n";
+    }, kernel);
 
     //term_thread.join();
     kernel_thread.join();
+    keyboard_thread.join();
 
     output_folder(vfs, "/proc");
 

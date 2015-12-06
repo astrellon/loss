@@ -32,6 +32,7 @@ namespace loss
             ReturnCode run();
 
             uint32_t id() const;
+            bool is_running() const;
 
             // Running processes
             // File system
@@ -55,6 +56,7 @@ namespace loss
         private:
 
             uint32_t _id;
+            bool _running;
             VirtualFileSystem _vfs;
             ProcessManager _process_manager;
             UserManager _user_manager;

@@ -272,8 +272,6 @@ namespace loss
         proc->status(IProcess::Idle);
         _process_queue.push(proc);
 
-        std::cout << "Notify one process: " << _process_queue.size() << "\n";
-
         find->second.pop_front();
 
         if (find->second.empty())
@@ -312,5 +310,10 @@ namespace loss
             return new TerminalEmulator(user, id, _kernel);
         }
         return nullptr;
+    }
+
+    bool ProcessManager::is_running() const
+    {
+        return _running;
     }
 }

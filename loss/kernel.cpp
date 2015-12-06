@@ -13,6 +13,7 @@ namespace loss
 {
     Kernel::Kernel(uint32_t id) :
         _id(id),
+        _running(false),
         _process_manager(this),
         _dev_fs(nullptr),
         _tty_device(nullptr),
@@ -88,6 +89,7 @@ namespace loss
             return result; 
         }
         kernel_message(true, "Created proc filesystem");
+        _running = true;
 
         return SUCCESS;
     }
@@ -126,12 +128,18 @@ namespace loss
     {
         _process_manager.run();
 
+        _running = false;
+
         return SUCCESS;
     }
 
     uint32_t Kernel::id() const
     {
         return _id;
+    }
+    bool Kernel::is_running() const
+    {
+        return _running;
     }
 
     VirtualFileSystem &Kernel::virtual_file_system()

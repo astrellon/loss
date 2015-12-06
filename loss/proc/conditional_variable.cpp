@@ -23,10 +23,8 @@ namespace loss
 
             auto proc = kernel()->process_manager().current_process();
             kernel()->process_manager().add_blocked_process(id(), proc);
-            std::cout << "Sleeping condition variable\n";
             proc->yield();
 
-            std::cout << "Waking up from conditon variable\n";
             _mutex.try_get_lock();
         }
     }
