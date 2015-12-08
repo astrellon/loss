@@ -52,8 +52,8 @@ namespace loss
     {
         if (info().std_out() != nullptr)
         {
-            //info().std_out()->write_string(message);
-            std::cout << message;
+            info().std_out()->write_string(message);
+            //std::cout << message;
         }
     }
 
@@ -62,7 +62,6 @@ namespace loss
         auto now = ClockType::now();
         if (now > finish_time)
         {
-            //write_std_out("---Yielded---\n");
             yield();
         }
     }

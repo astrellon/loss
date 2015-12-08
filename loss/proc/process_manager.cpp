@@ -39,34 +39,7 @@ namespace loss
 
         return SUCCESS;
     }
-    /*
-    ReturnCode ProcessManager::create_native_process(const std::string &std_out_path, const std::string &name, const User *user, NativeProcess *& result)
-    {
-        if (name.empty())
-        {
-            return NULL_PARAMETER;
-        }
 
-        auto id = ++_id_count;
-        
-        FileHandle *std_out_handle = nullptr;
-        if (std_out_path.size() > 0u)
-        {
-            auto open_result = _kernel->virtual_file_system().open(id, std_out_path, FileHandle::READ, std_out_handle);
-            if (open_result != SUCCESS)
-            {
-                return open_result;
-            }
-        }
-
-        auto process = new NativeProcess(name, user, id, _kernel);
-        add_process(process);
-        result = process;
-        process->info().std_out(std_out_handle);
-
-        return SUCCESS;
-    }
-    */
     ReturnCode ProcessManager::create_native_process(const std::string &std_out_path, const std::string &name, const User *user, IProcess *& result)
     {
         if (name.empty())
@@ -210,16 +183,16 @@ namespace loss
                 proc->resume();
             }
 
-            _mutex.lock();
             if (proc->status() == IProcess::Running || proc->status() == IProcess::Idle)
             {
                 _process_queue.push(proc);
             }
             else if (proc->status() != IProcess::Blocked)
             {
-                std::cout << "Ending process: " << proc->info().name() << ": " << proc->status() << "\n";
+                std::stringstream msg;
+                msg << "Ending process: " << proc->info().name() << ": " << proc->status() << "\n";
+                _kernel->tty_device()->write_string(msg.str());
             }
-            _mutex.unlock();
 
             if (_process_queue.size() == 0u)
             {
@@ -229,7 +202,7 @@ namespace loss
                 }
                 else
                 {
-                    _kernel->tty_device()->write_string("-- Waiting for blocked process");
+                    _kernel->tty_device()->write_string("-- Waiting for blocked process\n");
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
             }

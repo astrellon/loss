@@ -22,7 +22,6 @@ namespace loss
 
             void try_get_lock();
             void unlock();
-            void wait();
 
         private:
             bool _locked;

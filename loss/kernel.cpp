@@ -108,13 +108,11 @@ namespace loss
             return proc_result;
         }
 
-        /*
         proc_result = _process_manager.create_native_process("/dev/tty0", "term", _root_user, proc);
         if (proc_result != SUCCESS)
         {
             return proc_result;
         }
-        */
 
         run();
 
@@ -190,7 +188,6 @@ namespace loss
     {
         std::stringstream ss;
         ss << "[ " << (success ? "SUCCESS" : "FAIL") << " ] " << message << '\n';
-        //_tty_device->write(0, ss.str().size(), (const uint8_t *)(ss.str().c_str()));
-        std::cout << ss.str();
+        _tty_device->write(0, ss.str().size(), (const uint8_t *)(ss.str().c_str()));
     }
 }

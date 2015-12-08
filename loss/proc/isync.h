@@ -25,6 +25,10 @@ namespace loss
                 return _kernel;
             }
 
+        protected:
+
+            void wait_current_process();
+
         private:
 
             Kernel *_kernel;

@@ -1,7 +1,6 @@
 #include "mutex.h"
 
 #include "../kernel.h"
-#include "../kernel_manager.h"
 #include "iprocess.h"
 
 namespace loss
@@ -17,7 +16,7 @@ namespace loss
     {
         while (_locked)
         {
-            wait();
+            wait_current_process();
         }
         _locked = true;
     }
@@ -25,14 +24,8 @@ namespace loss
     {
         if (_locked)
         {
-            kernel()->process_manager().notify_one_blocked_process(id());
             _locked = false;
+            kernel()->process_manager().notify_one_blocked_process(id());
         }
-    }
-    void Mutex::wait()
-    {
-        auto *proc = kernel()->process_manager().current_process();
-        kernel()->process_manager().add_blocked_process(id(), proc);
-        proc->yield();
     }
 }

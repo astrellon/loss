@@ -6,9 +6,8 @@
 
 namespace loss
 {
-    ConditionalVariable::ConditionalVariable(Kernel *kernel, Mutex &lock, WaitCondition wait_cond) :
+    ConditionalVariable::ConditionalVariable(Kernel *kernel, WaitCondition wait_cond) :
         ISync(kernel),
-        _mutex(lock),
         _wait_cond(wait_cond)
     {
 
@@ -16,16 +15,9 @@ namespace loss
     
     void ConditionalVariable::wait()
     {
-        _mutex.try_get_lock();
         while (!_wait_cond())
         {
-            _mutex.unlock();
-
-            auto proc = kernel()->process_manager().current_process();
-            kernel()->process_manager().add_blocked_process(id(), proc);
-            proc->yield();
-
-            _mutex.try_get_lock();
+            wait_current_process();
         }
     }
 

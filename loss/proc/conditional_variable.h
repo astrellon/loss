@@ -1,7 +1,6 @@
 #pragma once
 
 #include "isync.h"
-#include "mutex.h"
 
 #include <functional>
 
@@ -14,7 +13,7 @@ namespace loss
         public:
             typedef std::function<bool()> WaitCondition;
 
-            ConditionalVariable(Kernel *kernel, Mutex &lock, WaitCondition wait_cond);
+            ConditionalVariable(Kernel *kernel, WaitCondition wait_cond);
 
             void wait();
             void notify_one();
@@ -22,7 +21,6 @@ namespace loss
 
         private:
 
-            Mutex &_mutex;
             WaitCondition _wait_cond;
 
     };

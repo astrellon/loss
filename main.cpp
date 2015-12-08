@@ -3,10 +3,8 @@
 #include <string>
 #include <fstream>
 #include <thread>
-#include <mutex>
 #include <sstream>
 #include <chrono>
-#include <condition_variable>
 
 #include <loss/kernel.h>
 #include <loss/kernel_manager.h>
@@ -15,8 +13,6 @@
 #include <loss/return_codes.h>
 #include <loss/fs/path.h>
 #include <loss/fs/ram_filesystem_drive.h>
-#include <loss/terminal_emulator.h>
-#include <loss/fs/stream_device.h>
 #include <loss/kernel_stream.h>
 
 void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)

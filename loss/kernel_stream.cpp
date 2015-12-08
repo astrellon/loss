@@ -5,7 +5,7 @@ namespace loss
     KernelStream::KernelStream(Kernel *kernel) :
         ICharacterDevice(kernel),
         _yield_lock(kernel),
-        _yield_cv(kernel, _yield_lock, [this]()
+        _yield_cv(kernel, [this]()
         {
             return _data.size() > 0u;
         })
@@ -91,7 +91,6 @@ namespace loss
 
             _data.erase(_data.begin(), _data.begin() + read_count);
         }
-        _yield_lock.unlock();
 
         return IOResult(read_count, SUCCESS);
     }
@@ -102,18 +101,13 @@ namespace loss
             return IOResult(0, NULL_PARAMETER);
         }
 
-        _yield_lock.try_get_lock();
-
+        std::lock_guard<std::mutex> lock_guard(_thread_lock);
+        for (auto i = 0; i < count; i++)
         {
-            std::lock_guard<std::mutex> lock_guard(_thread_lock);
-            for (auto i = 0; i < count; i++)
-            {
-                _data.push_back(data[i]);
-            }
+            _data.push_back(data[i]);
         }
 
         _yield_cv.notify_one();
-        _yield_lock.unlock();
 
         return IOResult(count, SUCCESS);
     }
