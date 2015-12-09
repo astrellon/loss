@@ -185,7 +185,9 @@ namespace loss
 
             if (proc->status() == IProcess::Running || proc->status() == IProcess::Idle)
             {
+                _mutex.lock();
                 _process_queue.push(proc);
+                _mutex.unlock();
             }
             else if (proc->status() != IProcess::Blocked)
             {
