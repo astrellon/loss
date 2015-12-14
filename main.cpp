@@ -6,6 +6,18 @@
 #include <sstream>
 #include <chrono>
 
+#ifdef _WIN32
+extern "C"
+{
+#   include <pdcurses/curses.h>
+}
+#else
+extern "C"
+{
+#   include <ncurses.h>
+}
+#endif
+
 #include <loss/kernel.h>
 #include <loss/kernel_manager.h>
 #include <loss/fs/virtual_fileystem.h>

@@ -32,6 +32,16 @@ namespace loss
             virtual IOResult write(uint32_t offset, uint32_t count, const uint8_t *data);
             virtual uint32_t size() const;
 
+            enum BlockingMode
+            {
+                LineBlock,
+                CharBlock,
+                NoBlock
+            };
+
+            void blocking_mode(BlockingMode mode);
+            BlockingMode blocking_mode() const;
+
         private:
             std::vector<uint8_t> _data;
 
@@ -42,6 +52,9 @@ namespace loss
             // Loss Kernel level
             Mutex _yield_lock;
             ConditionalVariable _yield_cv;
+            BlockingMode _blocking_mode;
+
+
     };
 
 }

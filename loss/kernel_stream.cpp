@@ -7,8 +7,23 @@ namespace loss
         _yield_lock(kernel),
         _yield_cv(kernel, [this]()
         {
-            return _data.size() > 0u;
-        })
+            if (_blocking_mode == CharBlock)
+            {
+                return _data.size() > 0u;
+            }
+            else
+            {
+                for (auto i = 0u; i < _data.size(); i++)
+                {
+                    if (_data[i] == '\n')
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }),
+        _blocking_mode(LineBlock)
     {
 
     }
@@ -73,6 +88,11 @@ namespace loss
         if (buffer == nullptr)
         {
             return IOResult(0, NULL_PARAMETER);
+        }
+
+        if (_blocking_mode == NoBlock && _data.size() == 0u)
+        {
+            return IOResult(0, SUCCESS);
         }
 
         _yield_cv.wait();
