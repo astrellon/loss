@@ -223,3 +223,69 @@ Total 37 bytes
 \x06            -- create_element
 \x1C t          -- type
 \x05 0x01
+
+Test protocol Mk II
+-------------------
+
+Null            -- 0x00
+Short Byte      -- 0xX1 (X = value)
+Short UByte     -- 0xX2 (X = value)
+Var int         -- 0xX3 (X = number of bytes)
+Var uint        -- 0xX4 (X = number of bytes)
+Short string    -- 0xX5 (length of string)
+String          -- 0x06
+Float           -- 0x07 0x15 (double)
+Boolean         -- 0x08 (false) 0x18 (true)
+Short Array     -- 0xX9 (X = num of elements)
+Array           -- 0x0A
+Short Object    -- 0xXB (X = num of elements)
+Object          -- 0x0C
+Short ByteArray -- 0xXD (X = num of elements)
+ByteArray       -- 0x0E
+
+
+L\x01
+\x12            -- One command
+\x01            -- connect_monitor
+\x22            -- Two parameters
+\x15 w          -- width
+\x24 \x01\x40   -- 320 uint
+\x15 h          -- height
+\x14 \xF0       -- 240 uint
+Total bytes 14
+
+
+L\x01
+\x22            -- Two commands
+\x02            -- create_desktop
+\x22            -- num params
+\x15 d          -- desktop id
+\x05
+\x15 m          -- monitor id
+\x05
+
+\x03            -- create_window
+\x42            -- num params
+\x15 d          -- desktop id
+\x05
+\x15 i          -- window id
+\x05
+\x15 w          -- width
+\x24 \x01\x40
+\x15 h          -- height
+\x14 \xF0
+Total 28 bytes
+
+Assume fixed
+
+\x01            -- Version
+\x22            -- Two commands
+\x02            -- create_desktop
+\x05            -- desktop id
+\x05            -- monitor id
+\x03            -- create_monitor
+\x05            -- desktop id
+\x05            -- window id
+\x24 \x01\x40   -- width
+\x14 \xF0       -- height
+Total 13 bytes
