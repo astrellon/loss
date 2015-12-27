@@ -2,6 +2,7 @@
 
 namespace loss
 {
+    // Input {{{
     DisplaySerialiser &DisplaySerialiser::operator % (uint8_t value)
     {
         _data.push_back(value);
@@ -66,6 +67,17 @@ namespace loss
         return *this;
     }
 
+    DisplaySerialiser &DisplaySerialiser::operator<< (float value)
+    {
+        auto bytes = reinterpret_cast<uint8_t *>(&value);
+        _data.push_back(0x07);
+        _data.push_back(bytes[0]);
+        _data.push_back(bytes[1]);
+        _data.push_back(bytes[2]);
+        _data.push_back(bytes[3]);
+        return *this;
+    }
+
     DisplaySerialiser &DisplaySerialiser::operator << (bool value)
     {
         _data.push_back(value ? 0x18 : 0x08);
@@ -98,6 +110,14 @@ namespace loss
         }
         return *this;
     }
+    // }}}
+    
+    // Output {{{
+    DisplaySerialiser &DisplaySerialiser::operator>>(uint32_t &output)
+    {
+        return *this;
+    }
+    // }}}
 
     const std::vector<uint8_t> &DisplaySerialiser::data() const
     {

@@ -12,11 +12,18 @@ namespace loss
             DisplaySerialiser &operator % (uint8_t value);
             DisplaySerialiser &operator << (int32_t value);
             DisplaySerialiser &operator << (uint32_t value);
+            DisplaySerialiser &operator << (float value);
 
             DisplaySerialiser &operator << (bool value);
 
             DisplaySerialiser &operator << (const char *name);
             DisplaySerialiser &operator << (const std::string &name);
+
+            DisplaySerialiser &operator >> (uint32_t &output);
+            DisplaySerialiser &operator >> (int32_t &output);
+            DisplaySerialiser &operator >> (float &output);
+            DisplaySerialiser &operator >> (bool value);
+            DisplaySerialiser &operator >> (std::string &output);
 
             const std::vector<uint8_t> &data() const;
 

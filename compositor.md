@@ -234,7 +234,7 @@ Var int         -- 0xX3 (X = number of bytes)
 Var uint        -- 0xX4 (X = number of bytes)
 Short string    -- 0xX5 (length of string)
 String          -- 0x06
-Float           -- 0x07 0x15 (double)
+Float           -- 0x07 0x17 (double)
 Boolean         -- 0x08 (false) 0x18 (true)
 Short Array     -- 0xX9 (X = num of elements)
 Array           -- 0x0A
