@@ -48,23 +48,6 @@ void output_folder(loss::VirtualFileSystem &vfs, const std::string &name)
 
 int main(int argc, char **argv)
 {
-    loss::DisplaySerialiser output;
-    output % 0x01u;
-    output << 0x02u;
-    output % 0x02u;
-    output << 0x00u;
-    output << 0x00u;
-    output % 0x03u;
-    output << 0x00u;
-    output << 0x00u;
-    output << 320u;
-    output << 240u;
-    output << "Hi";
-    output << "What is up my good friend?";
-    output.display();
-
-    return 0;
-
     auto kernel = loss::KernelManager::create_new_kernel();
 
     auto &vfs = kernel->virtual_file_system();

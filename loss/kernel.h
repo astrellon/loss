@@ -65,7 +65,6 @@ namespace loss
 
             RamFileSystem *_dev_fs;
             KernelStream *_tty_device;
-            //KeyboardDriver *_keyboard;
             KernelStream *_keyboard;
             void kernel_message(bool success, const std::string &message);
     };
