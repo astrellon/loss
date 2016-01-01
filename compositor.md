@@ -289,3 +289,17 @@ Assume fixed
 \x24 \x01\x40   -- width
 \x14 \xF0       -- height
 Total 13 bytes
+
+Current classes
+---------------
+
+Monitor:        -- Represents a connected screen (represented in pixels)
+Desktop:        -- Represents an area in virtual space (represented in floating point)
+DisplayObject:  -- Top level graphical object, has a bounding box and position
+
+DisplayObject subclasses
+- Label
+- Button
+- Text input
+- Image
+- 3D context (OpenGL context?)
