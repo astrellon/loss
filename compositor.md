@@ -302,5 +302,26 @@ DisplayObject types
 - Button
 - Text input
 - Image
+- Containers
 - 3D context (OpenGL context?)
 
+- Value object (label, button, checkbox, radio button, input box)
+
+
+UIElements
+- CSS classes
+- Value source
+- Parent
+
+UI States
+- Idle, hover, down
+- Selected/not selected
+
+Server:
+- Defines layout
+- Gives styles
+- Updates layout
+
+Client:
+- Handles applying styles
+- Handles animating styles
