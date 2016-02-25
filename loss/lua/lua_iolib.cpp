@@ -158,6 +158,7 @@ namespace loss
     int LuaIOLib::file_write(lua_State *lua)
     {
         auto file = cast_userdata<LuaFile>(lua, 1);
+        lua_pushvalue(lua, 1);
         return g_write(lua, file->file(), 2);
     }
     int LuaIOLib::file_close(lua_State *lua)
@@ -338,7 +339,7 @@ namespace loss
     // File Write Operatings
     int LuaIOLib::g_write (lua_State *L, FileHandle *file, int arg) 
     {
-        int nargs = lua_gettop(L) - 1;
+        int nargs = lua_gettop(L) - arg;
         int status = 1;
         for (; nargs--; arg++) {
             size_t l;
