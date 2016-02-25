@@ -208,7 +208,6 @@ namespace loss
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
             }
-
         }
     }
 
@@ -291,5 +290,9 @@ namespace loss
     bool ProcessManager::is_running() const
     {
         return _running;
+    }
+    void ProcessManager::shutdown()
+    {
+        _running = false;
     }
 }

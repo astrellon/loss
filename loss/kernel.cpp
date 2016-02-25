@@ -120,6 +120,9 @@ namespace loss
     }
     ReturnCode Kernel::shutdown()
     {
+        _running = false;
+        _process_manager.shutdown();
+
         return SUCCESS;
     }
     ReturnCode Kernel::run()

@@ -38,6 +38,7 @@ namespace loss
             static void add_file_lib(lua_State *lua);
             static int file_read(lua_State *lua);
             static int file_write(lua_State *lua);
+            static int file_close(lua_State *lua);
             static int file_gc(lua_State *lua);
             static int file_tostring(lua_State *lua);
 
@@ -48,6 +49,8 @@ namespace loss
             static int read_chars (lua_State *lua, FileHandle *file, size_t n);
             static void read_all (lua_State *lua, FileHandle *file);
             static int read_number (lua_State *lua, FileHandle *file);
+            
+            static int g_write(lua_State *lua, FileHandle *file, int first);
     };
 
 }

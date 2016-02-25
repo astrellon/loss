@@ -95,7 +95,23 @@ namespace loss
         vfs.open(info.id(), filename, file_mode, handle);
         if (handle == nullptr)
         {
-            return luaL_fileresult(lua, 0, filename);
+            if ((file_mode & (FileHandle::WRITE | FileHandle::APPEND)) > 0)
+            {
+                if (vfs.create_file(filename) != ReturnCode::SUCCESS)
+                {
+                    return luaL_fileresult(lua, 0, filename);
+                }
+
+                vfs.open(info.id(), filename, file_mode, handle);
+                if (handle == nullptr)
+                {
+                    return luaL_fileresult(lua, 0, filename);
+                }
+            }
+            else
+            {
+                return luaL_fileresult(lua, 0, filename);
+            }
         }
         
         auto result = new LuaFile();
@@ -119,6 +135,7 @@ namespace loss
     {
         {"read", file_read},
         {"write", file_write},
+        {"close", file_close},
         {"__gc", file_gc},
         {"__tostring", file_tostring},
         {NULL, NULL}
@@ -141,6 +158,12 @@ namespace loss
     int LuaIOLib::file_write(lua_State *lua)
     {
         auto file = cast_userdata<LuaFile>(lua, 1);
+        return g_write(lua, file->file(), 2);
+    }
+    int LuaIOLib::file_close(lua_State *lua)
+    {
+        auto file = cast_userdata<LuaFile>(lua, 1);
+        file->file()->close();
         return 0;
     }
     int LuaIOLib::file_gc(lua_State *lua)
@@ -166,6 +189,8 @@ namespace loss
         }
         return 1;
     }
+
+    // File Read Operatings {{{
     int LuaIOLib::g_read (lua_State *lua, FileHandle *file, int first) 
     {
         auto process = proc(lua);
@@ -308,7 +333,33 @@ namespace loss
             return 0;  /* read fails */
         }
     }
+    // }}}
+    
+    // File Write Operatings
+    int LuaIOLib::g_write (lua_State *L, FileHandle *file, int arg) 
+    {
+        int nargs = lua_gettop(L) - 1;
+        int status = 1;
+        for (; nargs--; arg++) {
+            size_t l;
+            const char *s = luaL_checklstring(L, arg, &l);
+            if (status != 1)
+            {
+                continue;
+            }
 
+            auto result = file->write(l, (const uint8_t *)s);
+            if (result.status() != ReturnCode::SUCCESS)
+            {
+                status = (int)result.status();
+                break;
+            }
+        }
+        if (status) return 1;  /* file handle already on stack top */
+        else return luaL_fileresult(L, status, NULL);
+    }
+    // }}}
+    
     // }}}
 
 }

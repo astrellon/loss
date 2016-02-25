@@ -66,21 +66,6 @@ int main(int argc, char **argv)
         return -1;
     }
     
-    /*
-    std::thread term_thread([] (loss::Kernel *kernel)
-    {
-        loss::TerminalEmulator renderer;
-        loss::FileHandle *handle = nullptr;
-        auto &vfs = kernel->virtual_file_system();
-
-        auto result = vfs.open(1u, "/dev/tty0", loss::FileHandle::WRITE | loss::FileHandle::READ, handle);
-        renderer.kernel(kernel);
-        renderer.file_handle(handle);
-
-        renderer.render();
-    }, kernel);
-    */
-    
     std::thread kernel_thread([] (loss::Kernel *kernel)
     {
         auto result = kernel->boot();
@@ -99,13 +84,17 @@ int main(int argc, char **argv)
         {
             std::string input;
             std::cin >> input;
+            if (input == "end")
+            {
+                kernel->shutdown();
+                break;
+            }
             input += "\n";
             kernel->keyboard()->write_threaded_string(0, input);
         }
         std::cout << "Keyboard thread done\n";
     }, kernel);
 
-    //term_thread.join();
     kernel_thread.join();
     keyboard_thread.join();
 
@@ -121,6 +110,7 @@ int main(int argc, char **argv)
         std::ofstream output("testout.bin");
         loss::RamFileSystemSerialise serialise(output, rootfs);
         serialise.save();
+        std::cout << "Saved hdd back to testout.bin\n";
     }
     
     return 0;

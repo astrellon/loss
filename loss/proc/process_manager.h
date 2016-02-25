@@ -54,6 +54,7 @@ namespace loss
             }
 
             bool is_running() const;
+            void shutdown();
 
         private:
             Kernel *_kernel;
