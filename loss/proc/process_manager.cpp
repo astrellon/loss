@@ -127,6 +127,10 @@ namespace loss
 
         if (!proc->load_string(file_contents.str()))
         {
+            std::string output("Failed to load script: ");
+            output += proc->get_top_error();
+            std::cout << output << std::endl;
+
             return FILE_NOT_FOUND;
         }
 

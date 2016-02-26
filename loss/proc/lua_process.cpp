@@ -23,6 +23,10 @@ namespace loss
 	{
 		return !luaL_loadstring(_lua, code.c_str());
 	}
+    std::string LuaProcess::get_top_error()
+    {
+        return std::string(lua_tostring(_lua, -1));
+    }
 
     int32_t LuaProcess::run_impl()
     {

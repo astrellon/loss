@@ -136,6 +136,7 @@ namespace loss
         {"read", file_read},
         {"write", file_write},
         {"close", file_close},
+        {"lines", file_lines},
         {"__gc", file_gc},
         {"__tostring", file_tostring},
         {NULL, NULL}
@@ -166,6 +167,60 @@ namespace loss
         auto file = cast_userdata<LuaFile>(lua, 1);
         file->file()->close();
         return 0;
+    }
+    int LuaIOLib::file_lines (lua_State *lua) {
+        int i;
+        int n = lua_gettop(lua) - 1;  /* number of arguments to read */
+        /* ensure that arguments will fit here and into 'io_readline' stack */
+        luaL_argcheck(lua, n <= LUA_MINSTACK - 3, LUA_MINSTACK - 3, "too many options");
+        lua_pushvalue(lua, 1);  /* file handle */
+        lua_pushinteger(lua, n);  /* number of arguments to read */
+        lua_pushboolean(lua, false);  /* close/not close file when finished */
+
+        for (i = 1; i <= n; i++) 
+        {
+            lua_pushvalue(lua, i + 1);  /* copy arguments */
+        }
+
+        lua_pushcclosure(lua, io_readline, 3 + n);
+        return 0;
+    }
+
+    int LuaIOLib::io_readline (lua_State *lua) {
+        auto file = cast_userdata<LuaFile>(lua, 1);
+        //LStream *p = (LStream *)lua_touserdata(L, lua_upvalueindex(1));
+        int i;
+        int n = (int)lua_tointeger(lua, lua_upvalueindex(2));
+        /*
+        if (file->fil
+            return luaL_error(lua, "file is already closed");
+        */
+        lua_settop(lua , 1);
+        for (i = 1; i <= n; i++)  /* push arguments to 'g_read' */
+        {
+            lua_pushvalue(lua, lua_upvalueindex(3 + i));
+        }
+        n = g_read(lua, file->file(), 2);  /* 'n' is number of results */
+        lua_assert(n > 0);  /* should return at least a nil */
+        if (!lua_isnil(lua, -n))  /* read at least one value? */
+        {
+            return n;  /* return them */
+        }
+        else 
+        {  /* first result is nil: EOF or error */
+            if (n > 1) 
+            {  /* is there error information? */
+                /* 2nd result is error message */
+                return luaL_error(lua, "%s", lua_tostring(lua, -n + 1));
+            }
+            if (lua_toboolean(lua, lua_upvalueindex(3))) 
+            {  /* generator created file? */
+                lua_settop(lua, 0);
+                lua_pushvalue(lua, lua_upvalueindex(1));
+                file->file()->close();
+            }
+            return 0;
+        }
     }
     int LuaIOLib::file_gc(lua_State *lua)
     {

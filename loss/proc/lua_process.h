@@ -16,6 +16,7 @@ namespace loss
             LuaProcess(const std::string &name, const User *user, uint32_t id, Kernel *kernel);
 
             bool load_string(const std::string &code);
+            std::string get_top_error();
 
             virtual int32_t shutdown();
 
