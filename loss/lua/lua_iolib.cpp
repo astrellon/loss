@@ -151,6 +151,10 @@ namespace loss
         lua_pop(lua, 1);  /* pop new metatable */
     }
 
+    static int io_readline(lua_State *lua)
+    {
+        return 0;
+    }
     int LuaIOLib::file_read(lua_State *lua)
     {
         auto file = cast_userdata<LuaFile>(lua, 1);
@@ -182,12 +186,12 @@ namespace loss
             lua_pushvalue(lua, i + 1);  /* copy arguments */
         }
 
-        lua_pushcclosure(lua, io_readline, 3 + n);
-        return 0;
+        lua_pushcclosure(lua, io_readline2, 3 + n);
+        return 1;
     }
 
-    int LuaIOLib::io_readline (lua_State *lua) {
-        auto file = cast_userdata<LuaFile>(lua, 1);
+    int LuaIOLib::io_readline2 (lua_State *lua) {
+        auto file = cast_upvalue_userdata<LuaFile>(lua, 1);
         //LStream *p = (LStream *)lua_touserdata(L, lua_upvalueindex(1));
         int i;
         int n = (int)lua_tointeger(lua, lua_upvalueindex(2));

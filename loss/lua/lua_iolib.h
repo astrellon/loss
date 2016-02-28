@@ -52,7 +52,8 @@ namespace loss
             static int read_number (lua_State *lua, FileHandle *file);
             
             static int g_write(lua_State *lua, FileHandle *file, int first);
-            static int io_readline (lua_State *lua);
+            //static int io_readline (lua_State *lua);
+            static int io_readline2 (lua_State *lua);
     };
 
 }

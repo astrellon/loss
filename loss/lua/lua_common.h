@@ -65,11 +65,22 @@ namespace loss
     {
         if (lua_type(lua, n) == LUA_TUSERDATA)
         {
-            LuaUData *udata = reinterpret_cast<LuaUData *>(lua_touserdata(lua, n));
+            auto udata = reinterpret_cast<LuaUData *>(lua_touserdata(lua, n));
             if (udata->id == T::LUA_ID)
             {
                 return reinterpret_cast<T *>(udata->ptr);
             }
+        }
+        return nullptr;
+    }
+    
+    template <class T>
+    static inline T *cast_upvalue_userdata(lua_State *lua, int n)
+    {
+        auto udata = reinterpret_cast<LuaUData *>(lua_touserdata(lua, lua_upvalueindex(n)));
+        if (udata->id == T::LUA_ID)
+        {
+            return reinterpret_cast<T *>(udata->ptr);
         }
         return nullptr;
     }
