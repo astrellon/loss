@@ -65,6 +65,8 @@ namespace loss
         auto done = false;
         while (!done)
         {
+            auto start_pos = read_position();
+
             auto result = read(64, temp);
             if (result.status() != SUCCESS)
             {
@@ -82,7 +84,8 @@ namespace loss
                     break;
                 }
             }
-            change_read_position(read_till);
+
+            read_position(start_pos + read_till);
 
             if (result.bytes() < 256)
             {
