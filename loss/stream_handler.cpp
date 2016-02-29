@@ -112,6 +112,8 @@ namespace loss
         uint8_t read_buff[64];
 
         auto has_period = false;
+        auto start_pos = read_position();
+
         while (!at_end_of_stream())
         {
             auto read_result = read(64, read_buff);
@@ -160,7 +162,7 @@ namespace loss
             num_buff[num_counter] = '\0';
             result = atof((const char*)num_buff);
 
-            change_read_position(bytes_read);
+            read_position(start_pos + bytes_read);
             return IOResult(bytes_read, SUCCESS);
         }
         return IOResult(0, INVALID_NUMBER);
