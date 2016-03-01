@@ -186,11 +186,11 @@ namespace loss
             lua_pushvalue(lua, i + 1);  /* copy arguments */
         }
 
-        lua_pushcclosure(lua, io_readline2, 3 + n);
+        lua_pushcclosure(lua, io_readline, 3 + n);
         return 1;
     }
 
-    int LuaIOLib::io_readline2 (lua_State *lua) {
+    int LuaIOLib::io_readline (lua_State *lua) {
         auto file = cast_upvalue_userdata<LuaFile>(lua, 1);
         //LStream *p = (LStream *)lua_touserdata(L, lua_upvalueindex(1));
         int i;
