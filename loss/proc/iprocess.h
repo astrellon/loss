@@ -40,6 +40,7 @@ namespace loss
             {
                 return _info;
             }
+            VirtualFileSystem &vfs();
 
             void write_std_out(const std::string &message);
             

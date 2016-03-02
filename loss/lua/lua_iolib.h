@@ -5,6 +5,7 @@
 namespace loss
 {
     class FileHandle;
+    class FolderEntry;
 
     class LuaFile
     {
@@ -21,19 +22,37 @@ namespace loss
             FileHandle *_file;
     };
 
+    class LuaFolder
+    {
+        public:
+            LuaFolder();
+
+            void folder(FolderEntry *entry);
+            FolderEntry *folder() const;
+
+            static const char *LUA_TABLENAME;
+            static int LUA_ID;
+
+        private:
+            FolderEntry *_folder;
+    };
+
     class LuaIOLib
     {
         public:
             static int add_wrappers(lua_State *lua);
 
         private:
+            // IO Lib
             static const luaL_Reg iolib[];
             static int add_io_lib(lua_State *lua);
-            static int io_close(lua_State *lua);
+            static int io_rename(lua_State *lua);
+            static int io_delete(lua_State *lua);
             static int io_open(lua_State *lua);
-            static int io_read(lua_State *lua);
-            static int io_write(lua_State *lua);
+            static int io_read_dir(lua_State *lua);
+            static int io_make_dir(lua_State *lua);
 
+            // File methods
             static const luaL_Reg filelib[];
             static void add_file_lib(lua_State *lua);
             static int file_read(lua_State *lua);
@@ -53,6 +72,10 @@ namespace loss
             
             static int g_write(lua_State *lua, FileHandle *file, int first);
             static int io_readline (lua_State *lua);
+
+            // Folder methods
+            static const luaL_Reg dirlib[];
+            static void add_dir_lib(lua_State *lua);
     };
 
 }

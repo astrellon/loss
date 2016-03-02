@@ -32,10 +32,12 @@ namespace loss
     // New IO Library {{{
     const luaL_Reg LuaIOLib::iolib[] =
     {
-        {"close", io_close},
+        {"rename", io_rename},
+        {"delete", io_delete},
+
         {"open", io_open},
-        {"read", io_read},
-        {"write", io_write},
+        {"read_dir", io_read_dir},
+        {"make_dir", io_make_dir},
         {NULL, NULL}
     };
 
@@ -47,11 +49,26 @@ namespace loss
         return 1;
     }
 
-    int LuaIOLib::io_close(lua_State *lua)
+    int LuaIOLib::io_rename(lua_State *lua)
     {
         auto process = proc(lua);
-        process->write_std_out("Close!");
-        return 0;
+        auto from = luaL_checkstring(lua, 1);
+        auto to = luaL_checkstring(lua, 2);
+
+        auto result = process->vfs().rename(std::string(from), std::string(to));
+        lua_pushinteger(lua, result);
+
+        return 1;
+    }
+    int LuaIOLib::io_delete(lua_State *lua)
+    {
+        auto process = proc(lua);
+        auto filename = luaL_checkstring(lua, 1);
+
+        auto result = process->vfs().remove_entry(filename);
+        lua_pushinteger(lua, result);
+
+        return 1;
     }
     int LuaIOLib::io_open(lua_State *lua)
     {
@@ -89,7 +106,7 @@ namespace loss
 
         auto process = proc(lua);
         auto &info = process->info();
-        auto &vfs = info.kernel()->virtual_file_system();
+        auto &vfs = info.vfs();
 
         FileHandle *handle = nullptr;
         vfs.open(info.id(), filename, file_mode, handle);
@@ -120,13 +137,19 @@ namespace loss
         wrap_object(lua, result);
         return 1;
     }
-    int LuaIOLib::io_read(lua_State *lua)
+    int LuaIOLib::io_read_dir(lua_State *lua)
     {
         return 0;
     }
-    int LuaIOLib::io_write(lua_State *lua)
+    int LuaIOLib::io_make_dir(lua_State *lua)
     {
-        return 0;
+        auto process = proc(lua);
+        auto filename = luaL_checkstring(lua, 1);
+
+        auto result = process->vfs().create_folder(filename);
+        lua_pushinteger(lua, result);
+
+        return 1;
     }
     // }}}
     
@@ -192,7 +215,6 @@ namespace loss
 
     int LuaIOLib::io_readline (lua_State *lua) {
         auto file = cast_upvalue_userdata<LuaFile>(lua, 1);
-        //LStream *p = (LStream *)lua_touserdata(L, lua_upvalueindex(1));
         int i;
         int n = (int)lua_tointeger(lua, lua_upvalueindex(2));
         /*
@@ -254,7 +276,7 @@ namespace loss
     int LuaIOLib::g_read (lua_State *lua, FileHandle *file, int first) 
     {
         auto process = proc(lua);
-        auto &vfs = process->info().kernel()->virtual_file_system();
+        auto &vfs = process->vfs();
 
         int nargs = lua_gettop(lua) - 1;
         int success;
@@ -309,7 +331,7 @@ namespace loss
     int LuaIOLib::read_line (lua_State *lua, FileHandle *file, int chop) 
     {
         auto process = proc(lua);
-        auto &vfs = process->info().kernel()->virtual_file_system();
+        auto &vfs = process->vfs();
 
         luaL_Buffer b;
         luaL_buffinit(lua, &b);
@@ -341,7 +363,7 @@ namespace loss
     int LuaIOLib::read_chars (lua_State *lua, FileHandle *file, size_t n) 
     {
         auto process = proc(lua);
-        auto &vfs = process->info().kernel()->virtual_file_system();
+        auto &vfs = process->vfs();
         
         //size_t nr;  /* number of chars actually read */
         char *p;
@@ -359,7 +381,7 @@ namespace loss
     void LuaIOLib::read_all (lua_State *lua, FileHandle *file) 
     {
         auto process = proc(lua);
-        auto &vfs = process->info().kernel()->virtual_file_system();
+        auto &vfs = process->vfs();
         
         size_t rlen = LUAL_BUFFERSIZE;  /* how much to read in each cycle */
         luaL_Buffer b;
@@ -379,7 +401,7 @@ namespace loss
     int LuaIOLib::read_number (lua_State *lua, FileHandle *file)
     {
         auto process = proc(lua);
-        auto &vfs = process->info().kernel()->virtual_file_system();
+        auto &vfs = process->vfs();
         
         double d;
         if (file->read_number(d).status() == SUCCESS)
@@ -421,5 +443,26 @@ namespace loss
     // }}}
     
     // }}}
-
+    
+    // Directory methods {{{
+    const luaL_Reg LuaIOLib::dirlib[] =
+    {
+        {"read", file_read},
+        {"write", file_write},
+        {"close", file_close},
+        {"lines", file_lines},
+        {"__gc", file_gc},
+        {"__tostring", file_tostring},
+        {NULL, NULL}
+    };
+    
+    void LuaIOLib::add_dir_lib(lua_State *lua)
+    {
+        luaL_newmetatable(lua, LuaFile::LUA_TABLENAME);
+        lua_pushvalue(lua, -1);  /* push metatable */
+        lua_setfield(lua, -2, "__index");  /* metatable.__index = metatable */
+        luaL_setfuncs(lua, filelib, 0);  /* add file methods to new metatable */
+        lua_pop(lua, 1);  /* pop new metatable */
+    }
+    // }}}
 }

@@ -48,6 +48,11 @@ namespace loss
         _status = status;
     }
             
+    VirtualFileSystem &IProcess::vfs()
+    {
+        return _info.kernel()->virtual_file_system();
+    }
+
     void IProcess::write_std_out(const std::string &message)
     {
         if (info().std_out() != nullptr)
