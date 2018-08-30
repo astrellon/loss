@@ -8,13 +8,13 @@ Aim: To be able to run many virtual kernels built to run Lua.
 
 Currently LOSS shouldn't require anything other than clang and libncurses which doesn't always come pre-installed for all distros.
 ```
-sudo apt-get install clang libncurses5-dev
+sudo apt-get install clang libncurses5-dev libboost-system1.62-dev libboost-context1.62-dev libboost-coroutine1.62-dev libfuse-dev libsfml-dev libboost1.62-dev
 ```
 
 Building should be as simple as calling
 ```
 make
-./Loss
+./LossProg <name of harddrive file>
 ```
 
 Unit testing is as simple as
@@ -26,11 +26,19 @@ make TESTING=yes
 FUSE tool
 Todo: Extend tool to be able to create empty harddrives.
 ```
-sudo apt-get install libfuse-dev
-
-make FUSE=yes
-./Lossfs <name of harddrive file> <mount folder>
+./LossFuse -d <name of harddrive file> <mount folder>
 ```
+
+## Features
+- A modified version of lua using boost coroutines to support pre-emptive multitasking.
+- Mostly supports and has a concept of multiple processes.
+- Supports a VFS (virtual filesystem). So everything starts up in a RAMFS and then harddrives are mounted.
+- Uses CMake and generally seems to work across different platforms.
+
+## Flaws
+- Not really stable.
+- Fuse tool has some strange issues overriding files.
+- Has more dependancies than it really needs to build.
 
 ## Example
 ```
