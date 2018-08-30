@@ -8,11 +8,13 @@ Aim: To be able to run many virtual kernels built to run Lua.
 
 Currently LOSS shouldn't require anything other than clang and libncurses which doesn't always come pre-installed for all distros.
 ```
-sudo apt-get install clang libncurses5-dev libboost-system1.62-dev libboost-context1.62-dev libboost-coroutine1.62-dev libfuse-dev libsfml-dev libboost1.62-dev
+sudo apt-get install clang libncurses5-dev libboost-system1.62-dev libboost-context1.62-dev libboost-coroutine1.62-dev libfuse-dev libsfml-dev libboost1.62-dev cmake
 ```
 
 Building should be as simple as calling
 ```
+mkdir build
+cmake ..
 make
 ./LossProg <name of harddrive file>
 ```
