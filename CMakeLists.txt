@@ -8,9 +8,9 @@ set(CMAKE_CXX_COMPILER clang++)
 set(EXECUTABLE_NAME "LossProg")
 set(EXECUTABLE_NAME_FUSE "LossFuse")
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -g -O0 -I./")
-set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g -O0 -I./")
-set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O2 -I./")
+set(CMAKE_CXX_FLAGS "-std=c++11 -g -O0 -I../")
+set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g -O0 -I../")
+set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O2 -I../")
 
 file(GLOB_RECURSE loss_headers "loss/*.h")
 file(GLOB_RECURSE loss_sources "loss/*.cpp")

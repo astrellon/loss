@@ -31,3 +31,6 @@
 # Other
 *.swp
 *.vim
+
+# Built files
+/build

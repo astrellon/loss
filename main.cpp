@@ -50,11 +50,18 @@ int main(int argc, char **argv)
 {
     auto kernel = loss::KernelManager::create_new_kernel();
 
+    std::string inputFile = "testout.bin";
+    if (argc > 1)
+    {
+        inputFile = std::string(argv[1]);
+        std::cout << "Using inputFile: " << inputFile << std::endl;
+    }
+
     auto &vfs = kernel->virtual_file_system();
     auto rootfs = new loss::RamFileSystem();
     vfs.root_filesystem(rootfs);
     {
-        std::ifstream input("testout.bin");
+        std::ifstream input(inputFile);
         loss::RamFileSystemDeserialise deserialise(input, rootfs);
         deserialise.load();
     }
@@ -71,7 +78,7 @@ int main(int argc, char **argv)
         auto result = kernel->boot();
         if (result != loss::SUCCESS)
         {
-            std::cout << "Failed to boot kernel: " << loss::ReturnCodes::desc(result) << "\n";
+            std::cout << "Failed to boot kernel: " << loss::ReturnCodes::desc(result) << " (" << result << ")\n";
             return -1;
         }
 
